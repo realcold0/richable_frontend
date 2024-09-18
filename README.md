@@ -1,7 +1,7 @@
 # 🪙richable_frontend🪙
 2030 목표 자산 형성을 위한 맞춤 관리 서비스 리처블(Richable)입니다
 <br/>
-
+<br/>
 ### 😎 팀원 소개
 <table>
   <tr height="120px">
@@ -56,7 +56,7 @@ docs: 문서 수정
 style: 코드 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우
 refactor: 코드 리팩토링
 test: 테스트 코드, 리팩토링 테스트 코드 추가
-chore: 빌드 업무 수정, 패키지 매니저 수정, production code와 무관한 부분들 (.gitignore, build.gradle 같은)
+chore: production code와 무관한 부분 (.gitignore, build.gradle)
 comment: 주석 추가 및 변경
 remove: 파일, 폴더 삭제
 rename: 파일, 폴더명 수정
