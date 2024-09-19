@@ -293,5 +293,6 @@ ex) 240919 홍길동 로그인 기능 추가
 
 ### 참고 자료
 
+https://hyunjun.kr/21 <br/>
 https://inpa.tistory.com/entry/GIT-⚡️-github-flow-git-flow-📈-브랜치-전략
 https://velog.io/@cada/series/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8
