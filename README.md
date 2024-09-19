@@ -118,7 +118,7 @@ master: 제품 출시 버전을 관리하는 메인 브랜치
 ```
 ### 1️⃣ 브랜치 생성
 - 새로운 브랜치는 항상 master 브랜치에서 만든다.
-- 체계적인 분류 없이 브랜치 하나에 의존하게 되기 때문에 브랜치 이름을 통해 의도를 명확하게 드러내야 한다. ex) ```feature-login```
+- 브랜치 이름을 통해 의도를 명확하게 드러내야 한다. ex) ```feature-login```
   - 브랜치 이름에는 소문자를 사용하고, 단어 사이는 하이픈('-')으로 구분한다.
 
 ### 2️⃣ 개발, 커밋, 푸쉬
@@ -140,7 +140,8 @@ master: 제품 출시 버전을 관리하는 메인 브랜치
 
 ### 6️⃣ 배포
 - 라이브 서버(혹은 테스트 환경)에 배포했음에도 문제가 발견되지 않았다면 그대로 master 브랜치에 푸시를 하고, 즉시 배포를 진행한다.
-- master로 merge되고 push 되었을 때는, 즉시 배포되어야 한다. ```master로 merge가 일어나면 자동으로 배포가 되도록 설정해놓는다. (CI / CD)```
+- master로 merge되고 push 되었을 때는, 즉시 배포되어야 한다.
+  - master로 merge가 일어나면 자동으로 배포가 되도록 설정해놓는다. (CI / CD)
   - master 브랜치는 항상 최신 브랜치이다.
  
 <br/>
@@ -179,9 +180,9 @@ ex) 240919 홍길동 로그인 기능 추가
 ### 1️⃣ 공통
 - 단일 글자로 이름을 짓지 않고 이름을 통해 쓰임새를 알 수 있도록 한다.
 - this를 변수의 값으로 사용하지 않는다. 필요하다면 화살표 함수(Arrow Function)이나 바인딩을 사용하라.
-- 가독성을 위해 약어는 모두 대문자 혹은 모두 소문자로 표기한다. ```SMSContainer, HTTPRequest``` = O, ```SmsContainer, HttpRequest``` = X
+- 가독성을 위해 약어는 모두 대문자 혹은 모두 소문자로 표기한다. ex) ```SMSContainer, HTTPRequest``` = O, ```SmsContainer, HttpRequest``` = X
 - export되는 파일 내의 모든 상수는 모두 대문자로 표기한다.
-- 이름에 복수형을 표기하지 않는다. ```datas, items``` = X, ```dataList, itemList``` = O
+- 이름에 복수형을 표기하지 않는다. ex) ```datas, items``` = X, ```dataList, itemList``` = O
 - 줄임말을 사용하지 않는다.
   
 ### 2️⃣ 네이밍 문법
@@ -193,7 +194,7 @@ ex) 240919 홍길동 로그인 기능 추가
     
 ### 2️⃣ 파일 및 패키지
 - 파일의 이름은 소문자로 표기한다.
-- 패키지의 이름은 lowerCamelCase로 표기한다 ```exampleCode``` = O, ```example_code, examplecode``` = X
+- 패키지의 이름은 lowerCamelCase로 표기한다. ex) ```exampleCode``` = O, ```example_code, examplecode``` = X
 - 파일의 이름은 default export의 이름과 일치해야한다.
   
   ```
@@ -251,8 +252,8 @@ ex) 240919 홍길동 로그인 기능 추가
   const item = [];
   ```
 
-- 배열에 값을 넣을 때는 <strong>Array.push</strong>를 사용한다. ```dataList.push('abracadabra');```
-- 배열을 복사할 때는 배열의 <strong>확장연산자 ( ... )</strong>를 사용한다. ```const itemsCopy = [...items];```
+- 배열에 값을 넣을 때는 <strong>Array.push</strong>를 사용한다. ex) ```dataList.push('abracadabra');```
+- 배열을 복사할 때는 배열의 <strong>확장연산자 ( ... )</strong>를 사용한다. ex) ```const itemsCopy = [...items];```
 - 배열에 숫자가 아닌 속성을 사용하지 않는다. 사용을 원할경우 맵 혹은 오브젝트를 사용한다.
   
   ```
