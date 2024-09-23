@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <!-- 섹션 5: 커뮤니티 -->
+    <!-- 섹션 5: 커뮤니티! -->
     <div id="section5" class="section">
       <div class="content-wrapper">
         <div class="text-content">

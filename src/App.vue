@@ -14,7 +14,7 @@ import { RouterView } from 'vue-router'
       <!-- 푸터 -->
       <footer class="footer">
           <div class="footer-content">
-            <p>&copy; 2024 Your Company. All rights reserved.</p>
+            <p>&copy; 2024 Richable. All rights reserved.</p>
             <div class="footer-links">
               <a href="#">Privacy Policy</a>
               <a href="#">Terms of Service</a>
