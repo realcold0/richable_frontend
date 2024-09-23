@@ -5,12 +5,14 @@ import { RouterView } from 'vue-router'
 <template>
   <div class="main-template">
     <!-- 구분을 위해 임시로 blue로 설정 -->
-    <div class="sidebar">사이드바</div>
+    <SideBar/>
+
     <div class="page-view">
       <!-- topbar의 text는 path 별로 달라지게 해야 함 -->
       <div class="topbar">자산 현황</div>
       <RouterView />
     </div>
+    
   </div>
 </template>
 
@@ -27,18 +29,18 @@ import { RouterView } from 'vue-router'
   font-size: 18px;
 }
 
-.sidebar {
+/* .sidebar {
   position: fixed;
-  /* background-color: #F9F9F9; */
+  /* background-color: #F9F9F9; 
   background-color: blue;
   width : 56px;
   height: 100vh;
-}
+} */
 
 .page-view{
-  height: 1024px;
+  /* height: 1024px;
   margin-left : 56px;
-  width: 100vw;
+  width: 100vw; */
 }
 
 /* @media (min-width: 1024px) {

@@ -1,8 +1,6 @@
 <!-- RC-P-01 -->
 <template>
   <div>
-    <!-- Your template content here -->
-    홈 화면 입니다.
   </div>
 </template>
 
