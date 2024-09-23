@@ -32,7 +32,7 @@
         <div class="text-content">
           <h2 class="title">자산</h2>
           <p class="description">나의 자산을 한 눈에 <br />모아볼 수 있어요.</p>
-          <p class="description-sub">예금, 적금, 주식, 코인, 현물자산 등<br/> 나의 모든 자산을 확인하세요.</p>
+          <p class="description-sub">예/적금, 주식, 채권, 코인, 현물자산 등<br/> 나의 모든 자산을 확인하세요.</p>
         </div>
         <div class="image-content"></div>
       </div>
@@ -103,6 +103,23 @@
       </div>
     </div>
   </div>
+
+  <!-- 푸터 -->
+  <footer class="footer">
+      <div class="footer-content">
+        <p>&copy; 2024 Your Company. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="social-icons">
+          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Facebook"></a>
+          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Twitter"></a>
+          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Instagram"></a>
+        </div>
+      </div>
+    </footer>
 </template>
 
 <script setup>
@@ -121,7 +138,7 @@ function setActive(index, sectionId) {
 
 <style scoped>
 * {
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard', sans-serif;
   list-style: none;
   text-decoration: none;
   margin: 0;
@@ -246,5 +263,42 @@ html {
   width: 585px;
   box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
   border-radius: 20px;
+}
+
+/* 푸터 스타일 */
+.footer {
+  height: 300px;
+  background-color: #19181d;
+  padding: 40px 0;
+  text-align: center;
+  color: white;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.footer-links {
+  margin: 20px 0;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.social-icons a {
+  margin: 0 10px;
+}
+
+.social-icons img {
+  width: 24px;
+  height: 24px;
 }
 </style>
