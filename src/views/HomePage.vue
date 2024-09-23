@@ -193,7 +193,7 @@ html {
   align-items: center;
   min-height: 100vh;
   padding:  0;
-  background-color: #f9f9f9;
+  background-color: #fff;
 }
 
 .content-wrapper {
