@@ -103,23 +103,7 @@
       </div>
     </div>
   </div>
-
-  <!-- 푸터 -->
-  <footer class="footer">
-      <div class="footer-content">
-        <p>&copy; 2024 Your Company. All rights reserved.</p>
-        <div class="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">Contact Us</a>
-        </div>
-        <div class="social-icons">
-          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Facebook"></a>
-          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Twitter"></a>
-          <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Instagram"></a>
-        </div>
-      </div>
-    </footer>
+  
 </template>
 
 <script setup>
@@ -151,7 +135,7 @@ html {
 }
 
 .intro_bg {
-  background-image: url('@/assets/images/home-bg(1).png');
+  background-image: url('../assets/images/home-bg(1).png');
   background-size: cover;
   width: 100%;
   height: 640px;
@@ -257,7 +241,7 @@ html {
 .image-content {
   flex: 1;
   text-align: right;
-  background-image: url("../assets/images/laptop-rich.png");
+  background-image: url('../assets/images/laptop-rich.png');
   background-size: cover;
   height: 350px;
   width: 585px;
@@ -265,40 +249,4 @@ html {
   border-radius: 20px;
 }
 
-/* 푸터 스타일 */
-.footer {
-  height: 300px;
-  background-color: #19181d;
-  padding: 40px 0;
-  text-align: center;
-  color: white;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: auto;
-}
-
-.footer-links {
-  margin: 20px 0;
-}
-
-.footer-links a {
-  color: #fff;
-  margin: 0 15px;
-  text-decoration: none;
-}
-
-.footer-links a:hover {
-  text-decoration: underline;
-}
-
-.social-icons a {
-  margin: 0 10px;
-}
-
-.social-icons img {
-  width: 24px;
-  height: 24px;
-}
 </style>
