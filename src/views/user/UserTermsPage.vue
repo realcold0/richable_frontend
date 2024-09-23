@@ -37,7 +37,7 @@
           <!-- <i :class="serviceTermsExpanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'">펼치기</i> -->
         </button>
       </div>
-      <div v-if="serviceTermsExpanded" class="terms-content">
+      <div  class="terms-content"> <!--v-if="serviceTermsExpanded"-->
         <p>개인 회원 약관</p>
         <pre>
           제1장 총칙 제1조 (목적) 본 약관은 ㈜Richable(이하 "회사"라 합니다)이 운영하는
@@ -308,25 +308,67 @@
       </div>
       <div class="terms-content">
         <!--  v-if="privacyPolicyExpanded" -->
-        <p>
-          리치블 서비스는 서비스 이용 과정, 회원 인증 및 CS 응답을 위해 이용자 실명과 실명인증 정보,
-          개인정보가 제공됩니다...
-        </p>
+        <pre>
+          1. 개인정보의 수집항목 및 수집방법
+          Richable에서는 기본적인 회원 서비스 제공을 위한 필수정보로 실명인증정보와 가입정보로 구분하여 
+          다음의 정보를 수집하고 있습니다. 필수정보를 입력해주셔야 회원 서비스 이용이 가능합니다.
+
+            가. 수집하는 개인정보의 항목
+              * 수집하는 필수항목
+                - 실명인증정보 : 이름, 휴대전화번호, 본인 인증 또는 I-PIN(개인식별번호), GPKI(나라통계1.0 모집회원은 제외)
+                - 가입정보 : 아이디, 비밀번호, 성명, 이메일, 휴대전화번호, 기관명(운영회원)
+              * 선택항목
+                - 주소, 전화번호, 기관의 부서명(운영회원)
+	
+              [컴퓨터에 의해 자동으로 수집되는 정보]
+              인터넷 서비스 이용과정에서 아래 개인정보 항목이 자동으로 생성되어 수집될 수 있습니다. 
+                - IP주소, 서비스 이용기록, 방문기록 등
+	
+            나. 개인정보 수집방법
+              홈페이지 회원가입을 통한 수집
+
+          2. 개인정보의 수집/이용 목적 및 보유/이용 기간
+           Richable에서는 정보주체의 회원 가입일로부터 서비스를 제공하는 기간 동안에 한하여 Richable 
+          서비스를 이용하기 위한 최소한의 개인정보를 보유 및 이용 하게 됩니다. 회원가입 등을 통해 개인정보의 수집·이용, 
+          제공 등에 대해 동의하신 내용은 언제든지 철회하실 수 있습니다. 회원 탈퇴를 요청하거나 수집/이용목적을 달성하거나 
+          보유/이용기간이 종료한 경우, 사업 폐지 등의 사유발생시 개인 정보를 지체 없이 파기합니다.
+
+            * 실명인증정보
+              - 개인정보 수집항목 : 이름, 휴대폰 본인 인증 또는 I-PIN(개인식별번호), GPKI
+              - 개인정보의 수집·이용목적   : 홈페이지 이용에 따른 본인 식별/인증절차에 이용
+              - 개인정보의 보유 및 이용기간 : I-PIN / GPKI는 별도로 저장하지 않으며 실명인증용으로만 이용
+
+            * 가입정보
+              - 개인정보 수집항목 : 아이디, 비밀번호, 성명, 이메일, 전화번호, 휴대전환번호, 기관명
+              - 개인정보의 수집·이용목적 : 홈페이지 서비스 이용 및 회원관리, 불량회원의 부정 이용방지, 민원신청 및 처리 등
+              - 개인정보의 보유 및 이용기간 : 2년 또는 회원탈퇴시
+
+          정보주체는 개인정보의 수집·이용목적에 대한 동의를 거부할 수 있으며, 동의 거부시 Richable에 회원가입이 되지 않으며, 
+          Richable에서 제공하는 서비스를 이용할 수 없습니다.
+
+          3. 수집한 개인정보 제3자 제공
+          Richable에서는 정보주체의 동의, 법률의 특별한 규정 등 개인정보 보호법 제17조 및 제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.
+              
+          4. 개인정보 처리업무 안내
+          Richable에서는 개인정보의 취급위탁은 하지 않고 있으며, 원활한 서비스 제공을 위해 아래의 기관을 통한 실명인증 및 공공 I-PIN, 
+          GPKI 인증을 하고 있습니다.
+        </pre>
         <!-- More content here -->
       </div>
     </div>
 
     <!-- Actions -->
     <div class="d-flex justify-content-center mt-4">
-      <button type="button" class="btn btn-light me-2">취소</button>
-      <button
+      <router-link to="/user/signup" class="join-link btn btn-light"> 취소</router-link>
+      <router-link to="/user/signin" class="join-link btn btn-light"> 완료</router-link>
+      <!-- <button
         type="button"
         class="btn btn-primary"
         :disabled="!canProceed"
         @click="completeAgreement"
       >
         완료
-      </button>
+      </button> -->
     </div>
   </div>
 </template>
@@ -340,8 +382,8 @@ const agreeServiceTerms = ref(false)
 const agreePrivacyPolicy = ref(false)
 
 // Collapsing sections for terms
-const serviceTermsExpanded = ref(false)
-const privacyPolicyExpanded = ref(false)
+// const serviceTermsExpanded = ref(false)
+// const privacyPolicyExpanded = ref(false)
 
 // Computed for enabling/disabling the "완료" button
 const canProceed = ref(false)
@@ -358,14 +400,14 @@ const toggleAll = () => {
 }
 
 // Toggle service terms expansion
-const toggleServiceTerms = () => {
-  serviceTermsExpanded.value = !serviceTermsExpanded.value
-}
+// const toggleServiceTerms = () => {
+//   serviceTermsExpanded.value = !serviceTermsExpanded.value
+// }
 
-// Toggle privacy policy expansion
-const togglePrivacyPolicy = () => {
-  privacyPolicyExpanded.value = !privacyPolicyExpanded.value
-}
+// // Toggle privacy policy expansion
+// const togglePrivacyPolicy = () => {
+//   privacyPolicyExpanded.value = !privacyPolicyExpanded.value
+// }
 
 // Function to simulate agreement completion
 const completeAgreement = () => {
@@ -376,7 +418,7 @@ const completeAgreement = () => {
 <style scoped>
 .terms-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   background-color: white;

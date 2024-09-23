@@ -161,8 +161,7 @@
         <router-link to="/user/signin" class="join-link btn btn-light"> 취소</router-link>
         <span class="mx-2"> </span>
         <router-link to="/user/terms" class="btn btn-pink" :disabled="disableSubmit">
-          다음</router-link
-        >
+          다음</router-link>
       </div>
     </form>
   </div>
@@ -196,8 +195,8 @@ const BASE_URL = '/api/member'
 const headers = { 'Content-Type': 'multipart/form-data' }
 
 // Check username availability
-const checkUsername = async () => {
-  if (!member.username) {
+const checkId = async () => {
+  if (!member.id) {
     return alert('사용자 ID를 입력하세요.')
   }
 
@@ -228,9 +227,9 @@ const join = async () => {
     return alert('비밀번호가 일치하지 않습니다.')
   }
 
-  if (avatar.value?.files?.length > 0) {
-    member.avatar = avatar.value.files[0]
-  }
+  // if (avatar.value?.files?.length > 0) {
+  //   member.avatar = avatar.value.files[0]
+  // }
 
   try {
     const formData = new FormData()
