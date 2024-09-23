@@ -28,6 +28,26 @@ const router = createRouter({
       component: () => import('../views/user/SignUpPage.vue')
     },
     {
+      path: '/user/findpassword',
+      name: 'findpassword',
+      component: () => import('../views/user/FindPassWord.vue')
+    },
+    {
+      path: '/user/findpassword2',
+      name: 'findpassword2',
+      component: () => import('../views/user/FindPassWord2.vue')
+    },
+    {
+      path: '/user/findid',
+      name: 'findid',
+      component: () => import('../views/user/FindId.vue')
+    },
+    {
+      path: '/user/findid2',
+      name: 'findid2',
+      component: () => import('../views/user/FindId2.vue')
+    },
+    {
       path: '/user/terms',
       name: 'terms',
       component: () => import('../views/user/UserTermsPage.vue')
@@ -90,7 +110,7 @@ const router = createRouter({
     {
       path: '/knowhow/list',
       name: 'knowhowList',
-      component: () => import('../views/knowhow/KnowhowListPage.vue')
+      component: () => import('../views/knowhow/KnowHowListPage.vue')
     },
     {
       path: '/knowhow/detail',

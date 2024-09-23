@@ -1,5 +1,7 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router';
+
+const route = useRoute();
 </script>
 
 <template>
@@ -17,6 +19,9 @@ import { RouterView } from 'vue-router'
 }
 
 .sidebar {
+  display: flex;
+  padding: 0;
+  margin: 0;
   background-color: blue;
 }
 
