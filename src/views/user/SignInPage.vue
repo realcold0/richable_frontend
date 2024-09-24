@@ -88,6 +88,7 @@ const login = async () => {
 
 <style scoped>
 body {
+  width: 500px;
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #f8f9fa;
   display: flex;
@@ -110,8 +111,8 @@ body {
 }
 
 .login-container {
-  width: 100%;
-  max-width: 400px;
+  width: 500px;
+  /* max-width: 400px; */
   background: white;
   padding: 2rem;
   border-radius: 10px;

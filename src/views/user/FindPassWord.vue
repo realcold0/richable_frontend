@@ -64,21 +64,21 @@
       </div>
 
       <!-- Continue Button -->
-      <div class=" mb-5">
+      <div class="mb-5">
         <button
-  type="button"
-  class="btn btn-secondary w-100 mb-3"
-  :disabled="!verificationCode || verificationCode !== '123456'"
-  @click="navigateToPw2"
->
-  계속
-</button>
-    </div>
+          type="button"
+          class="btn btn-secondary w-100 mb-3"
+          :disabled="!verificationCode || verificationCode !== '123456'"
+          @click="navigateToPw2"
+        >
+          계속
+        </button>
+      </div>
 
       <!-- Additional Links -->
-      <div class=" mb-5 text-center">
+      <div class="mb-5 text-center">
         <router-link to="/user/findid" class="join-link">아이디 찾기</router-link>
-        <br><br>
+        <br /><br />
         <router-link to="/user/signin" class="join-link">다른 방법으로 로그인</router-link>
       </div>
     </form>
@@ -86,49 +86,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
-const email = ref('');
-const verificationCode = ref('');
+const email = ref('')
+const verificationCode = ref('')
 
 const sendVerificationCode = () => {
   if (email.value) {
-    alert(`인증번호가 ${email.value} 이메일로 발송되었습니다.`);
+    alert(`인증번호가 ${email.value} 이메일로 발송되었습니다.`)
   } else {
-    alert('이메일을 입력해주세요.');
+    alert('이메일을 입력해주세요.')
   }
-};
+}
 
 const verifyCode = () => {
   if (verificationCode.value === '123456') {
-    alert('인증 코드가 확인되었습니다.');
+    alert('인증 코드가 확인되었습니다.')
   } else {
-    alert('인증 코드가 일치하지 않습니다.');
+    alert('인증 코드가 일치하지 않습니다.')
   }
-};
+}
 
 const submitForm = () => {
   if (verificationCode.value === '123456') {
-    alert('아이디를 성공적으로 찾았습니다.');
+    alert('아이디를 성공적으로 찾았습니다.')
   } else {
-    alert('인증 코드가 필요합니다.');
+    alert('인증 코드가 필요합니다.')
   }
-};
+}
 
 // Programmatic navigation
 const navigateToPw2 = () => {
   if (verificationCode.value === '123456') {
-    router.push('/user/findpassword2');
+    router.push('/user/findpassword2')
   }
-};
+}
 </script>
 
 <style scoped>
 .find-pw-container {
-  width: 100%;
+  width: 500px;
   max-width: 500px;
   margin: 0 auto;
   padding: 2rem;
@@ -137,6 +137,7 @@ const navigateToPw2 = () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
   margin-top: 5rem;
+  margin-bottom: 5rem;
 }
 
 .join-link {
