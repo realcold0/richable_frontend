@@ -1,5 +1,7 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
+
+const route = useRoute()
 </script>
 
 <template>
@@ -11,24 +13,23 @@ import { RouterView } from 'vue-router'
       <!-- topbar의 text는 path 별로 달라지게 해야 함 -->
       <div class="topbar">자산 현황</div>
       <RouterView />
-      
+
       <!-- 푸터 -->
       <footer class="footer">
-          <div class="footer-content">
-            <p>&copy; 2024 Richable. All rights reserved.</p>
-            <div class="footer-links">
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Contact Us</a>
-            </div>
-            <div class="social-icons">
-              <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Facebook"></a>
-              <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Twitter"></a>
-              <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Instagram"></a>
-            </div>
+        <div class="footer-content">
+          <p>&copy; 2024 Richable. All rights reserved.</p>
+          <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
           </div>
-        </footer>
-
+          <div class="social-icons">
+            <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Facebook" /></a>
+            <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Twitter" /></a>
+            <a href="#"><img src="../src/assets/images/navbar-rich.png" alt="Instagram" /></a>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 </template>
@@ -56,7 +57,7 @@ import { RouterView } from 'vue-router'
 
 .page-view {
   height: 1024px;
-  margin-left : 56px;
+  margin-left: 56px;
   width: 100vw;
   background-color: blue;
 }
