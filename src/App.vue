@@ -59,7 +59,7 @@ const route = useRoute()
   height: 1024px;
   margin-left: 56px;
   width: 100vw;
-  background-color: blue;
+  /* background-color: blue; */
 }
 
 /* 푸터 스타일 */
