@@ -190,6 +190,7 @@ aside {
   transition: width 0.2s ease; /* 너비 변경 시 애니메이션 */
   border-radius: 0% 16px 16px 0%;
   border: 1px solid gray;
+  background-color: white;
 }
 
 /* 사이드바 활성 상태일 때 확장 */
