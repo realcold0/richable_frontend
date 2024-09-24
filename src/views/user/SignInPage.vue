@@ -1,13 +1,11 @@
-<!-- RC-P-02 -->
 <template>
   <div id="singin" class="login-container">
-    <img class="title" src="C:\final_project\project\fe\src\assets\images\navbar-full-rich.png" />
-    <!-- <h2 class="mb-4">Richable</h2> -->
+    <img class="title" src="../../assets/images/navbar-full-rich.png" />
     <form @submit.prevent="login">
       <div class="mb-3 text-start">
         <label for="id" class="form-label">아이디</label>
         <input
-          type="id"
+          type="text"
           v-model="id"
           class="form-control"
           id="id"
@@ -30,10 +28,12 @@
           class="position-absolute"
           style="right: 10px; top: 36px; cursor: pointer"
         >
-          <!-- SVG icons for visibility toggle can be placed here -->
+          <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button type="submit" class="btn btn-secondary disabled login-btn">로그인</button>
+      <button  type="submit" class="btn btn-secondary login-btn"
+      :disabled="!id || !password" @click="handleLogin"> 로그인</button>
+
     </form>
 
     <div class="d-flex justify-content-center mt-3">
@@ -58,32 +58,47 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
 import axios from 'axios'
 
 const id = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const router = useRouter();
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+const handleLogin = () => {
+      if (id.value && password.value) {
+        // Perform login logic here
+        router.push({ name: 'home' });  // Or any route you want to navigate to after login
+      } else {
+        alert('Please fill in both ID and password');
+      }
+    };
 
 const login = async () => {
   try {
-    const response = await axios.post('http://localhost:8080/login', {
+    console.log('ID:', id.value);
+    console.log('Password:', password.value);
+    
+    const response = await axios.post('http://localhost:8080/api/auth/login', {
       id: id.value,
       password: password.value
-    })
+    });
+    console.log('Token received:', response.data.token);
 
     if (response.status === 200) {
-      alert('Login successful!')
-      // 로그인 성공 후의 처리 (예: 페이지 이동)
+      alert('Login successful!');
+      localStorage.setItem('authToken', response.data.token);
     }
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
+    console.error('Login failed:', error);
+    alert('Login failed. Please check your credentials.');
   }
-}
+};
+
 </script>
 
 <style scoped>

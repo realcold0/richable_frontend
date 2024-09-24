@@ -347,11 +347,12 @@
           Richable에서 제공하는 서비스를 이용할 수 없습니다.
 
           3. 수집한 개인정보 제3자 제공
-          Richable에서는 정보주체의 동의, 법률의 특별한 규정 등 개인정보 보호법 제17조 및 제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.
+          Richable에서는 정보주체의 동의, 법률의 특별한 규정 등 개인정보 보호법 제17조 및 제18조에 해당하는 경우에만 
+          개인정보를 제3자에게 제공합니다.
               
           4. 개인정보 처리업무 안내
-          Richable에서는 개인정보의 취급위탁은 하지 않고 있으며, 원활한 서비스 제공을 위해 아래의 기관을 통한 실명인증 및 공공 I-PIN, 
-          GPKI 인증을 하고 있습니다.
+          Richable에서는 개인정보의 취급위탁은 하지 않고 있으며, 원활한 서비스 제공을 위해 아래의 기관을 통한 
+          실명인증 및 공공 I-PIN, GPKI 인증을 하고 있습니다.
         </pre>
         <!-- More content here -->
       </div>
@@ -360,7 +361,7 @@
     <!-- Actions -->
     <div class="d-flex justify-content-center mt-4">
       <router-link to="/user/signup" class="join-link btn btn-light"> 취소</router-link>
-      <router-link to="/user/signin" class="join-link btn btn-light"> 완료</router-link>
+      <router-link to="/user/signin" class="join-link btn btn-light" @click="completeAgreement"> 완료</router-link>
       <!-- <button
         type="button"
         class="btn btn-primary"
