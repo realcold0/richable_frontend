@@ -16,6 +16,7 @@
           </button>
         </div>
       </ul>
+
     </div>
     <div class="tab-content">
       <div class="tab-page" v-if="selectedTab === 'tab1'">
@@ -24,15 +25,13 @@
           <div class="asset-amount">12,100,000원</div>
         </div>
         <div class="asset-list">
-          <div class="list-title">금융 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;"
-              @click="openCreateModal" /></div>
+          <div class="list-title">금융 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;" /></div>
           <div class="list-box">
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">예/적금</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -46,9 +45,8 @@
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">주식</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -62,9 +60,8 @@
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">채권</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -78,9 +75,8 @@
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">코인</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -94,9 +90,8 @@
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">현금</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -122,15 +117,13 @@
           <div class="asset-amount">25,100,000원</div>
         </div>
         <div class="asset-list">
-          <div class="list-title">현물 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;"
-              @click="openCreateModal2" /></div>
+          <div class="list-title">금융 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;" /></div>
           <div class="list-box">
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">금융 자산</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="font-weight: bold; font-size: 18px;">예/적금</div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -138,15 +131,14 @@
               </div>
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="dollar-sign" />
+                <font-awesome-icon icon="piggy-bank" />
               </div>
             </div>
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">전자기기</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="font-weight: bold; font-size: 18px;">주식</div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -154,15 +146,14 @@
               </div>
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="desktop" />
+                <font-awesome-icon icon="chart-line" />
               </div>
             </div>
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">브랜드</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="font-weight: bold; font-size: 18px;">채권</div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -170,15 +161,14 @@
               </div>
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="tags" />
+                <font-awesome-icon icon="money-check-dollar" />
               </div>
             </div>
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">명품</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="font-weight: bold; font-size: 18px;">코인</div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -186,15 +176,14 @@
               </div>
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="fa-regular fa-gem" />
+                <font-awesome-icon icon="fa-brands fa-bitcoin" />
               </div>
             </div>
             <div class="asset-item">
               <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">기타</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
+                <div style="font-weight: bold; font-size: 18px;">현금</div>
+                <div style="color:#C30044; font-size: 16px; margin-left: 4px;"><font-awesome-icon
+                    icon="pen-to-square" /></div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -202,7 +191,7 @@
               </div>
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="basket-shopping" />
+                <font-awesome-icon icon="money-bill" />
               </div>
             </div>
           </div>
@@ -215,10 +204,6 @@
         </div>
       </div>
     </div>
-    <AssetCreateModal ref="createModal" />
-    <AssetUpdateModal ref="editModal" />
-    <TangibleAssetCreateModal ref="createModal2" />
-    <TangibleAssetUpdateModal ref="editModal2" />
   </div>
 </template>
 
@@ -226,16 +211,11 @@
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { Tooltip as BootstrapTooltip } from 'bootstrap';
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Modal } from 'bootstrap';
-import AssetCreateModal from '../../components/modal/asset/AssetCreateModal.vue';
-import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue';
-import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue';
-import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue';
 
 // Chart.js에 필요한 컴포넌트(컨트롤러, 요소, 플러그인)를 등록
 Chart.register(PieController, ArcElement, Tooltip, Legend);
 
-const selectedTab = ref('tab1'); // tab status
+const selectedTab = ref('tab1');
 const tooltipButton = ref(null);
 const tooltipInstance = ref(null);
 const tooltipMessage = ref('금융 자산은 [예/적금], [주식], [채권], [코인], [현금]을 포함합니다.');
@@ -254,9 +234,6 @@ const updateTooltipMessage = async () => {
   tooltipButton.value.setAttribute('title', tooltipMessage.value); // 새로운 메시지 설정
   tooltipInstance.value = new BootstrapTooltip(tooltipButton.value); // 새 툴팁 생성
 };
-
-// selectedTab이 변경될 때마다 툴팁 메시지를 업데이트
-watch(selectedTab, updateTooltipMessage);
 
 const pieChart = ref(null);
 const pieChart2 = ref(null); // tab2의 차트를 위한 ref 추가
@@ -308,100 +285,22 @@ const renderPieChart = async () => {
   });
 };
 
-// 파이 차트 설정
-const renderPieChart2 = async () => {
-  await nextTick(); // ref가 제대로 연결된 후 차트를 렌더링하기 위해 nextTick 사용
-
-  if (chartInstance2) {
-    chartInstance2.destroy(); // 차트를 다시 렌더링할 때 이전 인스턴스 제거
-  }
-
-  chartInstance2 = new Chart(pieChart2.value, {
-    type: 'doughnut',
-    data: {
-      labels: ['금융자산', '전자기기', '브랜드', '명품', '기타'],
-      datasets: [
-        {
-          data: [45, 15, 20, 10, 10],
-          backgroundColor: ['#C30044', '#FF0062', '#DA0052', '#FFF2F6', '#DA0052'],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // 차트 가로세로 비율을 유지하지 않음
-      plugins: {
-        legend: {
-          position: 'bottom',  // 범례를 아래로 이동
-           labels: {
-            boxWidth: 70,  // 범례 아이콘의 너비 설정 (기본값: 40)
-            padding: 100,  // 범례 항목과 차트 사이의 간격 설정
-            font: {
-              size: 14,   // 글꼴 크기 설정
-              weight: 'bold',  // 글꼴 두께 설정
-            },
-          },
-        },
-      },
-      layout: {
-        padding: {
-          top: 10,  // 추가 여백 (차트 내부 여백)
-          bottom: 10,  // 하단 여백 추가
-        },
-      },
-    },
-  });
-};
-
 // 탭이 변경될 때 차트를 렌더링하는 함수
 watch(selectedTab, (newTab) => {
   if (newTab === 'tab1') {
     renderPieChart(); // '금융 자산 현황' 탭일 때만 차트를 렌더링
-    // renderPieChart2();
-  } else if (newTab === 'tab2') {
-    renderPieChart2();
   }
 });
-
-// 모달
-const createModal = ref(null); // 금융 자산
-const editModal = ref(null);
-const editModal2 = ref(null); // 현물 자산
-const createModal2 = ref(null);
-
-const openCreateModal = () => {
-  if (createModal.value) {
-    // Vue의 AssetUpdateModal에서 제공하는 show() 메서드를 사용한다고 가정
-    createModal.value.show();
-  }
-};
-
-const openCreateModal2 = () => {
-  if (createModal2.value) {
-    createModal2.value.show();
-  }
-};
-
-const openEditModal = () => {
-  if (editModal.value) {
-    editModal.value.show();
-  }
-};
-
-const openEditModal2 = () => {
-  if (editModal2.value) {
-    editModal2.value.show();
-  }
-};
-
 
 onMounted(() => {
   updateTooltipMessage();
 
    // 초기 마운트 시 tab1 차트를 렌더링
   renderPieChart();
-
 });
+
+// selectedTab이 변경될 때마다 툴팁 메시지를 업데이트
+watch(selectedTab, updateTooltipMessage);
 </script>
 
 <style scoped>
