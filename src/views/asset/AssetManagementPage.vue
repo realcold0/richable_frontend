@@ -226,7 +226,6 @@
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { Tooltip as BootstrapTooltip } from 'bootstrap';
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Modal } from 'bootstrap';
 import AssetCreateModal from '../../components/modal/asset/AssetCreateModal.vue';
 import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue';
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue';
