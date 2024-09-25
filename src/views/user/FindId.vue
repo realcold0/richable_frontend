@@ -87,7 +87,7 @@ const sendVerificationCode = () => {
 }
 
 const verifyCode = () => {
-  if (verificationCode.value === '123456') {
+  if (verificationCode.value === ' ') {
     alert('인증 코드가 확인되었습니다.')
   } else {
     alert('인증 코드가 일치하지 않습니다.')
