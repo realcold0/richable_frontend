@@ -24,9 +24,6 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
 ConsumeCategorySum {
   margin: 64px 0;
 }
-ConsumeCategorySum {
-  margin: 64px 0;
-}
 
 
 
