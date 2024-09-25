@@ -48,7 +48,7 @@ const router = createRouter({
       component: () => import('../views/user/FindId2.vue')
     },
     {
-      path: '/user/terms',
+      path: '/user/terms/:id',
       name: 'terms',
       component: () => import('../views/user/UserTermsPage.vue')
     },
