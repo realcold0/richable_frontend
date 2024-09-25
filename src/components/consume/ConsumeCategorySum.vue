@@ -18,10 +18,28 @@
                     <table class="consumeList">
                         <tbody>
                             <tr>
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
                                 <td>외식</td>
                                 <td>10000</td>
                                 <td>50%</td>
-
+                            </tr>
+                            <tr>
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
+                                <td>외식</td>
+                                <td>10000</td>
+                                <td>50%</td>
+                            </tr>
+                            <tr>
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
+                                <td>외식</td>
+                                <td>10000</td>
+                                <td>50%</td>
+                            </tr>
+                            <tr>
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
+                                <td>외식</td>
+                                <td>10000</td>
+                                <td>50%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -35,14 +53,14 @@
 
 <script setup>
 import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  DoughnutController,
+    Chart as ChartJS,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    DoughnutController,
 } from 'chart.js';
 import { nextTick, onMounted, ref } from 'vue';
 
@@ -85,18 +103,7 @@ onMounted(() =>{
 </script>
 
 <style scoped>
-    .wrapper {
-        height: 100vh;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        display: flex;
-
-        background-color: red;
-    }
-
     .anlyzeWrapper {
-        background-color: blue;
         width: 864px;
         padding: 30px 20px;
     }
@@ -105,13 +112,15 @@ onMounted(() =>{
         margin-left: 1em;
     }
 
+    .analyzeText {
+        font-size: 20px;
+    }
     .anlyzeWrapper #month, #mostCategory {
         font-size: 32px;
     }
     .anlyzeWrapper .chart {
         width: 255px;
         height: 255px;
-        background-color: red;
     }
     .anlyzeWrapper .chart canvas {
         width: 100%;
@@ -122,12 +131,13 @@ onMounted(() =>{
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content :space-between;
+        justify-content: space-between;
         padding: 30px 20px;
-        background-color: aqua;
-        border-radius:  31px;
-
+        margin-top: 14px;
+        border-radius: 31px;
+        border: 1px solid #D9D9D9;
     }
+
 
     .consumeSumAndList {
         width: 394px;
@@ -135,17 +145,39 @@ onMounted(() =>{
     .totalConsumeAmount {
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
+        
+        align-items: center;
         width: 100%;
-        justify-content: space-around;
-        background-color:antiquewhite;
+        padding: 0 28px 0 28px;
     }
 
     .consumeList {
         width: 100%;
     }
 
-    .consumeList .td {
+    .consumeList {
+        border-collapse: separate;
+        border-spacing: 0 20px;
+    }
+
+    .consumeList td {
         text-align: center;
+        font-size: 20px;
+    }
+    .consumeList tr td:first-child{
+        height: 20px;
+        width: 20px;
+        text-align: start;
+    }
+    .consumeList tr td:nth-child(2){
+        width: 40%;
+        text-align: start;
+    }
+
+    .consumeList .icon {
+        color: red;
+        width: 10px;
     }
 
 
