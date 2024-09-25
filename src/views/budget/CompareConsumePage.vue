@@ -1,31 +1,30 @@
 <template>
   <div class="container">
-    <!-- 월간 네비게이션 -->
-    <div class="month-navigation text-center">
-      <button @click="previousMonth" class="btn btn-light custom-btn">
-        <i class="fas fa-chevron-left"></i>
-      </button>
+  <!-- 월간 네비게이션 -->
+  <div class="month-navigation text-center">
+      <!-- 이전 달 버튼 -->
+      <button @click="previousMonth" class="btn custom-btn-left"></button>
       <h2>{{ months[currentMonthIndex] }}</h2>
-      <button @click="nextMonth" class="btn btn-light custom-btn">
-        <i class="fas fa-chevron-right"></i>
-      </button>
+      <!-- 다음 달 버튼 -->
+      <button @click="nextMonth" class="btn custom-btn-right"></button>
     </div>
 
-    <!-- 상단 소비 정보 -->
-    <div class="text-center mb-4 saved-info">
-      <h2>이번 달에 아낄 수 있었던 비용이에요 😏</h2>
-      <h1 class="saved-amount">{{ totalSaved.toLocaleString() }}원</h1>
-    </div>
+<!-- 상단 소비 정보 -->
+<div class="text-center mb-4 saved-info">
+  <h2>이번 달에 아낄 수 있었던 비용이에요 🥲</h2>
+  <h1 class="saved-amount">{{ totalSaved.toLocaleString() }}원</h1>
+</div>
 
     <!-- 카테고리 선택 및 비교 -->
     <div class="text-center mb-4 category-comparison">
       <h4>대한민국 평균 소비금액을 기준으로 비교해요</h4>
       <h5>나는 평균 대비 얼마나 지출할까요?</h5>
-      <select v-model="category" class="form-select custom-select">
+    </div>
+      <div>
+        <p>
+        나의 이번 달 <select v-model="category" class="form-select custom-select" >
         <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
-      </select>
-      <p>
-        나의 이번 달 <strong>{{ category }}</strong> 소비는 평균보다
+        </select> 소비는 평균보다
         <strong :class="diffAmount > 0 ? 'text-success' : 'text-danger'"
           >{{ Math.abs(diffAmount).toLocaleString() }}원</strong
         >
@@ -91,98 +90,93 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
-// import apiClient from '@/services/api' // Axios 인스턴스 불러오기
+import axios from 'axios';
+import { useRoute } from 'vue-router';  // useRoute로 라우트 정보 가져오기
 
 // 차트.js 등록
 Chart.register(...registerables)
 
 // 달별 네비게이션
 const months = [
-  '1월',
-  '2월',
-  '3월',
-  '4월',
-  '5월',
-  '6월',
-  '7월',
-  '8월',
-  '9월',
-  '10월',
-  '11월',
-  '12월'
-]
-const currentMonthIndex = ref(8)
+  '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+];
+const currentMonthIndex = ref(8);
 const previousMonth = () => {
-  if (currentMonthIndex.value > 0) currentMonthIndex.value -= 1
-}
+  if (currentMonthIndex.value > 0) currentMonthIndex.value -= 1;
+};
 const nextMonth = () => {
-  if (currentMonthIndex.value < 11) currentMonthIndex.value += 1
-}
+  if (currentMonthIndex.value < 11) currentMonthIndex.value += 1;
+};
 
 // 소비 정보
-const totalSaved = ref(12100000)
+const totalSaved = ref(12100000);
 const categories = ref([
-  '식료품',
-  '유흥',
-  '쇼핑',
-  '공과금',
-  '생활용품',
-  '의료비',
-  '교통비',
-  '통신비',
-  '문화',
-  '교육비',
-  '외식/숙박',
-  '기타'
-])
-const category = ref('식료품')
-const userSpending = ref(700000)
-const averageSpending = 50000
-const diffAmount = computed(() => userSpending.value - averageSpending)
+  '식료품', '유흥', '쇼핑', '공과금', '생활용품', '의료비', '교통비', '통신비', '문화', '교육비', '외식/숙박', '기타'
+]);
+const category = ref('식료품');
+const userSpending = ref(0);
+const averageSpending = ref(50000);
+const diffAmount = computed(() => userSpending.value - averageSpending.value);
 
 // 소비 데이터 및 페이지네이션
-const consumptionData = ref([]) // 초기값을 빈 배열로 설정
-const currentPage = ref(1)
-const itemsPerPage = ref(5)
+const consumptionData = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
 const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  return consumptionData.value.slice(start, start + itemsPerPage.value)
-})
-const totalPages = computed(() => Math.ceil(consumptionData.value.length / itemsPerPage.value))
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return consumptionData.value.slice(start, start + itemsPerPage.value);
+});
+const totalPages = computed(() => Math.ceil(consumptionData.value.length / itemsPerPage.value));
 const changePage = (page) => {
-  if (page >= 1 && page <= totalPages.value) currentPage.value = page
-}
+  if (page >= 1 && page <= totalPages.value) currentPage.value = page;
+};
 
 // 6개월 저축 시뮬레이션
-const currentSavings = ref(120000)
-const totalSavings = ref(600000)
+const currentSavings = ref(120000);
+const totalSavings = ref(600000);
+
+// 라우터에서 uid 가져오기
+const route = useRoute();
+const uid = route.params.uid;  // URL에서 uid 파라미터 가져오기
 
 // 소비 데이터 가져오기
 const fetchConsumes = async () => {
   try {
-    const response = await apiClient.get('/all') // 백엔드에서 전체 소비 데이터를 가져옴
-    consumptionData.value = response.data // 데이터를 consumptionData에 저장
+    const response = await axios.get(`http://localhost:8080/consume/user/${uid}`);  // uid 기반으로 API 호출
+    consumptionData.value = response.data;
+
+    // 카테고리에 따른 소비 데이터 필터링
+    userSpending.value = consumptionData.value
+      .filter(item => item.category === category.value)
+      .reduce((sum, item) => sum + item.amount, 0);  // 총 소비 금액 계산
   } catch (error) {
-    console.error('Error fetching consume data:', error)
+    console.error('Error fetching consume data:', error);
   }
-}
+};
 
 // 차트 초기화
-onMounted(() => {
-  fetchConsumes() // 컴포넌트가 마운트될 때 소비 데이터를 가져옴
+let myChart = null;
+let savingChart = null;
 
-  const myChart = new Chart(document.getElementById('myChart').getContext('2d'), {
+const createCharts = () => {
+  const ctx1 = document.getElementById('myChart').getContext('2d');
+  const ctx2 = document.getElementById('savingChart').getContext('2d');
+
+  if (myChart) myChart.destroy();  // 이전 차트 삭제
+  if (savingChart) savingChart.destroy();
+
+  myChart = new Chart(ctx1, {
     type: 'bar',
     data: {
       labels: ['평균 소비', '나의 소비'],
       datasets: [
         {
           label: '소비 비교',
-          data: [averageSpending, userSpending.value],
+          data: [averageSpending.value, userSpending.value],
           backgroundColor: ['#d3d3d3', '#ff6384'],
-          borderWidth: 1 // 막대 두께 수정
+          borderWidth: 1
         }
       ]
     },
@@ -191,13 +185,13 @@ onMounted(() => {
       scales: { y: { beginAtZero: true } },
       plugins: {
         legend: {
-          position: 'bottom' // 범례 위치
+          position: 'bottom'
         }
       }
     }
-  })
+  });
 
-  const savingChart = new Chart(document.getElementById('savingChart').getContext('2d'), {
+  savingChart = new Chart(ctx2, {
     type: 'line',
     data: {
       labels: ['2024.10', '2024.11', '2024.12', '2025.01', '2025.02'],
@@ -207,7 +201,7 @@ onMounted(() => {
           data: [120000, 240000, 360000, 480000, 600000],
           borderColor: '#ff6384',
           fill: false,
-          borderWidth: 2 // 선 두께 조정
+          borderWidth: 2
         },
         {
           label: '평소 저축',
@@ -223,13 +217,31 @@ onMounted(() => {
       scales: { y: { beginAtZero: true } },
       plugins: {
         legend: {
-          position: 'top' // 범례 위치 상단
+          position: 'top'
         }
       }
     }
-  })
-})
+  });
+};
+
+// 데이터 가져온 후 차트 생성
+onMounted(() => {
+  fetchConsumes().then(() => {
+    createCharts();
+  });
+});
+
+// 카테고리 변경 시 차트 업데이트
+watch(category, () => {
+  if (consumptionData.value.length > 0) {
+    userSpending.value = consumptionData.value
+      .filter(item => item.category === category.value)
+      .reduce((sum, item) => sum + item.amount, 0);
+    createCharts();
+  }
+});
 </script>
+
 
 <style scoped>
 /* 월 네비게이션 */
@@ -237,7 +249,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 .month-navigation h2 {
@@ -245,12 +257,32 @@ onMounted(() => {
   font-size: 24px;
 }
 
-/* 월 전환 버튼 */
-.custom-btn {
-  font-size: 24px;
-  border-radius: 50%; /* 둥근 버튼 모양 */
-  padding: 10px;
+/* 왼쪽 방향 삼각형 버튼 */
+.custom-btn-left {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 20px solid #c0c0c0; /* 삼각형의 색상 */
+  background: none;
+  padding: 0;
+  margin: 10px;
 }
+
+/* 오른쪽 방향 삼각형 버튼 */
+.custom-btn-right {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 20px solid #c0c0c0; /* 삼각형의 색상 */
+  background: none;
+  padding: 0;
+  margin: 10px;
+}
+
+
+
 
 /* 상단 소비 정보 */
 .saved-info h2 {
@@ -278,7 +310,7 @@ onMounted(() => {
 }
 
 .custom-select {
-  width: 300px;
+  width: 100px;
   height: 40px;
   font-size: 16px;
   margin-bottom: 10px;
