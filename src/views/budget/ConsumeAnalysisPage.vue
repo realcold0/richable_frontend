@@ -1,15 +1,17 @@
-<!-- RC-P-14 -->
 <template>
   <div>
-    <!-- Your template content here -->
-    소비 분석 페이지
+    <ConsumeCategorySum/>
   </div>
 </template>
-
 <script setup>
-// You can define your Composition API logic here
+import ConsumeCategorySum from '@/components/consume/ConsumeCategorySum.vue';
 </script>
 
+
+
+
 <style scoped>
-/* Your style here */
+  ConsumeCategorySum {
+    margin : 0 auto;
+  }
 </style>
