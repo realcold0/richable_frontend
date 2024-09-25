@@ -31,9 +31,14 @@
           <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button  type="submit" class="btn btn-secondary login-btn"
-      :disabled="!id || !password" @click="handleLogin"> 로그인</button>
-
+      <button
+        type="submit"
+        class="btn btn-secondary login-btn"
+        :disabled="!id || !password"
+        @click="handleLogin"
+      >
+        로그인
+      </button>
     </form>
 
     <div class="d-flex justify-content-center mt-3">
@@ -58,47 +63,52 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const id = ref('')
 const password = ref('')
 const showPassword = ref(false)
-const router = useRouter();
+const router = useRouter()
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 const handleLogin = () => {
-      if (id.value && password.value) {
-        // Perform login logic here
-        router.push({ name: 'home' });  // Or any route you want to navigate to after login
-      } else {
-        alert('Please fill in both ID and password');
-      }
-    };
+  if (id.value && password.value) {
+    // Perform login logic here
+    router.push({ name: 'Home' }) // Or any route you want to navigate to after login
+  } else {
+    alert('Please fill in both ID and password')
+  }
+}
 
 const login = async () => {
+  if (!id.value || !password.value) {
+    alert('Please fill in both ID and password')
+    return
+  }
+
   try {
-    console.log('ID:', id.value);
-    console.log('Password:', password.value);
-    
-    const response = await axios.post('http://localhost:8080/api/auth/login', {
+    console.log('ID:', id.value)
+    console.log('Password:', password.value)
+
+    const response = await axios.post('http://localhost:8080/member/login', {
       id: id.value,
       password: password.value
-    });
-    console.log('Token received:', response.data.token);
+    })
+    console.log('Token received:', response.data.token)
 
     if (response.status === 200) {
-      alert('Login successful!');
-      localStorage.setItem('authToken', response.data.token);
+      alert('Login successful!')
+      localStorage.setItem('authToken', response.data.token)
+      router.push({ name: 'home' })
     }
   } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login failed. Please check your credentials.');
+    console.error('Login failed:', error)
+    alert('Login failed. Please check your credentials.')
   }
-};
-
+}
 </script>
 
 <style scoped>

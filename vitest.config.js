@@ -9,6 +9,10 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url))
+    },
+    server: {
+      port: 5173, // Specify the port for Vite development server
     }
-  })
+  }),
+  
 )
