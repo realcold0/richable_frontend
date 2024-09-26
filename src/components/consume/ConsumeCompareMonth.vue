@@ -14,16 +14,22 @@
     </div>
 </template>
 <script setup>
+import { useMonthStore } from '@/stores/consume/curMonth';
+import axios from 'axios';
 import {
     Chart as ChartJS, LineElement, PointElement, LineController, CategoryScale, LinearScale
 } from 'chart.js';
-
 import { nextTick, onMounted, ref } from 'vue';
 
+
 ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale);
+const month = useMonthStore();
 
 const lineChart = ref(null);
 let chartInstance = null;
+
+const curMonth = ref([]);
+const prevMonth = ref([]);
 
 const renderLineChart = async() => {
     await nextTick(); 
@@ -32,21 +38,48 @@ const renderLineChart = async() => {
         chartInstance.destroy()
     }
 
+    await axios.get(`http://localhost:8080/consume/category/dailysum/${month.year}/${month.month}`)
+    .then( response => {
+        curMonth.value = response.data.prices;
+        console.log(response.data.cntYear, response.data.cntMonth);
+    }).catch(error => {
+        console.log(error);
+    });
+
+    await axios.get(`http://localhost:8080/consume/category/dailysum/${month.getPrevMonth.year}/${month.getPrevMonth.month}`)
+    .then( response => {
+        prevMonth.value = response.data.prices;
+        console.log(response.data.cntYear, response.data.cntMonth);
+    }).catch(error => {
+        console.log(error);
+    })
+
+
+
     chartInstance = new ChartJS(lineChart.value , {
         type : 'line',
         data : {
             labels: '123123',
             datasets: [{
-                label: 'My First Dataset',
-                data: [65, 59, 80, 81, 56, 55, 40],
+                label: month.month,
+                data: curMonth.value,
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
+                tension: 0.5
+            },
+            {
+                label: month.getPrevMonth.month,
+                data: prevMonth.value,
+                fill: false,
+                borderColor: 'rgb(75, 111, 192)',
+                tension: 0.5
+            }
+            ]
         }
         ,
         options : {
             responsive : true,
+            grouped :true,
         }
     });
 }

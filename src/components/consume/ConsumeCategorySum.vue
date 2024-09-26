@@ -19,7 +19,7 @@
                         <tbody>
                             
                             <tr v-for="category in categorys">
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" style="color: {{  }};" /></td>
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
                                 <td>{{ category.category }}</td>
                                 <td>{{category.sum}}</td>
                                 <td>{{ Math.round((category.sum / totalSum) * 100)}}%</td>
