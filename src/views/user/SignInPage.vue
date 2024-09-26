@@ -31,12 +31,7 @@
           <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button
-        type="submit"
-        class="btn btn-secondary login-btn"
-        :disabled="!id || !password"
-        @click="handleLogin"
-      >
+      <button type="submit" class="btn btn-secondary login-btn" :disabled="!id || !password">
         로그인
       </button>
     </form>
@@ -74,24 +69,14 @@ const router = useRouter()
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
-const handleLogin = () => {
-  if (id.value && password.value) {
-    router.push({ name: 'home' })
-  } else {
-    alert('Please fill in both ID and password')
-  }
-}
 
 const login = async () => {
   if (!id.value || !password.value) {
-    alert('Please fill in both ID and password')
+    alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
 
   try {
-    console.log('ID:', id.value)
-    console.log('Password:', password.value)
-
     const response = await axios.post('http://localhost:8080/member/login', {
       id: id.value,
       password: password.value
