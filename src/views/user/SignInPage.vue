@@ -46,7 +46,7 @@
 
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <img src="https://via.placeholder.com/40?text=N" alt="Naver" />
+      <div id="naver_id_login"></div>
     </div>
 
     <div class="mt-3">
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -93,6 +93,18 @@ const login = async () => {
     alert('Login failed. Please check your credentials.')
   }
 }
+
+onMounted(() => {
+  const naver_id_login = new window.naver_id_login(
+    '6lCwElPsJ16_JoPQSjSA',
+    'http://localhost:8080/member/register'
+  )
+  const state = naver_id_login.getUniqState()
+  naver_id_login.setButton('white', 1, 40) // 버튼 설정
+  naver_id_login.setState(state)
+  // naver_id_login.setPopup() // popup 설정을 위한 코드
+  naver_id_login.init_naver_id_login()
+})
 </script>
 
 <style scoped>
@@ -162,5 +174,9 @@ body {
 a {
   text-decoration: none;
   color: inherit;
+}
+#naver_id_login {
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>

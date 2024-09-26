@@ -31,6 +31,46 @@
         <p :class="disableSubmit ? 'text-danger' : 'text-primary'">{{ checkError }}</p>
       </div>
 
+      <!-- Password Fields -->
+      <div class="mb-3 text-start">
+        <label for="password" class="form-label">비밀번호</label>
+        <input
+          type="password"
+          v-model="member.password"
+          class="form-control"
+          id="password"
+          placeholder="비밀번호를 입력하세요"
+          required
+        />
+      </div>
+      <div class="mb-3 text-start">
+        <label for="password2" class="form-label">비밀번호 확인</label>
+        <input
+          type="password"
+          v-model="member.password2"
+          class="form-control"
+          id="password2"
+          placeholder="비밀번호를 다시 입력하세요"
+          required
+        />
+        <p v-if="member.password !== member.password2" class="error-message">
+          비밀번호가 일치하지 않습니다.
+        </p>
+      </div>
+
+      <!-- Email Field -->
+      <div class="mb-3 text-start">
+        <label for="email" class="form-label">이메일</label>
+        <input
+          type="email"
+          v-model="member.email"
+          class="form-control"
+          id="email"
+          placeholder="이메일을 입력하세요"
+          required
+        />
+      </div>
+
       <!-- Nickname Field -->
       <div class="mb-3 text-start">
         <label for="nickname" class="form-label">별명</label>
@@ -69,46 +109,6 @@
             <label class="form-check-label" for="female">여성</label>
           </div>
         </div>
-      </div>
-
-      <!-- Email Field -->
-      <div class="mb-3 text-start">
-        <label for="email" class="form-label">이메일</label>
-        <input
-          type="email"
-          v-model="member.email"
-          class="form-control"
-          id="email"
-          placeholder="이메일을 입력하세요"
-          required
-        />
-      </div>
-
-      <!-- Password Fields -->
-      <div class="mb-3 text-start">
-        <label for="password" class="form-label">비밀번호</label>
-        <input
-          type="password"
-          v-model="member.password"
-          class="form-control"
-          id="password"
-          placeholder="비밀번호를 입력하세요"
-          required
-        />
-      </div>
-      <div class="mb-3 text-start">
-        <label for="password2" class="form-label">비밀번호 확인</label>
-        <input
-          type="password"
-          v-model="member.password2"
-          class="form-control"
-          id="password2"
-          placeholder="비밀번호를 다시 입력하세요"
-          required
-        />
-        <p v-if="member.password !== member.password2" class="error-message">
-          비밀번호가 일치하지 않습니다.
-        </p>
       </div>
 
       <!-- Birthday Field -->

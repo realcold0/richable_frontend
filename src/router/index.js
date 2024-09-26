@@ -23,6 +23,11 @@ const router = createRouter({
       component: () => import('../views/user/SignInPage.vue')
     },
     {
+      path: '/user/signin/naver',
+      name: 'naver',
+      component: () => import('../views/user/SignInNaver.vue')
+    },
+    {
       path: '/user/signup',
       name: 'signUp',
       component: () => import('../views/user/SignUpPage.vue')
