@@ -5,35 +5,41 @@
       <i class="fa-solid fa-lock"></i>
       비밀번호 변경
     </h1>
-    <form @submit.prevent="onSubmit">
+    <form @submit.prevent="resetPassword">
       <div class="mb-4 text-start">
-        <label for="password" class="form-label">
+        <label for="newPassword" class="form-label">
           <i class="fa-solid fa-lock"></i>
           새 비밀번호:
         </label>
         <input
           type="password"
           class="form-control"
+          id="newPassword"
           placeholder="새 비밀번호"
-          v-model="changePassword.newPassword"
+          v-model="newPassword"
           @input="resetError"
         />
       </div>
       <div class="mb-4 text-start">
-        <label for="password" class="form-label">
+        <label for="confirmPassword" class="form-label">
           <i class="fa-solid fa-lock"></i>
           새 비밀번호 확인:
         </label>
         <input
           type="password"
           class="form-control"
+          id="confirmPassword"
           placeholder="새 비밀번호 확인"
-          v-model="changePassword.newPassword2"
+          v-model="confirmPassword"
           @input="resetError"
         />
       </div>
       <div v-if="error" class="text-danger">{{ error }}</div>
-      <button type="submit" class="btn btn-primary mt-4" :disabled="disableSubmit">
+      <button
+        type="submit"
+        class="btn btn-primary mt-4"
+        :disabled="!newPassword || !confirmPassword"
+      >
         <i class="fa-solid fa-check"></i>
         확인
       </button>
@@ -42,22 +48,56 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios' // Import axios directly
+import { usePasswordResetStore } from '@/stores/passwordResetStore'
+import axios from 'axios'
 
 const router = useRouter()
-// const auth = useAuthStore()
-const changePassword = reactive({
-  username: '', //auth.username
-  oldPassword: '',
-  newPassword: '',
-  newPassword2: ''
-})
-const disableSubmit = computed(
-  () => !changePassword.oldPassword || !changePassword.newPassword || !changePassword.newPassword2
-)
+const passwordResetStore = usePasswordResetStore()
+
+const newPassword = ref('')
+const confirmPassword = ref('')
 const error = ref('')
+
+const BASE_URL = 'http://localhost:8080/member'
+
+onMounted(() => {
+  if (!passwordResetStore.isVerified) {
+    alert('비정상적인 접근입니다. 비밀번호 찾기 페이지로 이동합니다.')
+    router.push({ name: 'findpassword' })
+  }
+})
+
+const resetError = () => {
+  error.value = ''
+}
+
+const resetPassword = async () => {
+  if (newPassword.value !== confirmPassword.value) {
+    error.value = '비밀번호가 일치하지 않습니다.'
+    return
+  }
+
+  try {
+    // API 호출로 비밀번호 재설정
+    const response = await axios.post(`${BASE_URL}/set/pw`, {
+      id: passwordResetStore.userId,
+      newPassword: newPassword.value
+    })
+
+    if (response.data.success) {
+      alert('비밀번호가 성공적으로 재설정되었습니다.')
+      passwordResetStore.reset() // 상태 초기화
+      router.push({ name: 'signIn' })
+    } else {
+      error.value = response.data.message || '비밀번호 재설정 중 오류가 발생했습니다.'
+    }
+  } catch (err) {
+    console.error('Error resetting password:', err)
+    error.value = '서버 오류가 발생했습니다. 나중에 다시 시도해주세요.'
+  }
+}
 </script>
 
 <style scoped>

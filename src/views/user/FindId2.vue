@@ -1,40 +1,45 @@
 <template>
-  <div class="find-id-confirmation-container ">
+  <div class="find-id-confirmation-container">
     <h2 class="text-center mb-5">아이디 찾기</h2>
-    <p class="text-center mb-5">
-      입력하신 정보와 일치하는 아이디는 아래와 같습니다.
-    </p>
+    <p class="text-center mb-5">입력하신 정보와 일치하는 아이디는 아래와 같습니다.</p>
     <p class="text-center found-id">
       {{ foundId }}
     </p>
     <!-- Go to Login Page -->
-    <div class=" mb-5 text-center"> </div>
+    <div class="mb-5 text-center"></div>
     <!-- Password Recovery Button -->
     <div class="d-flex justify-content-center mb-3">
-      <router-link to="/user/findpassword" class="join-link btn btn-pink" @click="findPassword">비밀번호 찾기</router-link>
+      <router-link to="/user/findpassword" class="join-link btn btn-pink" @click="findPassword"
+        >비밀번호 찾기</router-link
+      >
     </div>
     <!-- Go to Login Page -->
-    <div class=" mb-2 text-center">
-        <router-link to="/user/signin" class="join-link"> 로그인 페이지로 이동</router-link>
+    <div class="mb-2 text-center">
+      <router-link to="/user/signin" class="join-link"> 로그인 페이지로 이동</router-link>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-// Simulate the found ID
-const foundId = ref('tester01');
+const route = useRoute()
+const foundId = ref('')
+
+onMounted(() => {
+  foundId.value = route.params.id || '아이디를 찾을 수 없습니다.'
+})
 
 // Function to simulate password recovery
 const findPassword = () => {
-  alert('비밀번호 찾기 페이지로 이동합니다.');
-};
+  // alert('비밀번호 찾기 페이지로 이동합니다.')
+}
 
 // Function to simulate going to the login page
 const goToLogin = () => {
-  alert('로그인 페이지로 이동합니다.');
-};
+  // alert('로그인 페이지로 이동합니다.')
+}
 </script>
 
 <style scoped>
