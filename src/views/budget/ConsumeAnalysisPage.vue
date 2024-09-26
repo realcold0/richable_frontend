@@ -1,10 +1,12 @@
 <template>
-  <div class="wrapper">
+  <div class="pageWrapper">
+    <SelectMonth/>
     <ConsumeCategorySum/>
     <ConsumeCompareMonth/>
   </div>
 </template>
 <script setup>
+import SelectMonth from '@/components/consume/SelectMonth.vue';
 import ConsumeCategorySum from '@/components/consume/ConsumeCategorySum.vue';
 import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
 </script>
@@ -13,8 +15,8 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
 
 
 <style scoped>
-.wrapper {
-  height: 100vh;
+.pageWrapper {
+  margin: 80px 0;
   align-items: center;
   justify-content: center;
   flex-direction: column;
