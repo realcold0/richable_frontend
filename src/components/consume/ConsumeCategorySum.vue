@@ -12,35 +12,19 @@
                 <div class="consumeSumAndList">
                     <div class="totalConsumeAmount">
                         <h3>총소비</h3>
-                        <h3>5,000,000 원</h3>
+                        <h3>{{ totalSum }}</h3>
                     </div>
                     
                     <table class="consumeList">
                         <tbody>
-                            <tr>
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
-                                <td>외식</td>
-                                <td>10000</td>
-                                <td>50%</td>
+                            
+                            <tr v-for="category in categorys">
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" style="color: {{  }};" /></td>
+                                <td>{{ category.category }}</td>
+                                <td>{{category.sum}}</td>
+                                <td>{{ Math.round((category.sum / totalSum) * 100)}}%</td>
                             </tr>
-                            <tr>
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
-                                <td>외식</td>
-                                <td>10000</td>
-                                <td>50%</td>
-                            </tr>
-                            <tr>
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
-                                <td>외식</td>
-                                <td>10000</td>
-                                <td>50%</td>
-                            </tr>
-                            <tr>
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
-                                <td>외식</td>
-                                <td>10000</td>
-                                <td>50%</td>
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -52,6 +36,8 @@
 
 
 <script setup>
+import { useMonthStore } from '@/stores/consume/curMonth';
+import axios from 'axios';
 import {
     Chart as ChartJS,
     Title,
@@ -65,9 +51,15 @@ import {
 import { nextTick, onMounted, ref } from 'vue';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, DoughnutController);
+const month = useMonthStore();
 
 const doughnutChart = ref(null);
 let chartInstance = null;
+
+const totalSum = ref(null);
+const categorys = ref([]);
+let labels = ref([]);
+let data = ref([]);
 
 const renderDoughnutChart = async() => {
     await nextTick(); 
@@ -76,12 +68,27 @@ const renderDoughnutChart = async() => {
         chartInstance.destroy()
     }
 
+    console.log(`http://localhost:8080/consume/category/sum/${month.year}/${month.month}`)
+
+    
+
+    await axios.get(`http://localhost:8080/consume/category/sum/${month.year}/${month.month}`)
+    .then( response =>{
+        labels.value = response.data.categorys.map(item => item.category)
+        data.value = response.data.categorys.map(item => item.sum)
+        totalSum.value = response.data.sum;
+        categorys.value = response.data.categorys;
+    }).catch(error => {
+        console.log(error);
+    })
+
+    
     chartInstance = new ChartJS(doughnutChart.value , {
         type : 'doughnut',
         data : {
+            labels :labels.value,
             datasets: [{
-            label: 'My First Dataset',
-            data: [300, 50, 100],
+            data: data.value,
             backgroundColor: [
             'rgb(255, 99, 132)',
             'rgb(54, 162, 235)',
@@ -92,6 +99,7 @@ const renderDoughnutChart = async() => {
         },
         options : {
             responsive : true,
+
         }
     })
 }
