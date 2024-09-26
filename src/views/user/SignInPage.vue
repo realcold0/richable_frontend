@@ -76,8 +76,7 @@ const togglePassword = () => {
 }
 const handleLogin = () => {
   if (id.value && password.value) {
-    // Perform login logic here
-    router.push({ name: 'Home' }) // Or any route you want to navigate to after login
+    router.push({ name: 'home' })
   } else {
     alert('Please fill in both ID and password')
   }

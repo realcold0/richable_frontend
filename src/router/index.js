@@ -43,7 +43,7 @@ const router = createRouter({
       component: () => import('../views/user/FindId.vue')
     },
     {
-      path: '/user/findid2',
+      path: '/user/findid2/:id',
       name: 'findid2',
       component: () => import('../views/user/FindId2.vue')
     },
