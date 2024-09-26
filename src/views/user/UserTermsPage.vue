@@ -361,33 +361,26 @@
 
     <!-- Actions -->
     <div class="d-flex justify-content-center mt-4">
-      <router-link to="/user/signup" class="join-link btn btn-light"> 취소</router-link>
-      <router-link to="/user/signin" class="join-link btn btn-light" @click="completeAgreement">
-        완료</router-link
-      >
-      <!-- <button
-        type="button"
-        class="btn btn-primary"
-        :disabled="!canProceed"
-        @click="completeAgreement"
-      >
-        완료
-      </button> -->
-    </div>
+    <router-link to="/user/signup" class="join-link btn btn-light">취소</router-link>
+    <button class="btn btn-primary" :disabled="!canProceed" @click="submitAgreement">
+      완료
+    </button>
+  </div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import axios from 'axios'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 // Checkbox values
 const agreeToAll = ref(false)
 const agreeServiceTerms = ref(false)
 const agreePrivacyPolicy = ref(false)
-
-// Collapsing sections for terms
-// const serviceTermsExpanded = ref(false)
-// const privacyPolicyExpanded = ref(false)
 
 // Computed for enabling/disabling the "완료" button
 const canProceed = ref(false)
@@ -403,20 +396,33 @@ const toggleAll = () => {
   agreePrivacyPolicy.value = agreeToAll.value
 }
 
-// Toggle service terms expansion
-// const toggleServiceTerms = () => {
-//   serviceTermsExpanded.value = !serviceTermsExpanded.value
-// }
+const submitAgreement = async () => {
+  if (!canProceed.value) {
+    alert('모든 약관에 동의해주세요.')
+    return
+  }
 
-// // Toggle privacy policy expansion
-// const togglePrivacyPolicy = () => {
-//   privacyPolicyExpanded.value = !privacyPolicyExpanded.value
-// }
+  // 현재 라우트에서 id 파라미터를 가져옵니다.
+  const userId = route.params.id
 
-// Function to simulate agreement completion
-const completeAgreement = () => {
-  alert('모든 약관에 동의하였습니다.')
+  try {
+    const response = await axios.post(`http://localhost:8080/member/terms/${userId}`, {
+      info: agreeServiceTerms.value,
+      finance: agreePrivacyPolicy.value
+    })
+
+    if (response.data.success) {
+      alert('약관 동의가 완료되었습니다.')
+      router.push('/user/signin') // 로그인 페이지로 이동
+    } else {
+      alert('약관 동의 처리 중 오류가 발생했습니다.')
+    }
+  } catch (error) {
+    console.error('Error submitting agreement:', error)
+    alert('약관 동의 처리 중 오류가 발생했습니다.')
+  }
 }
+
 </script>
 
 <style scoped>

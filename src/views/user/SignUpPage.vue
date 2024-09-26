@@ -120,6 +120,7 @@
           :monday-first="true"
           placeholder="생년월일을 선택하세요"
           class="form-control"
+          value-type="date"
         />
       </div>
 
@@ -127,7 +128,7 @@
       <div class="d-flex justify-content-center">
         <router-link to="/user/signin" class="join-link btn btn-light"> 취소</router-link>
         <span class="mx-2"></span>
-        <button type="submit" class="btn btn-pink" :disabled="disableSubmit">다음</button>
+        <button type="submit" class="btn btn-light" :disabled="disableSubmit">다음</button>
       </div>
     </form>
   </div>
@@ -151,6 +152,19 @@ const member = reactive({
   gender: '',
   birthday: null
 })
+// 날짜를 'YYYY-MM-DD' 형식으로 포맷팅하는 함수
+const formatDate = (date) => {
+  if (!date) return null
+  const d = new Date(date)
+  let month = '' + (d.getMonth() + 1)
+  let day = '' + d.getDate()
+  const year = d.getFullYear()
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [year, month, day].join('-')
+}
 
 const BASE_URL = 'http://localhost:8080/member'
 
@@ -188,13 +202,15 @@ const join = async () => {
     nickname: member.nickname,
     gender: member.gender,
     email: member.email,
-    birthday: member.birthday // Ensure this matches the DTO in your backend
+    birth_year: formatDate(member.birthday)
   }
+
+  // console.log('Sending member data:', memberToSend); // 디버깅을 위해 추가
 
   try {
     const { data } = await axios.post(`${BASE_URL}/register`, memberToSend)
     console.log('Signup successful:', data)
-    router.push({ name: 'home' })
+    router.push({ name: 'terms', params: { id: member.id } })
   } catch (error) {
     console.error('Error during signup:', error)
     alert('회원가입에 실패했습니다. 다시 시도하세요.')
