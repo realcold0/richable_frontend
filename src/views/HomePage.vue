@@ -166,7 +166,7 @@ html {
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 1000;
+  z-index: 700;
 }
 
 .mid-nav {
