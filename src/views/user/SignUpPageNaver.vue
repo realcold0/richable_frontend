@@ -116,21 +116,13 @@
         <label for="birthday">생년월일:</label>
         <Datepicker
           v-model="member.birthday"
-          value-type="year"
-          :format="'YYYY'"
-          :placeholder="'연도를 선택하세요'"
-          :clearable="false"
-          :disabled-date="disabledDate"
+          :format="'yyyy-MM-dd'"
+          :monday-first="true"
+          placeholder="생년월일을 선택하세요"
           class="form-control"
+          value-type="date"
         />
       </div>
-      <!-- <div class="row mb-3 text-start">
-        <label for="birthday">생년월일 (출생 연도):</label>
-        <select v-model="member.birthday" class="form-control" id="birthday" required>
-          <option value="">연도를 선택하세요</option>
-          <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-        </select>
-      </div> -->
 
       <!-- Buttons -->
       <div class="d-flex justify-content-center">
@@ -160,17 +152,19 @@ const member = reactive({
   gender: '',
   birthday: null
 })
-
-// 날짜를 'YYYY' 형식으로 포맷팅하는 함수
+// 날짜를 'YYYY-MM-DD' 형식으로 포맷팅하는 함수
 const formatDate = (date) => {
   if (!date) return null
   const d = new Date(date)
-  return d.getFullYear()
-}
+  let month = '' + (d.getMonth() + 1)
+  let day = '' + d.getDate()
+  const year = d.getFullYear()
 
-// Generate a list of years from 1900 to the current year
-const currentYear = new Date().getFullYear()
-const years = Array.from({ length: currentYear - 1900 + 1 }, (v, i) => currentYear - i)
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [year, month, day].join('-')
+}
 
 const BASE_URL = 'http://localhost:8080/member'
 
