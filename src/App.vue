@@ -32,19 +32,17 @@ const route = useRoute()
       </footer>
     </div>
   </div>
-  <div id="app">
-    <MyPageComponent />
-  </div>
+  <div id="app"></div>
 </template>
 
 <script>
-import MyPageComponent from './components/MyPageComponent.vue';
+import MyPageComponent from './components/MyPageComponent.vue'
 
 export default {
   components: {
-    MyPageComponent,
-  },
-};
+    MyPageComponent
+  }
+}
 </script>
 <style scoped>
 .main-template {
