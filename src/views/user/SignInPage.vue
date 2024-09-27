@@ -46,13 +46,14 @@
 
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <div id="naver_id_login"></div>
-    </div>
+      <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button>
+    </img>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
       <router-link to="/user/signup" class="join-link">가입하기</router-link>
     </div>
+  </div>
   </div>
 </template>
 
@@ -66,8 +67,24 @@ const password = ref('')
 const showPassword = ref(false)
 const router = useRouter()
 
+const BASE_URL = 'http://localhost:8080/member'
+
 const togglePassword = () => {
   showPassword.value = !showPassword.value
+}
+
+const naverLogin = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/naverlogin`);
+    if (response.data.redirectUrl) {
+      // 받은 state를 세션 스토리지에 저장
+      sessionStorage.setItem('naverState', response.data.state);
+      window.location.href = response.data.redirectUrl;
+    }
+  } catch (error) {
+    console.error('Naver login initiation failed:', error);
+    alert('네이버 로그인을 시작하는 데 문제가 발생했습니다.');
+  }
 }
 
 const login = async () => {
@@ -94,17 +111,35 @@ const login = async () => {
   }
 }
 
+const handleNaverCallback = async (code, state) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/naverCallback`, {
+      params: { code, state }
+    })
+    if (response.status === 200) {
+      console.log('Naver login success:', response.data)
+      // 여기서 받은 사용자 정보를 처리 (예: 로컬 스토리지에 저장)
+      alert('네이버 로그인 성공!')
+      router.push({ name: 'home' })
+    }
+  } catch (error) {
+    console.error('Naver login callback failed:', error)
+    alert('네이버 로그인 처리 중 오류가 발생했습니다.')
+  }
+}
+
 onMounted(() => {
-  const naver_id_login = new window.naver_id_login(
-    '6lCwElPsJ16_JoPQSjSA',
-    'http://localhost:8080/member/register'
-  )
-  const state = naver_id_login.getUniqState()
-  naver_id_login.setButton('white', 1, 40) // 버튼 설정
-  naver_id_login.setState(state)
-  // naver_id_login.setPopup() // popup 설정을 위한 코드
-  naver_id_login.init_naver_id_login()
+  // Check for Naver login callback
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
+  if (code && state) {
+    handleNaverCallback(code, state)
+  }
 })
+
+
 </script>
 
 <style scoped>
@@ -169,6 +204,14 @@ body {
 }
 .form-control:focus {
   box-shadow: none;
+}
+.naver-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 a {
