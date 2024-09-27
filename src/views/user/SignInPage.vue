@@ -46,7 +46,8 @@
 
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button>
+      <div  id="naver_id_login" @click="naverLogin"></div>
+      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
     </img>
 
     <div class="mt-3">
@@ -68,6 +69,10 @@ const showPassword = ref(false)
 const router = useRouter()
 
 const BASE_URL = 'http://localhost:8080/member'
+
+// 네이버 로그인 설정
+const NAVER_CLIENT_ID = '6lCwElPsJ16_JoPQSjSA'
+const NAVER_CALLBACK_URL = 'http://localhost:8080/member/naverCallback'
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -134,6 +139,25 @@ onMounted(() => {
   const code = urlParams.get('code')
   const state = urlParams.get('state')
 
+  // 네이버 로그인 스크립트 로드
+  const naverScript = document.createElement('script');
+        naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
+        naverScript.charset = 'utf-8';
+        document.head.appendChild(naverScript);
+  
+        // jQuery 스크립트 로드
+        const jqueryScript = document.createElement('script');
+        jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
+        document.head.appendChild(jqueryScript);
+
+        // 스크립트 로드 완료 후 네이버 로그인 초기화
+    naverScript.onload = () => {
+      jqueryScript.onload = () => {
+        const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, NAVER_CALLBACK_URL);
+        naver_id_login.setButton("white", 1, 40);
+        naver_id_login.init_naver_id_login();
+      };
+    };
   if (code && state) {
     handleNaverCallback(code, state)
   }
