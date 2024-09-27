@@ -2,7 +2,7 @@
     <div class="wrapper">
         <div class="anlyzeWrapper">
             <div class="analyzeText">
-                <span id="month">9월</span>에는 <span id="mostCategory">식비</span>에 가장 많은 소비를 하였습니다.
+                <span id="month">{{ month.month }}월</span>에는 <span id="mostCategory">{{ categorys[0]?.category }}</span>에 가장 많은 소비를 하였습니다.
             </div>
             <div class="analyze">
                 <div class="chart">
@@ -17,14 +17,12 @@
                     
                     <table class="consumeList">
                         <tbody>
-                            
-                            <tr v-for="category in categorys">
-                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" /></td>
+                            <tr v-for="(category, index) in categorys" :key="index">
+                                <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" id="firstIcon" :style="{color : iconColors[index]}" /></td>
                                 <td>{{ category.category }}</td>
                                 <td>{{category.sum}}</td>
                                 <td>{{ Math.round((category.sum / totalSum) * 100)}}%</td>
                             </tr>
-                            
                         </tbody>
                     </table>
                 </div>
@@ -48,7 +46,7 @@ import {
     LinearScale,
     DoughnutController,
 } from 'chart.js';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, DoughnutController);
 const month = useMonthStore();
@@ -60,6 +58,7 @@ const totalSum = ref(null);
 const categorys = ref([]);
 let labels = ref([]);
 let data = ref([]);
+const iconColors = ['#008A1E' , '#2768FF', '#FFB724', '#36A2EB', '#FF6384', '#4BC0C0', 'FF9F40', '#9966FF' , '#9966FF' , '#9966FF' , '#FDD1E0', '#9CA5D6']
 
 const renderDoughnutChart = async() => {
     await nextTick(); 
@@ -89,11 +88,7 @@ const renderDoughnutChart = async() => {
             labels :labels.value,
             datasets: [{
             data: data.value,
-            backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)'
-            ],
+            backgroundColor: iconColors,
             hoverOffset: 4
         }]
         },
@@ -103,11 +98,13 @@ const renderDoughnutChart = async() => {
         }
     })
 }
-
 onMounted(() =>{
     renderDoughnutChart();
 })
 
+watch(() => month.month, (newValue, oldVlaue) =>{
+    renderDoughnutChart(); 
+})
 </script>
 
 <style scoped>

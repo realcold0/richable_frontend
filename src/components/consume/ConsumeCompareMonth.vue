@@ -19,7 +19,7 @@ import axios from 'axios';
 import {
     Chart as ChartJS, LineElement, PointElement, LineController, CategoryScale, LinearScale
 } from 'chart.js';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 
 
 ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale);
@@ -30,7 +30,7 @@ let chartInstance = null;
 
 const curMonth = ref([]);
 const prevMonth = ref([]);
-
+const days =  Array.from({length : 31}, (_, i) => i + 1);
 const renderLineChart = async() => {
     await nextTick(); 
 
@@ -59,19 +59,19 @@ const renderLineChart = async() => {
     chartInstance = new ChartJS(lineChart.value , {
         type : 'line',
         data : {
-            labels: '123123',
+            labels: days,
             datasets: [{
-                label: month.month,
+                label: month.month+'월',
                 data: curMonth.value,
                 fill: false,
-                borderColor: 'rgb(75, 192, 192)',
+                borderColor: '#DA0052',
                 tension: 0.5
             },
             {
-                label: month.getPrevMonth.month,
+                label: month.getPrevMonth.month +'월',
                 data: prevMonth.value,
                 fill: false,
-                borderColor: 'rgb(75, 111, 192)',
+                borderColor: '#FA9EBE',
                 tension: 0.5
             }
             ]
@@ -80,12 +80,24 @@ const renderLineChart = async() => {
         options : {
             responsive : true,
             grouped :true,
+            elements :{
+                line :{
+                    tension : 0.3
+                },
+                point :{
+                    radius : 0,
+                }
+            }
         }
     });
 }
 
 onMounted(() =>{ 
     renderLineChart();
+})
+
+watch(() => month.month, (newValue, oldVlaue) =>{
+    renderLineChart(); 
 })
 
 </script>

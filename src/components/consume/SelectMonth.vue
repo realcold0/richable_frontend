@@ -2,7 +2,11 @@
     <div class="wrapper">
         <div class="monthWrapper">
             <div id="left" @click="decreaseMonth"><font-awesome-icon :icon="['fas', 'caret-left']" class="icon"/></div>
-            <h1 id="month">{{ month.month }} 월</h1>
+            <div class="date">
+                <h5 id="year">{{ month.year }}</h5>
+                <h1 id="month">{{ month.month }}월</h1>
+            </div>
+            
             <div id="right" @click="increaseMonth"><font-awesome-icon :icon="['fas', 'caret-right']" class="icon"/></div>
         </div>
         
@@ -25,7 +29,7 @@ const increaseMonth = () => {
     .monthWrapper {
         display: flex;
         flex-direction: row;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
 
         height: 83px;
@@ -33,9 +37,15 @@ const increaseMonth = () => {
         background-color: rgba(250, 158, 190, 0.47);
         border-radius: 31px;
     }
+    .monthWrapper .date {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
 
-    #left, #right {
+    /* icon정렬 */
+    #left, #right { 
         display: flex;
         align-items: center;
         justify-content: center;
