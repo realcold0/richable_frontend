@@ -847,6 +847,8 @@ onMounted(() => {
 .graph-container {
   width: 400px;
   height: 350px;
+  font-family: pretendard;
+
 }
 
 .graph-container canvas {
@@ -856,15 +858,14 @@ onMounted(() => {
 
 .graph-title {
   color: #0D171C;
-  font-family: Inter;
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
 }
 
 .graph-sum {
+  font-family: pretendard;
   color: #0D171C;
-  font-family: Inter;
   font-size: 18px;
   font-weight: 700;
   line-height: 40px;
