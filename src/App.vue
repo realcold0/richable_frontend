@@ -58,7 +58,7 @@ import { RouterView } from 'vue-router'
   height: 1024px;
   margin-left : 56px;
   width: 100vw;
-  background-color: blue;
+  /* background-color: blue; */
 }
 
 /* 푸터 스타일 */
