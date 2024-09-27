@@ -32,8 +32,20 @@ const route = useRoute()
       </footer>
     </div>
   </div>
+  <div id="app">
+    <MyPageComponent />
+  </div>
 </template>
 
+<script>
+import MyPageComponent from './components/MyPageComponent.vue';
+
+export default {
+  components: {
+    MyPageComponent,
+  },
+};
+</script>
 <style scoped>
 .main-template {
   display: flex;
