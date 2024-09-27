@@ -82,8 +82,8 @@ const naverLogin = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/naverlogin`);
     if (response.data.redirectUrl) {
-      // 받은 state를 세션 스토리지에 저장
-      sessionStorage.setItem('naverState', response.data.state);
+      // 받은 state를 localStorage에 저장
+      localStorage.setItem('naverState', response.data.state);
       window.location.href = response.data.redirectUrl;
     }
   } catch (error) {
@@ -118,18 +118,27 @@ const login = async () => {
 
 const handleNaverCallback = async (code, state) => {
   try {
+    const savedState = localStorage.getItem('naverState');
     const response = await axios.get(`${BASE_URL}/naverCallback`, {
-      params: { code, state }
-    })
+      params: { 
+        code, 
+        state,
+        savedState // 저장된 state를 함께 전송
+      }
+    });
     if (response.status === 200) {
-      console.log('Naver login success:', response.data)
-      // 여기서 받은 사용자 정보를 처리 (예: 로컬 스토리지에 저장)
-      alert('네이버 로그인 성공!')
-      router.push({ name: 'home' })
+      console.log('Naver login success:', response.data);
+      // 받은 토큰을 localStorage에 저장
+      localStorage.setItem('authToken', response.data.token);
+      alert('네이버 로그인 성공!');
+      router.push({ name: 'home' });
     }
   } catch (error) {
-    console.error('Naver login callback failed:', error)
-    alert('네이버 로그인 처리 중 오류가 발생했습니다.')
+    console.error('Naver login callback failed:', error);
+    alert('네이버 로그인 처리 중 오류가 발생했습니다.');
+  } finally {
+    // 사용 후 state 제거
+    // localStorage.removeItem('naverState');
   }
 }
 
