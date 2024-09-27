@@ -4,7 +4,7 @@
     <h2 class="mb-4">회원가입</h2>
 
     <form @submit.prevent="join">
-      <!-- Username Field -->
+      <!-- id Field -->
       <div class="mb-3 text-start">
         <label for="id" class="form-label">
           <i class="fa-solid fa-user"></i> 사용자 ID
@@ -20,10 +20,10 @@
         <div class="d-flex align-items-center">
           <input
             type="text"
-            v-model="member.username"
-            @input="changeUsername"
+            v-model="member.id"
+            @input="changeId"
             class="form-control me-2"
-            id="username"
+            id="id"
             placeholder="사용자명을 입력하세요"
             required
           />
@@ -54,7 +54,7 @@
               type="radio"
               v-model="member.gender"
               id="male"
-              value="남성"
+              value="M"
             />
             <label class="form-check-label" for="male">남성</label>
           </div>
@@ -64,7 +64,7 @@
               type="radio"
               v-model="member.gender"
               id="female"
-              value="여성"
+              value="F"
             />
             <label class="form-check-label" for="female">여성</label>
           </div>
@@ -84,7 +84,7 @@
         />
       </div>
 
-      <!-- Password Field -->
+      <!-- Password Fields -->
       <div class="mb-3 text-start">
         <label for="password" class="form-label">비밀번호</label>
         <input
@@ -96,8 +96,6 @@
           required
         />
       </div>
-
-      <!-- Confirm Password Field -->
       <div class="mb-3 text-start">
         <label for="password2" class="form-label">비밀번호 확인</label>
         <input
@@ -113,55 +111,24 @@
         </p>
       </div>
 
-      <!-- Avatar Upload -->
-      <!-- <div class="mb-3 text-start">
-        <label for="avatar" class="form-label">프로필 사진</label>
-        <input type="file" ref="avatar" class="form-control" id="avatar" />
-      </div> -->
-
-      <!-- Year, Month, Day Fields -->
+      <!-- Birthday Field -->
       <div class="row mb-3 text-start">
-        <div class="col-4">
-          <label for="year" class="form-label">출생년도</label>
-          <input
-            type="text"
-            v-model="member.year"
-            class="form-control"
-            id="year"
-            placeholder="YYYY"
-            required
-          />
-        </div>
-        <div class="col-4">
-          <label for="month" class="form-label">월</label>
-          <input
-            type="text"
-            v-model="member.month"
-            class="form-control"
-            id="month"
-            placeholder="MM"
-            required
-          />
-        </div>
-        <div class="col-4">
-          <label for="day" class="form-label">일</label>
-          <input
-            type="text"
-            v-model="member.day"
-            class="form-control"
-            id="day"
-            placeholder="DD"
-            required
-          />
-        </div>
+        <label for="birthday">생년월일:</label>
+        <Datepicker
+          v-model="member.birthday"
+          :format="'yyyy-MM-dd'"
+          :monday-first="true"
+          placeholder="생년월일을 선택하세요"
+          class="form-control"
+          value-type="date"
+        />
       </div>
 
       <!-- Buttons -->
       <div class="d-flex justify-content-center">
         <router-link to="/user/signin" class="join-link btn btn-light"> 취소</router-link>
-        <span class="mx-2"> </span>
-        <router-link to="/user/terms" class="btn btn-pink" :disabled="disableSubmit">
-          다음</router-link>
+        <span class="mx-2"></span>
+        <button type="submit" class="btn btn-light" :disabled="disableSubmit">다음</button>
       </div>
     </form>
   </div>
@@ -170,85 +137,80 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios' // Import axios directly
+import axios from 'axios'
+import Datepicker from 'vue3-datepicker'
 
 const router = useRouter()
-// const avatar = ref(null);
 const checkError = ref('')
 const disableSubmit = ref(true)
-
-// Reactive member object
 const member = reactive({
-  username: '',
+  id: '',
   email: '',
   password: '',
   password2: '',
   nickname: '',
   gender: '',
-  year: '',
-  month: '',
-  day: ''
-  // avatar: null,
+  birthday: null
 })
+// 날짜를 'YYYY-MM-DD' 형식으로 포맷팅하는 함수
+const formatDate = (date) => {
+  if (!date) return null
+  const d = new Date(date)
+  let month = '' + (d.getMonth() + 1)
+  let day = '' + d.getDate()
+  const year = d.getFullYear()
 
-const BASE_URL = '/api/member'
-const headers = { 'Content-Type': 'multipart/form-data' }
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
 
-// Check username availability
+  return [year, month, day].join('-')
+}
+
+const BASE_URL = 'http://localhost:8080/member'
+
+// Check id availability
 const checkId = async () => {
   if (!member.id) {
     return alert('사용자 ID를 입력하세요.')
   }
-
   try {
-    const { data } = await axios.get(`${BASE_URL}/checkusername/${member.username}`)
-    console.log('AUTH GET CHECKUSERNAME', data)
-    disableSubmit.value = data
-    checkError.value = data ? '이미 사용중인 ID입니다.' : '사용가능한 ID입니다.'
+    const { data } = await axios.get(`${BASE_URL}/checkDupl/${member.id}`)
+    disableSubmit.value = data.exists
+    checkError.value = data.exists ? '이미 사용중인 ID입니다.' : '사용가능한 ID입니다.'
   } catch (error) {
-    console.error('Error checking username:', error)
+    console.error('Error checking id:', error)
     checkError.value = '중복 체크에 실패했습니다. 다시 시도하세요.'
   }
 }
 
-// Handle username input
-const changeUsername = () => {
+// Handle id input
+const changeId = () => {
   disableSubmit.value = true
-  if (member.username) {
-    checkError.value = 'ID 중복 체크를 하셔야 합니다.'
-  } else {
-    checkError.value = ''
-  }
+  checkError.value = member.id ? 'ID 중복 체크를 하셔야 합니다.' : ''
 }
 
-// Form submission logic
+/// Form submission logic
 const join = async () => {
   if (member.password !== member.password2) {
     return alert('비밀번호가 일치하지 않습니다.')
   }
 
-  // if (avatar.value?.files?.length > 0) {
-  //   member.avatar = avatar.value.files[0]
-  // }
+  // Create memberToSend inside the join function to capture the latest data
+  const memberToSend = {
+    id: member.id,
+    password: member.password,
+    nickname: member.nickname,
+    gender: member.gender,
+    email: member.email,
+    birth_year: formatDate(member.birthday)
+  }
+
+  // console.log('Sending member data:', memberToSend); // 디버깅을 위해 추가
 
   try {
-    const formData = new FormData()
-    formData.append('username', member.username)
-    formData.append('email', member.email)
-    formData.append('password', member.password)
-    formData.append('nickname', member.nickname)
-    formData.append('gender', member.gender)
-    formData.append('year', member.year)
-    formData.append('month', member.month)
-    formData.append('day', member.day)
-
-    // if (member.avatar) {
-    //   formData.append('avatar', member.avatar);
-    // }
-
-    const { data } = await axios.post(`${BASE_URL}/create`, formData, { headers })
-    console.log('AUTH POST CREATE', data)
-    router.push({ name: 'home' }) // Redirect after successful signup
+    const { data } = await axios.post(`${BASE_URL}/register`, memberToSend)
+    console.log('Signup successful:', data)
+    router.push({ name: 'terms', params: { id: member.id } })
   } catch (error) {
     console.error('Error during signup:', error)
     alert('회원가입에 실패했습니다. 다시 시도하세요.')
@@ -263,7 +225,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* height: 100vh; */
 }
 
 .signup-container {
@@ -277,24 +238,9 @@ body {
   margin: 5% auto;
 }
 
-.signup-btn {
-  width: 100px;
-  margin-top: 1rem;
-}
-
-.form-label {
-  text-align: start;
-  font-weight: bold;
-}
-
 .btn {
   width: 80px;
   margin-top: 1rem;
-}
-
-.username-check {
-  color: #00c851;
-  font-weight: bold;
 }
 
 .error-message {
