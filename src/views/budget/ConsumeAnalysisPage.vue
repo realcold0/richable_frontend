@@ -1,15 +1,32 @@
-<!-- RC-P-14 -->
 <template>
-  <div>
-    <!-- Your template content here -->
-    소비 분석 페이지
+  <div class="pageWrapper">
+    <SelectMonth/>
+    <ConsumeCategorySum/>
+    <ConsumeCompareMonth/>
   </div>
 </template>
-
 <script setup>
-// You can define your Composition API logic here
+import SelectMonth from '@/components/consume/SelectMonth.vue';
+import ConsumeCategorySum from '@/components/consume/ConsumeCategorySum.vue';
+import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
 </script>
 
+
+
+
 <style scoped>
-/* Your style here */
+.pageWrapper {
+  margin: 80px 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+}
+
+ConsumeCategorySum {
+  margin: 64px 0;
+}
+
+
+
 </style>
