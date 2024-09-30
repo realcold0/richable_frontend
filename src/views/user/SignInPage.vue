@@ -47,8 +47,6 @@
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
       <div  id="naver_id_login" @click="naverLogin"></div>
-      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
-    </img>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
@@ -127,19 +125,41 @@ const handleNaverCallback = async (code, state) => {
       }
     });
     if (response.status === 200) {
-      console.log('Naver login success:', response.data);
-      // 받은 토큰을 localStorage에 저장
-      localStorage.setItem('authToken', response.data.token);
-      alert('네이버 로그인 성공!');
-      router.push({ name: 'home' });
+        if (response.data.token) {
+          // Existing user
+          console.log('Naver login success:', response.data);
+          localStorage.setItem('authToken', response.data.token);
+          alert('네이버 로그인 성공!');
+          router.push({ name: 'home' });
+        } else {
+          // New user
+          console.log('New user data:', response.data);
+          // Store the user data in localStorage or Vuex store
+          localStorage.setItem('naverUserData', JSON.stringify(response.data));
+          alert('회원가입이 필요합니다.');
+          router.push({ name: 'signup', query: { naver: 'true' } });
+        }
+      }
+    } catch (error) {
+      console.error('Naver login callback failed:', error);
+      alert('네이버 로그인 처리 중 오류가 발생했습니다.');
+    } finally {
+      localStorage.removeItem('naverState');
     }
-  } catch (error) {
-    console.error('Naver login callback failed:', error);
-    alert('네이버 로그인 처리 중 오류가 발생했습니다.');
-  } finally {
-    // 사용 후 state 제거
-    // localStorage.removeItem('naverState');
-  }
+  //   if (response.status === 200) {
+  //     console.log('Naver login success:', response.data);
+  //     // 받은 토큰을 localStorage에 저장
+  //     localStorage.setItem('authToken', response.data.token);
+  //     alert('네이버 로그인 성공!');
+  //     router.push({ name: 'home' });
+  //   }
+  // } catch (error) {
+  //   console.error('Naver login callback failed:', error);
+  //   alert('네이버 로그인 처리 중 오류가 발생했습니다.');
+  // } finally {
+  //   // 사용 후 state 제거
+  //   // localStorage.removeItem('naverState');
+  // }
 }
 
 onMounted(() => {
@@ -167,6 +187,8 @@ onMounted(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
+    console.log('code',code);
+    console.log('state',state);
   
     if (code && state) {
       handleNaverCallback(code, state);

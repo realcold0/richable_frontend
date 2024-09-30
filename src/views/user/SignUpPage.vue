@@ -168,8 +168,8 @@ const formatDate = (date) => {
 }
 
 // Generate a list of years from 1900 to the current year
-const currentYear = new Date().getFullYear()
-const years = Array.from({ length: currentYear - 1900 + 1 }, (v, i) => currentYear - i)
+// const currentYear = new Date().getFullYear()
+// const years = Array.from({ length: currentYear - 1900 + 1 }, (v, i) => currentYear - i)
 
 const BASE_URL = 'http://localhost:8080/member'
 
