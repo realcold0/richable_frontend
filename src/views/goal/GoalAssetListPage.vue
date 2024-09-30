@@ -1,8 +1,7 @@
-<!-- RC-P-25 -->
 <template>
   <div class="goal-asset-list-page">
     <!-- Top Section: Goal Asset Progress -->
-    <section class="goal-progress-section">
+    <section class="goal-progress-section goal-card" @click="openAssetGoalDetailModal">
       <div class="progress-bar-container">
         <p class="goal-description">
           김리치님의 목표 자산 현황<br />
@@ -23,7 +22,12 @@
 
     <!-- Bottom Section: Goal Cards with '+' icon for adding new goals -->
     <section class="goal-cards">
-      <div v-for="(goal, index) in goals" :key="index" class="goal-card" @click="openGoalDetailModal(goal)">
+      <div
+        v-for="(goal, index) in goals"
+        :key="index"
+        class="goal-card"
+        @click="openGoalDetailModal(goal)"
+      >
         <p>{{ index + 1 }} {{ goal.title }}</p>
         <p>{{ goal.currentAmount }}원 / {{ goal.totalAmount }}원</p>
         <div class="progress-bar">
@@ -33,55 +37,77 @@
       </div>
 
       <!-- Add Goal Button: 클릭하면 모달이 열리도록 연결 -->
-      <div class="goal-card add-goal" @click="openModal">
+      <div class="goal-card add-goal" @click="openCreateModal">
         <p>+</p>
       </div>
     </section>
 
     <!-- 모달 컴포넌트 연결 -->
-    <ConsumeGoalCreateModal ref="goalModal" />
-
-    <!-- Detail Goal Modal -->
-    <ConsumeGoalDetailModal ref="goalDetailModal" />
+    <ConsumeGoalCreateModal ref="goalCreateModal" />
+    <ConsumeGoalDetailModal ref="goalDetailModal" @deleteGoal="deleteGoal" />
+    <AssetGoalDetailModal ref="assetGoalDetailModal" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreateModal.vue';
-import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue';
+import { ref } from 'vue'
+import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreateModal.vue'
+import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue'
+import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailModal.vue'
 
 // 목표 데이터
 const goals = ref([
-  { title: '에어팟', totalAmount: 360000, currentAmount: 120000, progress: 33 },
-  { title: '아이패드', totalAmount: 500000, currentAmount: 250000, progress: 50 },
-  { title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 },
-  { title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 },
-  { title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 },
-
-]);
+  { id: 1, title: '에어팟', totalAmount: 360000, currentAmount: 120000, progress: 33 },
+  { id: 2, title: '아이패드', totalAmount: 500000, currentAmount: 250000, progress: 50 },
+  { id: 3, title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 }
+])
 
 // 모달 제어를 위한 ref
-const goalModal = ref(null);
-const goalDetailModal = ref(null);
+const goalCreateModal = ref(null)
+const goalDetailModal = ref(null)
+const assetGoalDetailModal = ref(null)
+
+// 삭제할 목표를 저장하는 변수
+let goalToDelete = null
 
 // 목표 생성 모달 열기 함수
-const openModal = () => {
-  if (goalModal.value) {
-    goalModal.value.show(); // 목표 생성 모달 표시
+const openCreateModal = () => {
+  if (goalCreateModal.value) {
+    goalCreateModal.value.show() // 목표 생성 모달 표시
   }
-};
+}
 
 // 목표 세부 모달 열기 함수
 const openGoalDetailModal = (goal) => {
+  goalToDelete = goal // 삭제를 위해 선택한 목표 저장
   if (goalDetailModal.value) {
     goalDetailModal.value.show({
       type: '소비',
       name: goal.title,
-      amount: goal.totalAmount,
-    });
+      amount: goal.totalAmount
+    })
   }
-};
+}
+
+// AssetGoalDetailModal 열기 함수 (카드 클릭 시 작동)
+const openAssetGoalDetailModal = () => {
+  if (assetGoalDetailModal.value) {
+    assetGoalDetailModal.value.show({
+      type: '자산 형성',
+      name: '김리치님의 목표 자산',
+      amount: 100000000
+    })
+  }
+}
+
+// 목표 삭제 함수
+const deleteGoal = () => {
+  if (goalToDelete) {
+    // 목표 목록에서 선택된 목표 삭제
+    goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.id)
+    goalToDelete = null
+  }
+}
 </script>
 
 <style scoped>
@@ -89,13 +115,15 @@ const openGoalDetailModal = (goal) => {
   padding: 20px;
 }
 
-.goal-progress-section {
+.goal-card {
+  flex: 1 1 calc(33.333% - 10px); /* 카드 크기를 3개씩 보이도록 조정 */
+  background-color: #ffffff;
+  padding: 30px; /* 카드 내부 여백 추가 */
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-bottom: 20px;
-}
-
-.goal-description {
-  font-size: 18px;
+  cursor: pointer;
+  font-size: 18px; /* 카드 내 텍스트 크기 확대 */
 }
 
 .progress-bar-container {
@@ -105,7 +133,7 @@ const openGoalDetailModal = (goal) => {
 .progress-bar {
   width: 100%;
   background-color: #f0f0f0;
-  height: 10px;
+  height: 15px; /* 프로그레스 바 높이 증가 */
   border-radius: 5px;
   margin: 10px 0;
 }
@@ -116,25 +144,19 @@ const openGoalDetailModal = (goal) => {
   border-radius: 5px;
 }
 
+.goal-description {
+  font-size: 18px;
+}
+
 .consumption-suggestion {
   text-align: center;
   margin-bottom: 20px;
 }
 
 .goal-cards {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.goal-card {
-  flex: 1 1 calc(33.333% - 10px);
-  background-color: #ffffff;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  cursor: pointer;
+  display: grid; /* 그리드 레이아웃으로 변경 */
+  grid-template-columns: repeat(3, 1fr); /* 3개의 칼럼으로 설정 */
+  gap: 20px; /* 카드 사이의 간격 유지 */
 }
 
 .add-goal {
