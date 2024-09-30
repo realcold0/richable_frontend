@@ -120,7 +120,6 @@
           :format="'YYYY'"
           :placeholder="'연도를 선택하세요'"
           :clearable="false"
-          :disabled-date="disabledDate"
           class="form-control"
         />
       </div>

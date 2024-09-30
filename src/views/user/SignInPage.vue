@@ -143,33 +143,34 @@ const handleNaverCallback = async (code, state) => {
 }
 
 onMounted(() => {
-  // Check for Naver login callback
-  const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
-
   // 네이버 로그인 스크립트 로드
   const naverScript = document.createElement('script');
-        naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
-        naverScript.charset = 'utf-8';
-        document.head.appendChild(naverScript);
-  
-        // jQuery 스크립트 로드
-        const jqueryScript = document.createElement('script');
-        jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
-        document.head.appendChild(jqueryScript);
-
-        // 스크립트 로드 완료 후 네이버 로그인 초기화
-    naverScript.onload = () => {
-      jqueryScript.onload = () => {
+    naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
+    naverScript.charset = 'utf-8';
+    
+    // jQuery 스크립트 로드
+    const jqueryScript = document.createElement('script');
+    jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
+    
+    // jQuery 먼저 로드 후 네이버 스크립트 로드
+    document.head.appendChild(jqueryScript);
+    jqueryScript.onload = () => {
+      document.head.appendChild(naverScript);
+      naverScript.onload = () => {
         const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, NAVER_CALLBACK_URL);
-        naver_id_login.setButton("white", 1, 40);
+        naver_id_login.setButton("green", 1, 40); // 버튼 색상을 녹색으로 변경
         naver_id_login.init_naver_id_login();
       };
     };
-  if (code && state) {
-    handleNaverCallback(code, state)
-  }
+  
+    // Check for Naver login callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+  
+    if (code && state) {
+      handleNaverCallback(code, state);
+    }
 })
 
 
