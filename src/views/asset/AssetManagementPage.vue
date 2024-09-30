@@ -454,9 +454,7 @@ onMounted(() => {
     margin-left: 80px;
 }
 
-.tab-page {
-    
-}
+
 
 .total-asset {
     background-color: #F9F9F9;

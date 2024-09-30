@@ -33,7 +33,7 @@ const route = useRoute()
     </div>
   </div>
   <div id="app">
-    <MyPageComponent />
+
   </div>
 </template>
 
