@@ -16,7 +16,7 @@
     <div v-if="selectedTab === 'expense'">
       <div class="filter-bar">
         <label for="expenseCategory">소비 카테고리</label>
-        <select v-model="selectedExpenseCategory" id="expenseCategory" class="form-select short-select">
+        <select  id="expenseCategory" class="form-select short-select">
           <option value="식료품">식료품</option>
           <option value="유흥">유흥</option>
           <option value="쇼핑">쇼핑</option>
@@ -43,7 +43,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(expense, index) in paginatedExpenses" :key="index">
+          <tr v-for="(expense, index) in paginatedExpenses" 
+              :key="index" 
+              @click="openDetailModal(expense)" 
+              @mouseover="hoverEffect(index)"
+              @mouseleave="removeHoverEffect(index)"
+              :class="{ 'hover-row': hoveredIndex === index }">
             <td>{{ expense.date }}</td>
             <td>{{ expense.category }}</td>
             <td>{{ expense.content }}</td>
@@ -79,7 +84,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(income, index) in paginatedIncomes" :key="index">
+          <tr v-for="(income, index) in paginatedIncomes" 
+              :key="index" 
+              @click="openDetailModal2(income)" 
+              @mouseover="hoverEffect(index)"
+              @mouseleave="removeHoverEffect(index)"
+              :class="{ 'hover-row': hoveredIndex === index }">
             <td>{{ income.date }}</td>
             <td>{{ income.category }}</td>
             <td>{{ income.content }}</td>
@@ -94,83 +104,100 @@
     </div>
 
     <!-- 등록 버튼 -->
-    <button class="btn btn-pink" @click="openModal">
+    <button class="btn btn-pink" @click="selectedTab === 'expense' ? openCreateModal() : openCreateModal2()">
       <font-awesome-icon icon="square-plus" />
     </button>
 
     <!-- 소비/소득 등록 모달 -->
-    <ExpenseModal v-if="selectedTab === 'expense'" ref="modalRef" />
-    <ConsumeCreateModal v-if="selectedTab === 'income'" ref="consumeModalRef" />
+    <IncomeCreateModal ref="createModal"/>
+    <IncomeDetailModal ref="detailModal" :detail="selectedDetail" @close="closeDetailModal"/>
+    <IncomeUpdateModal ref="updateModal"/>
+    <ConsumeCreateModal ref="createModal2"/>
+    <ConsumeDetailModal ref="detailModal2" :detail="selectedDetail2" @close="closeDetailModal2"/>
+    <ConsumeUpdateModal ref="updateModal2"/>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-import Pagination from '@/components/modal/pagenation/Pagenation.vue'; // 페이지네이션 컴포넌트 가져오기
-import ExpenseModal from '@/components/modal/budget/IncomeCreateModal.vue'; // 소비 모달 컴포넌트
-import ConsumeCreateModal from '@/components/modal/budget/ConsumeCreateModal.vue'; // 소득 모달 컴포넌트
+import Pagination from '@/components/modal/pagenation/Pagenation.vue'; 
+import IncomeCreateModal from '@/components/modal/budget/IncomeCreateModal.vue'; 
+import ConsumeCreateModal from '@/components/modal/budget/ConsumeCreateModal.vue'; 
+import IncomeDetailModal from '@/components/modal/budget/IncomeDetailModal.vue';
+import ConsumeDetailModal from '@/components/modal/budget/ConsumeDetailModal.vue';
+import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue'; 
+import ConsumeUpdateModal from '@/components/modal/budget/ConsumeUpdateModal.vue';
 
-// 탭 상태 관리
 const selectedTab = ref('expense');
 
 // 소비 및 소득 데이터
 const expenses = ref([
   { date: '2022.02.11', category: '식비', content: '땅땅포차', memo: '돈아끼자..', amount: 20000 },
-  // 더미 데이터 추가 가능
 ]);
 
 const incomes = ref([
   { date: '2022.02.11', category: '월급', content: '멀티잇', memo: '드디어 월급이...', amount: 350000 },
-  // 더미 데이터 추가 가능
 ]);
 
-// 페이지네이션 관련 상태
-const currentPage = ref(1);
-const itemsPerPage = ref(10); // 한 페이지에 보여줄 항목 수
-const totalExpenses = ref(expenses.value.length);
-const totalIncomes = ref(incomes.value.length);
-
-// 카테고리 필터 관리
-const selectedExpenseCategory = ref('전체');
-const selectedIncomeCategory = ref('전체');
-
-// 모달 열기 함수
-const modalRef = ref(null); // 소비 모달 참조
-const consumeModalRef = ref(null); // 소득 모달 참조
-
-const openModal = () => {
-  if (selectedTab.value === 'expense' && modalRef.value) {
-    modalRef.value.show(); // 소비 모달 열기
-  } else if (selectedTab.value === 'income' && consumeModalRef.value) {
-    consumeModalRef.value.show(); // 소득 모달 열기
-  }
+// 하버 상태 관리
+const hoveredIndex = ref(null);
+const hoverEffect = (index) => {
+  hoveredIndex.value = index;
 };
+const removeHoverEffect = () => {
+  hoveredIndex.value = null;
+};
+
+// 페이지네이션 상태 관리
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const totalExpenses = computed(() => expenses.value.length);
+const totalIncomes = computed(() => incomes.value.length);
+
+// 모달 상태 관리
+const createModal = ref(null);
+const detailModal = ref(null);
+const createModal2 = ref(null);
+const detailModal2 = ref(null);
+const selectedDetail = ref({}); 
+const selectedDetail2 = ref({}); 
+
+// 모달 열기/닫기 함수
+const openCreateModal = () => createModal.value?.show(); // 소비 모달 열기
+const openDetailModal = (detail) => {
+  //alert("**");
+  selectedDetail.value = detail;
+  detailModal.value?.show(); // 소비 상세 모달 열기
+};
+
+const openCreateModal2 = () => createModal2.value?.show(); // 소득 모달 열기
+const openDetailModal2 = (detail) => {
+  selectedDetail2.value = detail;
+  detailModal2.value?.show(); // 소득 상세 모달 열기
+};
+
+const closeDetailModal = () => detailModal.value?.hide(); // 소비 상세 모달 닫기
+const closeDetailModal2 = () => detailModal2.value?.hide(); // 소득 상세 모달 닫기
 
 // 페이지네이션 계산
 const paginatedExpenses = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return expenses.value.slice(start, end);
+  return expenses.value.slice(start, start + itemsPerPage.value);
 });
 
 const paginatedIncomes = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return incomes.value.slice(start, end);
+  return incomes.value.slice(start, start + itemsPerPage.value);
 });
 </script>
 
 <style scoped>
 .short-select {
-  width: 150px; /* 원하는 너비로 설정 */
+  width: 150px;
 }
 .filter-bar {
   margin-top: 10px;
   margin-left: 20px;
-}
-
-.short-select {
-  width: 150px; /* 여기서 너비를 조정할 수 있습니다 */
 }
 
 .tab-bar {
@@ -205,6 +232,11 @@ const paginatedIncomes = computed(() => {
   text-align: center;
 }
 
+.table tr.hover-row {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
 .btn-pink {
   background-color: #ff007f;
   position: fixed;
@@ -213,11 +245,8 @@ const paginatedIncomes = computed(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-}
-
-.filter-bar {
-  margin-top: 10px;
-  margin-left: 20px;
+  color: white;
+  border: none;
 }
 
 .pagination {

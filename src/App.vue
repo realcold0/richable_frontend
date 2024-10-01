@@ -38,13 +38,7 @@ const route = useRoute()
 </template>
 
 <script>
-import MyPageComponent from './components/MyPageComponent.vue';
 
-export default {
-  components: {
-    MyPageComponent,
-  },
-};
 </script>
 <style scoped>
 .main-template {
