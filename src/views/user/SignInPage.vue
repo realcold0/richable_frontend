@@ -31,7 +31,7 @@
           <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button type="submit" class="btn btn-secondary login-btn" :disabled="!id || !password">
+      <button type="submit" class="login-btn" :disabled="!id || !password">
         로그인
       </button>
     </form>
@@ -45,9 +45,7 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <div  id="naver_id_login" @click="naverLogin"></div>
-      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
+      <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
     </img>
 
     <div class="mt-3">
@@ -169,7 +167,7 @@ onMounted(() => {
 <style scoped>
 body {
   width: 500px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'pretendard', sans-serif;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
@@ -184,7 +182,9 @@ body {
 }
 .join-link {
   font-size: 0.9rem;
-  color: #0d6efd;
+  color: #777777;
+  font-weight: 500;
+  text-decoration: underline; /* 밑줄 추가 */
 }
 .form-label {
   padding: 0.5rem;
@@ -201,8 +201,13 @@ body {
   margin: 5% auto;
 }
 .login-btn {
+  border: none;
+  color : white;
+  border-radius: 5px;
   width: 100%;
+  height: 40px;
   margin-top: 1rem;
+  background-color: #FF0062;
 }
 .or-divider {
   margin: 1.5rem 0;
@@ -227,7 +232,9 @@ body {
   margin: 0 5px;
 }
 .form-control:focus {
+  border-color: #FF0062; /* 원하는 테두리 색상 */
   box-shadow: none;
+  outline: none; /* 기본 아웃라인 제거 */
 }
 .naver-btn {
   width: 40px;
@@ -245,5 +252,10 @@ a {
 #naver_id_login {
   display: inline-block;
   vertical-align: middle;
+}
+
+::placeholder {
+  color: #999999; /* 원하는 색상으로 변경 */
+  opacity: 1; /* 투명도 조절 */
 }
 </style>
