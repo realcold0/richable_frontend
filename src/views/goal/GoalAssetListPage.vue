@@ -1,7 +1,8 @@
 <template>
   <div class="goal-asset-list-page">
     <!-- Top Section: Goal Asset Progress -->
-    <section class="goal-progress-section goal-card" @click="openAssetGoalDetailModal">
+    <section class="goal-progress-section goal-card" 
+    @click="openAssetGoalDetailModal">
       <div class="progress-bar-container">
         <p class="goal-description">
           김리치님의 목표 자산 현황<br />
@@ -106,6 +107,11 @@ const deleteGoal = () => {
     // 목표 목록에서 선택된 목표 삭제
     goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.id)
     goalToDelete = null
+
+      // 목표 삭제 후 모달 닫기
+      if (goalDetailModal.value) {
+      goalDetailModal.value.hide() // 모달 닫기
+    }
   }
 }
 </script>

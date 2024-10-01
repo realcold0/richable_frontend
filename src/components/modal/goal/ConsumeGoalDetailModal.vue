@@ -50,7 +50,7 @@
           <button
             type="button"
             class="btn"
-            @click="deleteGoal"
+            @click="deleteGoalHandler"
             style="
               background-color: white;
               border: 1px solid #020202;
@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose, computed } from 'vue'
+import { ref, onMounted, defineExpose, computed, defineEmits } from 'vue'
 import { Modal } from 'bootstrap'
 
 // 목표 리스트 상태
@@ -135,13 +135,24 @@ const show = (goalData) => {
 }
 
 // 목표 삭제 함수
-const deleteGoal = () => {
-  if (goalToDelete.value) {
-    goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.value.id) // 목표 삭제
-    goalToDelete.value = null
-    modalInstance.hide() // 모달 닫기
+// const deleteGoal = () => {
+//   if (goalToDelete.value) {
+//     goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.value.id) // 목표 삭제
+//     goalToDelete.value = null
+//     modalInstance.hide() // 모달 닫기
+//   }
+// }
+
+const deleteGoalHandler = () => {
+  emit('deleteGoal', goalDetail.value.id) // 부모 컴포넌트로 목표 ID를 함께 전송
+  if (modalInstance) {
+    modalInstance.hide() // 목표 삭제 후 모달 닫기
   }
 }
+
+
+// 이벤트 emit 정의
+const emit = defineEmits(['deleteGoal'])
 
 // 목표 달성 함수
 const achieveGoal = () => {
