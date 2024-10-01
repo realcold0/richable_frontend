@@ -13,6 +13,7 @@ const route = useRoute()
       <!-- topbar의 text는 path 별로 달라지게 해야 함 -->
       <div class="topbar">자산 현황</div>
       <RouterView />
+    </div>
 
       <!-- 푸터 -->
       <footer class="footer">
@@ -31,10 +32,7 @@ const route = useRoute()
         </div>
       </footer>
     </div>
-  </div>
-  <div id="app">
-    <MyPageComponent />
-  </div>
+  
 </template>
 
 <script>
@@ -48,7 +46,9 @@ export default {
 </script>
 <style scoped>
 .main-template {
-  display: flex;
+  min-height: 100vh; /* 화면 전체 높이를 차지 */
+  position: relative;
+  padding-bottom: 200px; /* 푸터 높이만큼 패딩 추가 */
 }
 .topbar {
   height: 70px;
@@ -68,18 +68,21 @@ export default {
 } */
 
 .page-view {
-  height: 1024px;
-  margin-left: 56px;
-  width: 100vw;
-  /* background-color: blue; */
+ min-height: 100vh;
 }
 
 /* 푸터 스타일 */
 .footer {
+  height: 200px; /* 푸터 높이 설정 */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* 화면 전체 너비 */
   background-color: #19181d;
   padding: 40px 0;
   text-align: center;
   color: white;
+  transform: translateY(0);
 }
 
 .footer-content {

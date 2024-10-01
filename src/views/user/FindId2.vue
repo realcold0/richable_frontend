@@ -1,6 +1,6 @@
 <template>
   <div class="find-id-confirmation-container">
-    <h2 class="text-center mb-5">아이디 찾기</h2>
+    <h2 class="text-center mb-5" style="font-size: 20px;">아이디 찾기</h2>
     <p class="text-center mb-5">입력하신 정보와 일치하는 아이디는 아래와 같습니다.</p>
     <p class="text-center found-id">
       {{ foundId }}

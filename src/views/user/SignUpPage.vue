@@ -1,13 +1,13 @@
 <!-- RC-P-03.vue -->
 <template>
   <div id="signup" class="signup-container">
-    <h2 class="mb-4">회원가입</h2>
+    <h2 class="mb-4" style="font-size: 20px;">회원가입</h2>
 
     <form @submit.prevent="join">
       <!-- id Field -->
       <div class="mb-3 text-start">
         <label for="id" class="form-label">
-          <i class="fa-solid fa-user"></i> 사용자 ID
+          <i class="fa-solid fa-user"></i> 아이디
           <button
             type="button"
             class="btn btn-success py-0 me-2 m-0 p-0 check_dupl"
@@ -24,7 +24,7 @@
             @input="changeId"
             class="form-control me-2"
             id="id"
-            placeholder="사용자명을 입력하세요"
+            placeholder="아이디를 입력하세요"
             required
           />
         </div>
@@ -66,20 +66,20 @@
           v-model="member.email"
           class="form-control"
           id="email"
-          placeholder="이메일을 입력하세요"
+          placeholder="richable@email.com"
           required
         />
       </div>
 
       <!-- Nickname Field -->
       <div class="mb-3 text-start">
-        <label for="nickname" class="form-label">별명</label>
+        <label for="nickname" class="form-label">닉네임</label>
         <input
           type="text"
           v-model="member.nickname"
           class="form-control"
           id="nickname"
-          placeholder="별명을 입력하세요"
+          placeholder="닉네임을 입력하세요"
           required
         />
       </div>
@@ -126,9 +126,9 @@
 
       <!-- Buttons -->
       <div class="d-flex justify-content-center">
-        <router-link to="/user/signin" class="join-link btn btn-light"> 취소</router-link>
+        <router-link to="/user/signin" class="btn btn-light"> 취소</router-link>
         <span class="mx-2"></span>
-        <button type="submit" class="btn btn-light" :disabled="disableSubmit">다음</button>
+        <button type="submit" class="btn btn-light" style="background-color:#FF0062;  color : white">다음</button>
       </div>
     </form>
   </div>
@@ -220,7 +220,7 @@ const join = async () => {
 
 <style scoped>
 body {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'pretendard', sans-serif;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
@@ -238,13 +238,30 @@ body {
   margin: 5% auto;
 }
 
+.join-link {
+  font-size: 0.9rem;
+  color: #777777;
+  font-weight: 500;
+  text-decoration: underline; /* 밑줄 추가 */
+}
+
+::placeholder {
+  color: #999999; /* 원하는 색상으로 변경 */
+  opacity: 1; /* 투명도 조절 */
+}
+
+/* Datepicker 플레이스홀더 색상 */
+.datepicker-input::placeholder {
+  color: #999999; /* 통일된 색상으로 변경 */
+}
+
+
 .btn {
   width: 80px;
   margin-top: 1rem;
 }
 
 .error-message {
-  color: #ff4444;
-  font-weight: bold;
+  color: #DD303F;
 }
 </style>
