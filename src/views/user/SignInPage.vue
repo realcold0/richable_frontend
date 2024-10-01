@@ -31,12 +31,7 @@
           <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button
-        type="submit"
-        class="btn btn-secondary login-btn"
-        :disabled="!id || !password"
-        @click="handleLogin"
-      >
+      <button type="submit" class="login-btn" :disabled="!id || !password">
         로그인
       </button>
     </form>
@@ -50,19 +45,19 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <img src="https://via.placeholder.com/40?text=N" alt="Naver" />
-    </div>
+      <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
+    </img>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
       <router-link to="/user/signup" class="join-link">가입하기</router-link>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -71,27 +66,37 @@ const password = ref('')
 const showPassword = ref(false)
 const router = useRouter()
 
+const BASE_URL = 'http://localhost:8080/member'
+
+// 네이버 로그인 설정
+const NAVER_CLIENT_ID = '6lCwElPsJ16_JoPQSjSA'
+const NAVER_CALLBACK_URL = 'http://localhost:8080/member/naverCallback'
+
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
-const handleLogin = () => {
-  if (id.value && password.value) {
-    router.push({ name: 'home' })
-  } else {
-    alert('Please fill in both ID and password')
+
+const naverLogin = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/naverlogin`);
+    if (response.data.redirectUrl) {
+      // 받은 state를 세션 스토리지에 저장
+      sessionStorage.setItem('naverState', response.data.state);
+      window.location.href = response.data.redirectUrl;
+    }
+  } catch (error) {
+    console.error('Naver login initiation failed:', error);
+    alert('네이버 로그인을 시작하는 데 문제가 발생했습니다.');
   }
 }
 
 const login = async () => {
   if (!id.value || !password.value) {
-    alert('Please fill in both ID and password')
+    alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
 
   try {
-    console.log('ID:', id.value)
-    console.log('Password:', password.value)
-
     const response = await axios.post('http://localhost:8080/member/login', {
       id: id.value,
       password: password.value
@@ -108,12 +113,61 @@ const login = async () => {
     alert('Login failed. Please check your credentials.')
   }
 }
+
+const handleNaverCallback = async (code, state) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/naverCallback`, {
+      params: { code, state }
+    })
+    if (response.status === 200) {
+      console.log('Naver login success:', response.data)
+      // 여기서 받은 사용자 정보를 처리 (예: 로컬 스토리지에 저장)
+      alert('네이버 로그인 성공!')
+      router.push({ name: 'home' })
+    }
+  } catch (error) {
+    console.error('Naver login callback failed:', error)
+    alert('네이버 로그인 처리 중 오류가 발생했습니다.')
+  }
+}
+
+onMounted(() => {
+  // Check for Naver login callback
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
+  // 네이버 로그인 스크립트 로드
+  const naverScript = document.createElement('script');
+        naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
+        naverScript.charset = 'utf-8';
+        document.head.appendChild(naverScript);
+  
+        // jQuery 스크립트 로드
+        const jqueryScript = document.createElement('script');
+        jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
+        document.head.appendChild(jqueryScript);
+
+        // 스크립트 로드 완료 후 네이버 로그인 초기화
+    naverScript.onload = () => {
+      jqueryScript.onload = () => {
+        const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, NAVER_CALLBACK_URL);
+        naver_id_login.setButton("white", 1, 40);
+        naver_id_login.init_naver_id_login();
+      };
+    };
+  if (code && state) {
+    handleNaverCallback(code, state)
+  }
+})
+
+
 </script>
 
 <style scoped>
 body {
   width: 500px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'pretendard', sans-serif;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
@@ -128,7 +182,9 @@ body {
 }
 .join-link {
   font-size: 0.9rem;
-  color: #0d6efd;
+  color: #777777;
+  font-weight: 500;
+  text-decoration: underline; /* 밑줄 추가 */
 }
 .form-label {
   padding: 0.5rem;
@@ -145,8 +201,13 @@ body {
   margin: 5% auto;
 }
 .login-btn {
+  border: none;
+  color : white;
+  border-radius: 5px;
   width: 100%;
+  height: 40px;
   margin-top: 1rem;
+  background-color: #FF0062;
 }
 .or-divider {
   margin: 1.5rem 0;
@@ -171,11 +232,30 @@ body {
   margin: 0 5px;
 }
 .form-control:focus {
+  border-color: #FF0062; /* 원하는 테두리 색상 */
   box-shadow: none;
+  outline: none; /* 기본 아웃라인 제거 */
+}
+.naver-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+#naver_id_login {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+::placeholder {
+  color: #999999; /* 원하는 색상으로 변경 */
+  opacity: 1; /* 투명도 조절 */
 }
 </style>

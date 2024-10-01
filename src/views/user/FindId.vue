@@ -1,6 +1,6 @@
 <template>
   <div id="findid" class="find-id-container">
-    <h2 class="text-center mb-4">아이디 찾기</h2>
+    <h2 class="text-center mb-4" style="font-size: 20px;">아이디 찾기</h2>
 
     <form @submit.prevent="submitForm">
       <!-- Email Input Field -->
@@ -12,14 +12,13 @@
             v-model="email"
             class="form-control"
             id="email"
-            placeholder="이메일 주소를 입력해주세요"
+            placeholder="richable@email.com"
             required
           />
           <button
             type="button"
             class="btn btn-secondary"
             @click="sendVerificationCode"
-            :disabled="!email"
           >
             인증번호
           </button>
@@ -42,7 +41,6 @@
             type="button"
             class="btn btn-secondary"
             @click="verifyCode"
-            :disabled="!verificationCode"
           >
             확인
           </button>
@@ -54,7 +52,6 @@
         <button
           type="button"
           class="btn btn-secondary w-100 mb-3"
-          :disabled="!isCodeSent || !verificationCode"
           @click="goNext"
         >
           계속
@@ -134,9 +131,14 @@ const submitForm = () => {
 </script>
 
 <style scoped>
+.body{
+
+  color:#19181D;
+  font-family: pretendard;
+  
+}
 .find-id-container {
   width: 500px;
-  /* height: 100%; */
   max-width: 500px;
   margin: auto;
   padding: 2rem;
@@ -150,13 +152,65 @@ const submitForm = () => {
   margin-bottom: 5rem;
 }
 
+button {
+  background-color: #FF0062;
+  color: white; /* 버튼 텍스트 색상 */
+  border: none; /* 버튼 테두리 제거 */
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease; /* 부드러운 전환 효과 */
+}
+
+/* 버튼 호버 시 */
+button:hover {
+  background-color: #e60056; /* 약간 더 어두운 핑크 */
+}
+
+/* 버튼 클릭 시 (active 상태) */
+button:active {
+  background-color: #cc004d !important; /* 클릭 시 더 어두운 색상 */
+  transform: translateY(2px) !important; /* 눌렸을 때의 시각적 효과 */
+}
+
+/* input-group 내 버튼 스타일 */
+.input-group .btn {
+  background-color: #FF0062;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 0 5px 5px 0; /* 오른쪽만 둥글게 */
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* input-group 버튼 호버 시 */
+.input-group .btn:hover {
+  background-color: #e60056;
+}
+
+/* input-group 버튼 클릭 시 (active 상태) */
+.input-group .btn:active {
+  background-color: #cc004d;
+  transform: translateY(2px); /* 눌렸을 때의 시각적 효과 */
+}
+
+.form-control:focus {
+  border-color: #FF0062; /* 원하는 테두리 색상 */
+  box-shadow: none;
+  outline: none; /* 기본 아웃라인 제거 */
+}
+
 .join-link {
   font-size: 0.9rem;
-  color: #0d6efd;
-  text-decoration: none;
+  color: #777777;
+  font-weight: 500;
+  text-decoration: underline; /* 밑줄 추가 */
 }
 
 .input-group .btn {
   width: 100px;
 }
+
+
 </style>
