@@ -51,13 +51,7 @@
             type="button"
             class="btn"
             @click="deleteGoalHandler"
-            style="
-              background-color: white;
-              border: 1px solid #020202;
-              color: #020202;
-              font-weight: bold;
-              margin-right: 12px;
-            "
+            style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px;"
           >
             <font-awesome-icon icon="trash" />
           </button>
@@ -65,13 +59,7 @@
             type="button"
             class="btn"
             data-bs-dismiss="modal"
-            style="
-              background-color: white;
-              border: 1px solid #020202;
-              color: #020202;
-              font-weight: bold;
-              margin-right: 12px;
-            "
+            style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px;"
           >
             취소
           </button>
@@ -90,15 +78,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose, computed, defineEmits } from 'vue'
+import { ref, onMounted, computed, defineEmits, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
-
-// 목표 리스트 상태
-const goals = ref([
-  { id: 1, title: '에어팟', totalAmount: 360000, currentAmount: 120000, progress: 33 },
-  { id: 2, title: '아이패드', totalAmount: 500000, currentAmount: 250000, progress: 50 },
-  { id: 3, title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 }
-])
 
 // 선택한 목표 상세 데이터
 const goalDetail = ref({
@@ -112,16 +93,28 @@ const goalDetail = ref({
 let goalToDelete = ref(null)
 
 // 목표량 포맷팅
-const formattedAmount = computed(() => {
-  return goalDetail.value.amount.toLocaleString() // "360,000"
-})
+const formattedAmount = computed(() => goalDetail.value.amount.toLocaleString())
 
 const modal = ref(null)
 let modalInstance = null
 
 // 모달 열기 함수
 const show = (goalData) => {
-  goalDetail.value = goalData
+  console.log("goalData:", goalData); // goalData 로그 확인
+
+  // progress 값이 undefined가 아닌지 확인
+  if (typeof goalData.progress === 'undefined') {
+    console.error("progress 값이 없습니다!");
+    return;
+  }
+
+  goalDetail.value = { 
+    ...goalData,
+    progress: goalData.progress || 0 // progress 값도 포함
+ 
+  }  // goalData를 전체 복사하여 goalDetail에 설정
+  console.log("goalDetail after setting:", goalDetail.value); // goalDetail 설정 후 로그 확인
+  
   goalToDelete.value = goalData // 삭제를 위한 목표 저장
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
@@ -134,35 +127,34 @@ const show = (goalData) => {
   }
 }
 
-// 목표 삭제 함수
-// const deleteGoal = () => {
-//   if (goalToDelete.value) {
-//     goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.value.id) // 목표 삭제
-//     goalToDelete.value = null
-//     modalInstance.hide() // 모달 닫기
-//   }
-// }
-
+// 목표 삭제 핸들러
 const deleteGoalHandler = () => {
-  emit('deleteGoal', goalDetail.value.id) // 부모 컴포넌트로 목표 ID를 함께 전송
+  emit('deleteGoal', goalDetail.value.id) // 부모 컴포넌트로 목표 ID 전송
   if (modalInstance) {
     modalInstance.hide() // 목표 삭제 후 모달 닫기
   }
 }
 
+// 목표 달성 핸들러
+const achieveGoal = () => {
+  const progress = Number(goalDetail.value.progress);  // progress 값을 숫자로 변환
+  console.log("goalDetail.progress (as number):", progress);  // 숫자로 변환한 후 로그 확인
+
+  // 비교 시 정확하게 100인지 확인
+  if (progress !== 100) {  
+    alert("아직 달성되지 않았습니다.");
+    return;
+  }
+
+  emit('achieveGoal', goalDetail.value.id);
+  modalInstance.hide();
+  alert('목표가 달성되었습니다.');
+};
+
+
 
 // 이벤트 emit 정의
-const emit = defineEmits(['deleteGoal'])
-
-// 목표 달성 함수
-const achieveGoal = () => {
-  const goal = goals.value.find((goal) => goal.id === goalDetail.value.id)
-  if (goal) {
-    goal.progress = 100 // 목표 달성 100%로 변경
-    modalInstance.hide() // 모달 닫기
-    alert('목표가 달성되었습니다.')
-  }
-}
+const emit = defineEmits(['deleteGoal', 'achieveGoal'])
 
 // 컴포넌트 마운트 시 모달 초기화
 onMounted(() => {
@@ -174,20 +166,13 @@ onMounted(() => {
   }
 })
 
-defineExpose({ show })
+defineExpose({
+  show
+})
 </script>
 
 <style scoped>
 .modal-header {
   font-weight: bold;
-}
-
-.input-group-text {
-  border: none;
-  background: transparent;
-}
-
-.modal-footer .btn-pink {
-  background-color: #ff007f;
 }
 </style>

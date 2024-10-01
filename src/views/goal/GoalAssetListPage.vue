@@ -1,16 +1,22 @@
 <template>
   <div class="goal-asset-list-page">
     <!-- Top Section: Goal Asset Progress -->
-    <section class="goal-progress-section goal-card" 
-    @click="openAssetGoalDetailModal">
-      <div class="progress-bar-container">
+    <section class="goal-progress-section goal-card">
+      <div v-if="assetGoalDeleted" class="goal-card empty-goal-card" @click="openAssetGoalCreateModal">
+        <!-- 빈 카드 -->
+        <div>목표 자산을 추가하세요</div>
+        <div>+</div>
+      </div>
+
+      <!-- 목표 자산이 남아 있을 때만 자산 현황을 표시 -->
+      <div v-else-if="assetGoal && assetGoal.totalAmount" class="progress-bar-container" @click="openAssetGoalDetailModal">
         <p class="goal-description">
           김리치님의 목표 자산 현황<br />
-          <strong>100,000,000원</strong>까지 <strong>1234</strong>일 남았습니다 💪
+          <strong>{{ assetGoal.totalAmount.toLocaleString() }}원</strong>까지 <strong>1234</strong>일 남았습니다 💪
         </p>
-        <p>현재 <strong>40,023,150</strong>원 모았습니다 😁</p>
+        <p>현재 <strong>{{ assetGoal.currentAmount.toLocaleString() }}</strong>원 모았습니다 😁</p>
         <div class="progress-bar">
-          <div class="progress" :style="{ width: '40%' }"></div>
+          <div class="progress" :style="{ width: (assetGoal.currentAmount / assetGoal.totalAmount) * 100 + '%' }"></div>
         </div>
       </div>
     </section>
@@ -25,7 +31,7 @@
     <section class="goal-cards">
       <div
         v-for="(goal, index) in goals"
-        :key="index"
+        :key="goal.id"
         class="goal-card"
         @click="openGoalDetailModal(goal)"
       >
@@ -37,16 +43,17 @@
         <p>{{ goal.progress }}% 달성</p>
       </div>
 
-      <!-- Add Goal Button: 클릭하면 모달이 열리도록 연결 -->
+      <!-- Add Goal Button -->
       <div class="goal-card add-goal" @click="openCreateModal">
         <p>+</p>
       </div>
     </section>
 
     <!-- 모달 컴포넌트 연결 -->
-    <ConsumeGoalCreateModal ref="goalCreateModal" />
-    <ConsumeGoalDetailModal ref="goalDetailModal" @deleteGoal="deleteGoal" />
-    <AssetGoalDetailModal ref="assetGoalDetailModal" />
+    <ConsumeGoalCreateModal ref="goalCreateModal" @registerGoal="addNewGoal" />
+    <ConsumeGoalDetailModal ref="goalDetailModal" @deleteGoal="deleteGoal" @achieveGoal="removeAchievedGoal" />
+    <AssetGoalDetailModal ref="assetGoalDetailModal" @goalDeleted="onAssetGoalDeleted" />
+    <AssetGoalCreateModal ref="assetGoalCreateModal" @registerGoal="addNewAssetGoal" />
   </div>
 </template>
 
@@ -55,64 +62,104 @@ import { ref } from 'vue'
 import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreateModal.vue'
 import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue'
 import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailModal.vue'
+import AssetGoalCreateModal from '../../components/modal/goal/AssetGoalCreateModal.vue'
 
 // 목표 데이터
 const goals = ref([
   { id: 1, title: '에어팟', totalAmount: 360000, currentAmount: 120000, progress: 33 },
   { id: 2, title: '아이패드', totalAmount: 500000, currentAmount: 250000, progress: 50 },
-  { id: 3, title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 }
+  { id: 3, title: '노트북', totalAmount: 1000000, currentAmount: 500000, progress: 50 },
+  { id: 4, title: '맥북', totalAmount: 1000000, currentAmount: 1000000, progress: 100 }
 ])
+
+// assetGoal 변수 정의 (새로운 자산 목표를 관리)
+const assetGoal = ref({
+  totalAmount: 100000000,
+  currentAmount: 1234567
+});  // 자산 목표 리스트
 
 // 모달 제어를 위한 ref
 const goalCreateModal = ref(null)
 const goalDetailModal = ref(null)
 const assetGoalDetailModal = ref(null)
+const assetGoalCreateModal = ref(null)
+const assetGoalDeleted = ref(false);  // 자산 목표가 삭제되었는지 여부
 
-// 삭제할 목표를 저장하는 변수
-let goalToDelete = null
+// 목표 추가 함수
+const addNewGoal = (newGoal) => {
+  const newId = goals.value.length + 1
+  goals.value.push({
+    id: newId,
+    title: newGoal.title,
+    totalAmount: newGoal.totalAmount,
+    currentAmount: 0, // 신규 목표는 현재 금액 0으로 시작
+    progress: 0
+  })
+  console.log('새 목표 추가:', newGoal)
+}
+
+// 새로운 자산 목표 추가 함수
+const addNewAssetGoal = (newAssetGoal) => {
+  // 새로운 자산 목표를 assetGoal에 반영
+  assetGoal.value.totalAmount = newAssetGoal.amount;
+  assetGoal.value.currentAmount = 0; // 새로 등록된 목표 자산이므로 현재 금액은 0으로 설정
+  assetGoalDeleted.value = false;  // 삭제된 자산 목표를 다시 복원
+  console.log('새 자산 목표 추가:', newAssetGoal);
+};
 
 // 목표 생성 모달 열기 함수
 const openCreateModal = () => {
   if (goalCreateModal.value) {
-    goalCreateModal.value.show() // 목표 생성 모달 표시
+    goalCreateModal.value.show()
   }
 }
 
 // 목표 세부 모달 열기 함수
 const openGoalDetailModal = (goal) => {
-  goalToDelete = goal // 삭제를 위해 선택한 목표 저장
   if (goalDetailModal.value) {
     goalDetailModal.value.show({
+      id: goal.id,
       type: '소비',
       name: goal.title,
-      amount: goal.totalAmount
+      amount: goal.totalAmount,
+      progress: goal.progress
     })
   }
 }
 
-// AssetGoalDetailModal 열기 함수 (카드 클릭 시 작동)
+// 목표 자산 모달 열기 함수
 const openAssetGoalDetailModal = () => {
-  if (assetGoalDetailModal.value) {
-    assetGoalDetailModal.value.show({
+  if (!assetGoalDeleted.value) {  // 목표 자산이 삭제되지 않았을 때만 열기
+    const goalData = {
       type: '자산 형성',
-      name: '김리치님의 목표 자산',
-      amount: 100000000
-    })
+      amount: 100000000,
+    };
+    if (assetGoalDetailModal.value) {
+      assetGoalDetailModal.value.show(goalData);
+    }
   }
+};
+
+// 새로운 자산 목표 추가 모달 열기 함수
+const openAssetGoalCreateModal = () => {
+  if (assetGoalCreateModal.value) {
+    assetGoalCreateModal.value.show();
+  }
+}
+
+const onAssetGoalDeleted = () => {
+  assetGoalDeleted.value = true;  // 목표 삭제 후 빈 카드 표시
+  console.log('Asset goal deleted, showing empty card.');
+};
+
+// 목표 달성 시 목표 삭제 함수
+const removeAchievedGoal = (goalId) => {
+  goals.value = goals.value.filter((goal) => goal.id !== goalId)
 }
 
 // 목표 삭제 함수
-const deleteGoal = () => {
-  if (goalToDelete) {
-    // 목표 목록에서 선택된 목표 삭제
-    goals.value = goals.value.filter((goal) => goal.id !== goalToDelete.id)
-    goalToDelete = null
-
-      // 목표 삭제 후 모달 닫기
-      if (goalDetailModal.value) {
-      goalDetailModal.value.hide() // 모달 닫기
-    }
-  }
+const deleteGoal = (goalId) => {
+  goals.value = goals.value.filter((goal) => goal.id !== goalId)
 }
 </script>
 
@@ -122,14 +169,14 @@ const deleteGoal = () => {
 }
 
 .goal-card {
-  flex: 1 1 calc(33.333% - 10px); /* 카드 크기를 3개씩 보이도록 조정 */
+  flex: 1 1 calc(33.333% - 10px);
   background-color: #ffffff;
-  padding: 30px; /* 카드 내부 여백 추가 */
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   cursor: pointer;
-  font-size: 18px; /* 카드 내 텍스트 크기 확대 */
+  font-size: 18px;
 }
 
 .progress-bar-container {
@@ -139,7 +186,7 @@ const deleteGoal = () => {
 .progress-bar {
   width: 100%;
   background-color: #f0f0f0;
-  height: 15px; /* 프로그레스 바 높이 증가 */
+  height: 15px;
   border-radius: 5px;
   margin: 10px 0;
 }
@@ -160,9 +207,9 @@ const deleteGoal = () => {
 }
 
 .goal-cards {
-  display: grid; /* 그리드 레이아웃으로 변경 */
-  grid-template-columns: repeat(3, 1fr); /* 3개의 칼럼으로 설정 */
-  gap: 20px; /* 카드 사이의 간격 유지 */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .add-goal {
