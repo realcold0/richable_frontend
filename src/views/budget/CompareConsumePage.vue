@@ -4,7 +4,7 @@
     <div class="month-navigation text-center">
       <!-- 이전 달 버튼 -->
       <button @click="previousMonth" class="btn custom-btn-left"></button>
-      <div>{{ months[currentMonthIndex] }}</div>
+      <div>{{ months[month.value - 1] }}</div>
       <!-- 다음 달 버튼 -->
       <button @click="nextMonth" class="btn custom-btn-right"></button>
     </div>
@@ -21,9 +21,11 @@
       <h5>나는 평균 대비 얼마나 지출할까요?</h5>
     </div>
 
+    <!-- 카테고리 선택 및 비교 -->
     <div class="text-center">
       <p>
-        나의 이번 달 <select v-model="category" class="form-select custom-inline-select">
+        나의 이번 달 
+        <select v-model="category" class="form-select custom-inline-select">
           <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
         </select>
         소비는 평균보다
@@ -34,6 +36,10 @@
         <span v-else class="text-danger">많습니다</span>.
       </p>
       <canvas id="myChart"></canvas>
+    </div>
+
+    <div>
+      <br><br><br><br><br><br>
     </div>
 
     <!-- 6개월 절약 시뮬레이션 -->
@@ -53,28 +59,34 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
+import { useMonthStore } from '@/stores/consume/curMonth';
 
 // 차트.js 등록
-Chart.register(...registerables)
+Chart.register(...registerables);
 
 // 달별 네비게이션
-const months = [
-  '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월',
-]
-const currentMonthIndex = ref(8)
+const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+const monthStore = useMonthStore();
+const { month, year, increaseMonth, decreaseMonth } = monthStore;
+
+// 이전 달 선택
 const previousMonth = () => {
-  if (currentMonthIndex.value > 0) currentMonthIndex.value -= 1
-}
+  decreaseMonth(); // 이전 달로 이동
+  fetchCompareData(); // 새로운 달에 맞춰 데이터 갱신
+};
+
+// 다음 달 선택
 const nextMonth = () => {
-  if (currentMonthIndex.value < 11) currentMonthIndex.value += 1
-}
+  increaseMonth(); // 다음 달로 이동
+  fetchCompareData(); // 새로운 달에 맞춰 데이터 갱신
+};
 
 // 소비 정보
-const totalSaved = ref(12100000)
+const totalSaved = ref(12100000);
 const categories = ref([
   '식료품',
   '유흥',
@@ -88,45 +100,57 @@ const categories = ref([
   '교육비',
   '외식/숙박',
   '기타',
-])
-const category = ref('식료품')
-const userSpending = ref(0)
-const averageSpending = ref(50000)
-const diffAmount = computed(() => userSpending.value - averageSpending)
+]);
+const category = ref('식료품');
+const userSpending = ref(0);
+const averageSpending = ref(50000);
+const diffAmount = computed(() => userSpending.value - averageSpending.value);
 
 // 6개월 저축 시뮬레이션
-const currentSavings = ref(120000)
-const totalSavings = ref(600000)
+const currentSavings = ref(120000);
+const totalSavings = ref(600000);
 
 // 라우터에서 uid 가져오기
-const route = useRoute()
-const uid = route.params.uid
+const route = useRoute();
+const uid = route.params.uid;
 
-// 소비 데이터 가져오기
-const fetchConsumes = async () => {
+// cntMonth, cntCategory, averageSum, mySum 불러오기
+const fetchCompareData = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/consume/user/${uid}`)
-    consumptionData.value = response.data
+    // year와 month가 제대로 설정되어 있는지 확인
+    const cntYear = year.value ?? new Date().getFullYear(); // year가 undefined일 경우 현재 연도로 설정
+    const cntMonth = month.value ? month.value.toString().padStart(2, '0') : '01'; // month가 undefined일 경우 기본값 '01' 설정
 
-    // 카테고리에 따른 소비 데이터 필터링
-    userSpending.value = consumptionData.value
-      .filter((item) => item.category === category.value)
-      .reduce((sum, item) => sum + item.amount, 0)
+    // year와 month가 없는 경우 에러 처리
+    if (!cntYear || !cntMonth) {
+      console.error('Invalid year or month:', cntYear, cntMonth);
+      return;
+    }
+
+    // API 호출
+    const response = await axios.get(`http://localhost:8080/compare/${cntYear}/${cntMonth}/${category.value}`);
+    
+    const compareData = response.data.response.data;
+    userSpending.value = compareData.mySum;
+    averageSpending.value = compareData.averageSum;
+    
+    createCharts(); // 차트 갱신
   } catch (error) {
-    console.error('Error fetching consume data:', error)
+    console.error('Error fetching compare data:', error);
   }
-}
+};
+
 
 // 차트 초기화
-let myChart = null
-let savingChart = null
+let myChart = null;
+let savingChart = null;
 
 const createCharts = () => {
-  const ctx1 = document.getElementById('myChart').getContext('2d')
-  const ctx2 = document.getElementById('savingChart').getContext('2d')
+  const ctx1 = document.getElementById('myChart').getContext('2d');
+  const ctx2 = document.getElementById('savingChart').getContext('2d');
 
-  if (myChart) myChart.destroy() // 이전 차트 삭제
-  if (savingChart) savingChart.destroy()
+  if (myChart) myChart.destroy(); // 이전 차트 삭제
+  if (savingChart) savingChart.destroy();
 
   // 막대 그래프 설정 - 둥근 모서리, 두드러진 색상
   myChart = new Chart(ctx1, {
@@ -146,11 +170,11 @@ const createCharts = () => {
     },
     options: {
       responsive: true,
-      scales: { 
-        y: { 
+      scales: {
+        y: {
           beginAtZero: true,
           ticks: {
-            callback: function(value) {
+            callback: function (value) {
               return value.toLocaleString() + '원';  // y축 값에 '원' 단위 추가
             }
           }
@@ -158,20 +182,20 @@ const createCharts = () => {
       },
       plugins: {
         legend: {
-          display: false,  // 범례 비활성화
+          display: true,  // 범례 활성화
         },
         tooltip: {
           callbacks: {
-            label: function(tooltipItem) {
+            label: function (tooltipItem) {
               return tooltipItem.raw.toLocaleString() + '원';  // 툴팁에 '원' 추가
             },
           },
         },
       },
     },
-  })
+  });
 
-
+  // 절약 시뮬레이션 차트
   savingChart = new Chart(ctx2, {
     type: 'line',
     data: {
@@ -202,25 +226,18 @@ const createCharts = () => {
         },
       },
     },
-  })
-}
+  });
+};
 
 // 데이터 가져온 후 차트 생성
 onMounted(() => {
-  fetchConsumes().then(() => {
-    createCharts()
-  })
-})
+  fetchCompareData(); // 처음 마운트될 때 데이터 불러오기
+});
 
 // 카테고리 변경 시 차트 업데이트
 watch(category, () => {
-  if (consumptionData.value.length > 0) {
-    userSpending.value = consumptionData.value
-      .filter((item) => item.category === category.value)
-      .reduce((sum, item) => sum + item.amount, 0)
-    createCharts()
-  }
-})
+  fetchCompareData(); // 카테고리 변경 시 차트 업데이트
+});
 </script>
 
 <style scoped>
@@ -318,6 +335,8 @@ watch(category, () => {
 /* 차트 스타일 */
 canvas {
   max-width: 100%;
+  width: 800px;
+  height: 400px;
   margin: 0 auto;
   display: block;
 }
