@@ -3,8 +3,8 @@
         <div class="monthWrapper">
             <div id="left" @click="decreaseMonth"><font-awesome-icon :icon="['fas', 'caret-left']" class="icon"/></div>
             <div class="date">
-                <h5 id="year">{{ month.year }}</h5>
-                <h1 id="month">{{ month.month }}월</h1>
+                <div id="year">{{ month.year }}</div>
+                <div id="month">{{ month.month }}월</div>
             </div>
             
             <div id="right" @click="increaseMonth"><font-awesome-icon :icon="['fas', 'caret-right']" class="icon"/></div>

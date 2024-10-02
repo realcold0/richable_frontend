@@ -11,8 +11,8 @@
 
                 <div class="consumeSumAndList">
                     <div class="totalConsumeAmount">
-                        <h3>총소비</h3>
-                        <h3>{{ totalSum }}</h3>
+                        <div>총소비</div>
+                        <div>{{ totalSum }}</div>
                     </div>
                     
                     <table class="consumeList">
@@ -118,10 +118,10 @@ watch(() => month.month, (newValue, oldVlaue) =>{
     }
 
     .analyzeText {
-        font-size: 20px;
+        font-size: 18px;
     }
     .anlyzeWrapper #month, #mostCategory {
-        font-size: 32px;
+        font-size: 18px;
     }
     .anlyzeWrapper .chart {
         width: 255px;

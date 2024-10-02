@@ -102,13 +102,14 @@ watch(() => month.month, (newValue, oldVlaue) =>{
 
 </script>
 <style scoped>
+
     .consumeCompareWrapper {
         width: 864px;
         padding: 30px 20px;
         /* background-color: red; */
     }
     .consumeCompareTitle {
-        font-size: 32px;
+        font-size: 18px;
     }
 
     .graphWrapper {
