@@ -4,20 +4,20 @@
     <div class="month-navigation text-center">
       <!-- 이전 달 버튼 -->
       <button @click="previousMonth" class="btn custom-btn-left"></button>
-      <h2>{{ months[currentMonthIndex] }}</h2>
+      <div>{{ months[currentMonthIndex] }}</div>
       <!-- 다음 달 버튼 -->
       <button @click="nextMonth" class="btn custom-btn-right"></button>
     </div>
 
     <!-- 상단 소비 정보 -->
     <div class="text-center mb-4 saved-info">
-      <h2>이번 달에 아낄 수 있었던 비용이에요</h2>
-      <h1 class="saved-amount">{{ totalSaved.toLocaleString() }}원</h1>
+      <div>이번 달에 아낄 수 있었던 비용이에요</div>
+      <div class="saved-amount">{{ totalSaved.toLocaleString() }}원</div>
     </div>
 
     <!-- 카테고리 선택 및 비교 -->
     <div class="text-left mb-4 category-comparison">
-      <h4>대한민국 평균 소비금액을 기준으로 비교해요</h4>
+      <div>대한민국 평균 소비금액을 기준으로 비교해요</div>
       <h5>나는 평균 대비 얼마나 지출할까요?</h5>
     </div>
 
@@ -171,6 +171,7 @@ const createCharts = () => {
     },
   })
 
+
   savingChart = new Chart(ctx2, {
     type: 'line',
     data: {
@@ -223,6 +224,9 @@ watch(category, () => {
 </script>
 
 <style scoped>
+*{
+  font-size: 20px;
+}
 /* 월 네비게이션 */
 .month-navigation {
   display: flex;

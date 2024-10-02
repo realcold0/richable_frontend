@@ -11,7 +11,7 @@ const route = useRoute()
 
     <div class="page-view">
       <!-- topbar의 text는 path 별로 달라지게 해야 함 -->
-      <div class="topbar">자산 현황</div>
+      <div class="topbar"> <span style="margin-left: 12px;">자산 현황</span></div>
       <RouterView />
     </div>
 
@@ -36,13 +36,7 @@ const route = useRoute()
 </template>
 
 <script>
-import MyPageComponent from './components/MyPageComponent.vue';
 
-export default {
-  components: {
-    MyPageComponent,
-  },
-};
 </script>
 <style scoped>
 .main-template {
