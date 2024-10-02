@@ -67,11 +67,11 @@ const renderDoughnutChart = async() => {
         chartInstance.destroy()
     }
 
-    console.log(`http://localhost:8080/consume/category/sum/${month.year}/${month.month}`)
+    console.log(`http://localhost:8080/outcome/category/sum/${month.year}/${month.month}`)
 
     
 
-    await axios.get(`http://localhost:8080/consume/category/sum/${month.year}/${month.month}`)
+    await axios.get(`http://localhost:8080/outcome/category/sum/${month.year}/${month.month}`)
     .then( response =>{
         labels.value = response.data.categorys.map(item => item.category)
         data.value = response.data.categorys.map(item => item.sum)
