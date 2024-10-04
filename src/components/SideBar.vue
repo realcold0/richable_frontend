@@ -21,8 +21,8 @@
 
         <div  @mouseenter="toggleAssetMenu" @mouseleave="toggleAssetMenu" class="wrapButton">
             <div :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
-                <font-awesome-icon :icon="['fas', 'hand-holding-dollar']" class="icon" />
-                <span v-if="isSideBarActive" class="text sideToggle">자산</span>
+                <font-awesome-icon :icon="['fas', 'wallet']" class="icon" />
+                <span v-if="isSideBarActive" class="text sideToggle" style="margin-left: 8px; font-weight: 450;">자산</span>
             </div>
             <transition name="slide-fade">
                 <div v-if="isAssetMenuOpen" class="subButton">
@@ -44,18 +44,18 @@
       
         <div @mouseenter="toggleIncomeMenu" @mouseleave="toggleIncomeMenu" class="wrapButton">
             <div :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
-                <font-awesome-icon :icon="['fas', 'money-bill']" class="icon" />
-                <span v-if="isSideBarActive" class="text sideToggle">소득/소비</span>
+                <font-awesome-icon :icon="['fas', 'receipt']" class="icon" />
+                <span v-if="isSideBarActive" class="text sideToggle" style="margin-left: 8px; font-weight: 450;">소득/소비</span>
             </div>
 
             <div v-if="isIncomeMenuOpen" class="subButton">
-                <router-link to="/budget/list" class="button">
+                <router-link to="/budget/consume/analysis" class="button">
                 <span class="text">소비 분석</span>
                 </router-link>
                 <router-link to="/budget/consume/compare" class="button">
                 <span class="text">평균 소비 비교</span>
                 </router-link>
-                <router-link to="/budget/consume/analysis" class="button">
+                <router-link to="/budget/list" class="button">
                 <span class="text">소득/소비 관리</span>
                 </router-link>
             </div>
@@ -63,8 +63,8 @@
 
         <div @mouseenter="toggleInvestMenu" @mouseleave="toggleInvestMenu" class="wrapButton">
             <div :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
-                <font-awesome-icon :icon="['fas', 'chart-line']" class="icon" />
-                <span v-if="isSideBarActive" class="text sideToggle">투자</span>
+                <font-awesome-icon :icon="['fas', 'arrow-trend-up']" class="icon" />
+                <span v-if="isSideBarActive" class="text sideToggle" style="margin-left: 8px; font-weight: 450;">투자</span>
             </div>
 
             <div v-if="isInvestMenuOpen" class="subButton">
@@ -80,7 +80,7 @@
         <router-link to="/goal/list">
             <div @click="toggleGoalMenu" :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
                 <font-awesome-icon :icon="['fas', 'bullseye']" class="icon" />
-                <span v-if="isSideBarActive" class="text sideToggle">목표</span>
+                <span v-if="isSideBarActive" class="text sideToggle" style="margin-left: 8px ;font-weight: 450;">목표</span>
             </div>
         </router-link>
       
@@ -94,7 +94,7 @@
         <router-link to="/knowhow/list">
             <div @click="toggleCommunityMenu" :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
                 <font-awesome-icon :icon="['fas', 'users']" class="icon" />
-                <span v-if="isSideBarActive" class="text sideToggle">리치 노하우</span>
+                <span v-if="isSideBarActive" class="sideToggle" style="margin-left: 8px; font-weight: 450; ">리치 노하우</span>
             </div>
         </router-link>
     <!-- <div v-if="isCommunityMenuOpen" class="subButton">
@@ -102,14 +102,48 @@
                     <span class="text">리치 노하우</span>
                 </router-link>
             </div> -->
+        
     </div>
 
-    <div class="menu-bottom">
-      <router-link to="/user/signin" :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'">
-        <font-awesome-icon :icon="['fas', 'right-to-bracket']" class="icon" />
-        <span v-if="isSideBarActive" class="text">로그인</span>
+
+      <!-- 로그인/유저 정보/로그아웃 -->
+      <div class="menu-bottom">
+      <router-link v-if="!isLoggedIn" to="/user/signin" :class="isSideBarActive ? 'expanded-button login-button' : 'collapsed-button login-button'">
+        <font-awesome-icon :icon="['fas', 'arrow-right-to-bracket']" class="icon" />
+        <span v-if="isSideBarActive" class="text" style="margin-left: 8px; font-weight: 450;">로그인</span>
       </router-link>
+      
+      <!-- <div v-if="isLoggedIn" :class="isSideBarActive ? 'expanded-user' : 'collapsed-user'">
+        <div class="user-info" :class="isSideBarActive ? 'expanded-user' : 'collapsed-user'">
+          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
+          <div v-if="isSideBarActive">
+            <p class="user-name">{{ user.name }}</p>
+            <p class="user-email">{{ user.email }}</p>
+          </div>
+        </div> -->
+
+
+       
+          <div v-if="isLoggedIn" :class="isSideBarActive ? 'expanded-button' : 'collapsed-button'" class="user_info">
+            <router-link to="/user/myPage" >
+              <img 
+                src="../assets/images/navbar-rich.png" 
+                alt="user"
+                style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #CCCCD6;" />
+                <span v-if="isSideBarActive"class="text sideToggle" style="margin-left: 8px; font-weight: 550;">김리치</span>
+            </router-link>
+            </div>
+
+        
+        <div v-if="isLoggedIn" @click="logout">
+          <div :class="isSideBarActive ? 'expanded-button login-button' : 'collapsed-button login-button'">
+            <font-awesome-icon :icon="['fas', 'arrow-right-to-bracket']" class="icon" />
+            <span v-if="isSideBarActive" class="text" style="margin-left: 8px; font-weight: 550;">로그아웃</span>
+          </div>
+        </div>
+
     </div>
+    
   </aside>
 </template>
 
@@ -171,12 +205,37 @@ export default {
       this.isInvestMenuOpen = false
       this.isGoalMenuOpen = false
       this.isCommunityMenuOpen = false
+    },
+    checkLoginStatus() {
+      // localStorage에 토큰이 있는지 확인하여 로그인 상태 설정
+      const token = localStorage.getItem('authToken');
+      this.isLoggedIn = !!token;
+    },
+    logout() {
+      // 로그아웃 시 localStorage에서 토큰 삭제 후 로그인 페이지로 리디렉션
+      localStorage.removeItem('authToken');
+      alert('로그아웃 되었습니다.');
+      this.isLoggedIn = false;
+      this.$router.push('/user/signin');
+    }
+  },
+  mounted(){
+    this.checkLoginStatus();
+  },
+  watch: {
+    // 페이지가 바뀔 때마다 로그인 상태 확인
+    $route() {
+      this.checkLoginStatus();
     }
   }
 }
 </script>
 
 <style scoped>
+.body{
+  font-family: pretendard;
+  color: #19181d;
+}
 aside {
   position: fixed; /* 페이지 위로 열리도록 설정 */
   top: 0;
@@ -189,7 +248,8 @@ aside {
   width: 56px; /* 축소된 상태의 너비 */
   transition: width 0.2s ease; /* 너비 변경 시 애니메이션 */
   border-radius: 0% 16px 16px 0%;
-  border: 1px solid gray;
+  /* border: 1px solid gray; 기존 border 제거 */
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
   background-color: white;
 }
 
@@ -197,6 +257,7 @@ aside {
 aside.active {
   transform: translateX(0); /* 페이지 위로 열리도록 */
   width: 320px; /* 확장된 상태의 너비 */
+  box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.2); /* 확장된 상태에서 더 진한 그림자 */
 }
 
 .expanded-logo {
@@ -232,7 +293,7 @@ aside.active {
 
 a {
   text-decoration: none;
-  color: black;
+  color: #19181d;
 }
 .menu .wrapButton {
     display: flex;
@@ -240,12 +301,18 @@ a {
 }
 
 .menu .expanded-button {
-  margin: 20px 0;
-  padding: 0 20px;
+  margin: 10px 0;
+  padding: 10px 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
 }
+
+.menu .expanded-button:hover,
+.menu .collapsed-button:hover {
+  background-color: #f0f0f5; /* 호버 시 배경색 변경 */
+}
+
 
 .menu .expanded-button .icon {
   margin-right: 8px;
@@ -269,6 +336,12 @@ a {
 .subButton {
   display: flex;
   flex-direction: column;
+  margin-left: 38px;  
+  background-color: #f9f9f9; /* 서브메뉴 배경색 */
+  border-radius: 8px; /* 서브메뉴 항목의 둥근 모서리 */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 그림자 추가 */
+  padding: 10px 0; /* 서브메뉴의 상하 여백 */
+  overflow: hidden;
 }
 
 .subButton .button {
@@ -303,7 +376,16 @@ a {
   width: 24px;
 }
 
-/* 애니메이션 정의 (슬라이드 + 페이드 효과) */
+.subButton{
+  margin-left: 38px;  
+}
+
+.text{
+  color : #1D1616;
+  height: 20px;
+}
+
+/* 애니메이션 정의 (슬라이드 + 페이드 효과)
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.3s ease;
@@ -313,5 +395,6 @@ a {
 .slide-fade-leave-to {
   transform: translateY(-10px);
   opacity: 0;
-}
+} */
 </style>
+ 
