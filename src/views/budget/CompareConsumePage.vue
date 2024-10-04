@@ -45,26 +45,31 @@
       </div>
 
 
-    <!-- 6개월 절약 시뮬레이션 -->
-    <div v-if="totalSavings < 0" class="savings-summary-container">
-      <div class="summary-header">
-        <h4>6개월 간 소비를 절약했을 때</h4>
-      </div>
-      <p>
-        이번 달 소비 중 줄일 수 있는 소비는
-        <strong class="highlight">{{ (currentSavings || 0).toLocaleString() }}원</strong>이에요.
-        <br />6개월 동안
-        <strong class="highlight">{{ (totalSavings || 0).toLocaleString() }}원</strong> 절약이 가능해요!
-      </p>
-      <canvas id="savingChart"></canvas>
-    </div>
+      <div v-if="possibleSaveAmount.length > 0" class="savings-summary-container">
+  <div class="summary-header">
+    <h4>6개월 간 소비를 절약했을 때</h4>
   </div>
+  <p>
+    이번 달 소비 중 줄일 수 있는 소비는
+    <strong class="highlight">{{ possibleSaveAmount[0].toLocaleString() }}원</strong>이에요.
+    <br />6개월 동안
+    <strong class="highlight">{{ possibleSaveAmount[possibleSaveAmount.length - 1].toLocaleString() }}원</strong> 절약이 가능해요!
+  </p>
+  <canvas id="savingChart"></canvas>
+</div>
+
+
+
+
+</div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
+import { nextTick } from 'vue';
+
 
 // 차트.js 등록
 Chart.register(...registerables)
@@ -74,13 +79,15 @@ const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', 
 const currentMonthIndex = ref(8) // 현재 9월로 설정 (0부터 시작)
 const category = ref('식료품') // 기본 카테고리를 '식료품'으로 설정
 const categories = ref(['식료품', '유흥', '쇼핑', '공과금', '생활용품', '의료비', '교통비', '통신비', '문화', '교육비', '외식 · 숙박', '기타'])
-const totalSaved = ref(12100000) // 기본값 설정
-const currentSavings = ref(120000) // 기본값 설정
-const totalSavings = ref(600000) // 기본값 설정
+// const totalSaved = ref({}) // 기본값 설정
+// const currentSavings = ref({}) // 기본값 설정
+// const totalSavings = ref({}) // 기본값 설정
 const userSpending = ref(0)
 const couldsaving = ref(0)
 const averageSpending = ref(0)
 const diffAmount = computed(() =>  userSpending.value - averageSpending.value)
+const possibleSaveAmount = ref([]); // 빈 배열로 초기화
+const saveAmount = ref([]); // 빈 배열로 초기화
 
 const wordMapping2 = {
 '식료품': '식료품 · 비주류음료',
@@ -104,6 +111,7 @@ return wordMapping2[keyword] || '매핑되지 않은 컬럼';
 
 // 차트 초기화 변수
 let myChart = null
+let savingChart = null
 
 // 이전/다음 달 버튼 클릭 시
 const previousMonth = () => {
@@ -123,7 +131,9 @@ fetchComparisonData();
 watch(currentMonthIndex, () => {
 fetchComparisonData()
 fetchCouldSaving()
+fetchSimulationData()
 })
+
 // 소비 비교 데이터를 API에서 가져와 차트에 반영
 const fetchComparisonData = async () => {
 const cntYear = 2024; // 고정된 연도 값
@@ -160,18 +170,31 @@ try {
 const fetchSimulationData = async () => {
   const cntYear = 2024; // 고정된 연도 값
   const cntMonth = 10; // 10월로 설정
-  
+  try {
     const response = await axios.get(`http://localhost:8080/outcome/simulation/${cntYear}/${cntMonth}`);
     const data = response.data.response.data;
 
-    // 데이터가 정상적으로 들어오는지 확인하는 로그
     console.log(data);
 
-    // 불러온 데이터의 months, saveAmount, possibleSaveAmount 사용
-    const months = data.months;
-    const saveAmount = data.saveAmount;
-    const possibleSaveAmount = data.possibleSaveAmount;
+    // 데이터 처리
+    possibleSaveAmount.value = data.possibleSaveAmount.map(amount => Math.abs(amount));
+    saveAmount.value = data.saveAmount.map(amount => Math.abs(amount));
+
+    // DOM 업데이트가 완료된 후 차트 생성
+    nextTick(() => {
+      const canvasElement = document.getElementById('savingChart');
+      if (canvasElement) {
+        createSavingChart(data.months, saveAmount.value, possibleSaveAmount.value);
+      } else {
+        console.error('Cannot find canvas element for savingChart');
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching simulation data:', error);
+  }
 };
+
+
 
 // 막대 그래프 생성
 const createComparisonChart = () => {
@@ -222,12 +245,72 @@ const createComparisonChart = () => {
     },
   })
 }
+// 절약 시뮬레이션 차트 생성 함수
+const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
+  const ctx2 = document.getElementById('savingChart')?.getContext('2d');
+  
+  if (!ctx2) {
+    console.error('Cannot get context for savingChart');
+    return;
+  }
+
+  if (savingChart) savingChart.destroy(); // 기존 차트가 있으면 삭제
+
+  savingChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: '절약했을 때 저축',
+          data: possibleSaveAmount,
+          borderColor: '#FF6384',
+          fill: false,
+          borderWidth: 2,
+        },
+        {
+          label: '평소 저축',
+          data: saveAmount,
+          borderColor: '#D3D3D3',
+          fill: false,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return value.toLocaleString() + '원';
+            },
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              return tooltipItem.raw.toLocaleString() + '원';
+            },
+          },
+        },
+      },
+    },
+  });
+};
 
 // 페이지 로드 시 데이터 가져오기
 onMounted(() => {
-  fetchComparisonData(), // 초기 로드 시 데이터 가져오기
-  fetchCouldSaving()
-})
+  fetchComparisonData(); // 초기 로드 시 데이터 가져오기
+  fetchCouldSaving();     // 절약 가능 금액 데이터 가져오기
+  fetchSimulationData();  // 시뮬레이션 데이터 가져오기
+});
 </script>
 
 <style scoped>
