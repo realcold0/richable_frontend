@@ -17,6 +17,7 @@
         </div>
       </ul>
     </div>
+
     <div class="tab-content">
       <div class="tab-page" v-if="selectedTab === 'tab1'">
         <div class="total-asset">
@@ -26,13 +27,11 @@
         <div class="asset-list">
           <div class="list-title">금융 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;"
               @click="openCreateModal" /></div>
+
           <div class="list-box">
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('bank')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">예/적금</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -43,12 +42,9 @@
                 <font-awesome-icon icon="piggy-bank" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('stock')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">주식</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -59,12 +55,9 @@
                 <font-awesome-icon icon="chart-line" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('bond')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">채권</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -75,12 +68,9 @@
                 <font-awesome-icon icon="money-check-dollar" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('coin')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">코인</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
@@ -89,22 +79,6 @@
               <div
                 style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
                 <font-awesome-icon icon="fa-brands fa-bitcoin" />
-              </div>
-            </div>
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">현금</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="money-bill" />
               </div>
             </div>
           </div>
@@ -116,96 +90,41 @@
           </div>
         </div>
       </div>
+
+
       <div class="tab-page" v-if="selectedTab === 'tab2'">
         <div class="total-asset">
           <div class="asset-title">김리치님의 총 현물 자산 현황 😎</div>
           <div class="asset-amount">25,100,000원</div>
         </div>
         <div class="asset-list">
-          <div class="list-title">현물 자산 목록 <font-awesome-icon icon="square-plus" style="color: #C30044;"
-              @click="openCreateModal2" /></div>
-          <div class="list-box">
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">금융 자산</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="dollar-sign" />
-              </div>
+    <div class="list-title">
+      현물 자산 목록 
+      <font-awesome-icon icon="square-plus" style="color: #C30044;" @click="openCreateModal2" />
+    </div>
+    
+    <!-- Carousel for Tangible Assets -->
+    <div class="list-box">
+
+      <button class="control-btn" @click="prevSlide" :disabled="currentSlide === 0"><</button>
+        <div class="carousel-track">
+          <div v-for="(asset, index) in paginatedAssets" :key="index" class="asset-item"  @click="openEditModal2(asset)">
+            <div class="asset-category">{{ asset.category }}</div>
+            <div class="asset-name">{{ asset.name }}</div>
+            <div class="asset-price">
+              <span class="price">{{ formatCurrency(asset.price) }}</span>
+              <span class="currency">원</span>
             </div>
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">전자기기</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="desktop" />
-              </div>
-            </div>
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">브랜드</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="tags" />
-              </div>
-            </div>
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">명품</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="fa-regular fa-gem" />
-              </div>
-            </div>
-            <div class="asset-item">
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 18px;">기타</div>
-                <div style="color:#C30044; font-size: 16px; margin-left: 4px;" @click="openEditModal2">
-                  <font-awesome-icon icon="pen-to-square" />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center;">
-                <div style="font-weight: bold; font-size: 24px; color: #FF0062;">11,000,000</div>
-                <div style="font-weight: bold; font-size: 18px; color: #8A8AA8; margin-left: 4px;"> 원</div>
-              </div>
-              <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 60px; margin-top:8px;">
-                <font-awesome-icon icon="basket-shopping" />
-              </div>
+            <div class="asset-icon">
+              <font-awesome-icon  :icon="getIcon(asset.category)" />
             </div>
           </div>
+        </div>
+          <button class="control-btn" @click="nextSlide" :disabled="currentSlide === maxSlide - 1">></button>
+
+      </div>
+
+
           <div class="asset-chart">
             <div class="list-title">총 현물 자산 분포</div>
             <div class="chart-box">
@@ -219,17 +138,20 @@
     <AssetUpdateModal ref="editModal" />
     <TangibleAssetCreateModal ref="createModal2" />
     <TangibleAssetUpdateModal ref="editModal2" />
+    <AssetCheckModal ref="checkModal"/>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, nextTick } from 'vue';
+import { onMounted, ref, watch, nextTick,computed} from 'vue';
 import { Tooltip as BootstrapTooltip } from 'bootstrap';
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
 import AssetCreateModal from '../../components/modal/asset/AssetCreateModal.vue';
 import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue';
+import AssetCheckModal from '../../components/modal/asset/AssetCheckModal.vue';
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue';
 import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue';
+import axios from 'axios';
 
 // Chart.js에 필요한 컴포넌트(컨트롤러, 요소, 플러그인)를 등록
 Chart.register(PieController, ArcElement, Tooltip, Legend);
@@ -239,6 +161,63 @@ const tooltipButton = ref(null);
 const tooltipInstance = ref(null);
 const tooltipMessage = ref('금융 자산은 [예/적금], [주식], [채권], [코인], [현금]을 포함합니다.');
 
+
+// 현재 페이지 인덱스
+const currentSlide = ref(0);
+const itemsPerPage = 4; // 한 페이지에 보여줄 항목 수
+
+// 목업 데이터
+const tangibleAssets = ref([
+  { category: '전자기기', name: '아이폰', price: 1200000 },
+  { category: '명품', name: '구찌 가방', price: 3000000 },
+  { category: '브랜드', name: '나이키 신발', price: 200000 },
+  { category: '기타', name: '기타 자산', price: 500000 },
+  { category: '전자기기', name: '맥북', price: 2000000 },
+  { category: '명품', name: '프라다 가방', price: 3500000 },
+  { category: '브랜드', name: '아디다스 신발', price: 150000 },
+  { category: '기타', name: '기타 자산 2', price: 600000 }
+]);
+
+// 현재 페이지에 보여줄 항목을 계산하여 반환
+const paginatedAssets = computed(() => {
+  const start = currentSlide.value * itemsPerPage;
+  const end = start + itemsPerPage;
+  return tangibleAssets.value.slice(start, end);
+});
+
+// 총 슬라이드 개수 계산
+const maxSlide = computed(() => Math.ceil(tangibleAssets.value.length / itemsPerPage));
+
+// 금액을 포맷팅하는 함수
+const formatCurrency = (amount) => {
+  return amount.toLocaleString('ko-KR');
+};
+
+// 카테고리에 따른 아이콘 매핑
+const getIcon = (category) => {
+  switch (category) {
+    case '자동차': return 'car'
+    case '전자기기': return 'desktop';
+    case '명품': return 'fa-gem';
+    case '브랜드': return 'tags';
+    case '기타': return 'question-circle';
+    default: return 'question-circle';
+  }
+};
+
+// 이전 슬라이드로 이동
+const prevSlide = () => {
+  if (currentSlide.value > 0) {
+    currentSlide.value--;
+  }
+};
+
+// 다음 슬라이드로 이동
+const nextSlide = () => {
+  if (currentSlide.value < maxSlide.value - 1) {
+    currentSlide.value++;
+  }
+};
 
 const updateTooltipMessage = async () => {
   // selectedTab에 따라 툴팁 메시지 변경
@@ -273,11 +252,11 @@ const renderPieChart = async () => {
   chartInstance = new Chart(pieChart.value, {
     type: 'doughnut',
     data: {
-      labels: ['예/적금', '주식', '채권', '코인', '현금'],
+      labels: ['예/적금', '주식', '채권', '코인'],
       datasets: [
         {
-          data: [25, 35, 20, 10, 10],
-          backgroundColor: ['#C30044', '#FF0062', '#DA0052', '#FFF2F6', '#DA0052'],
+          data: [25, 35, 20, 20],
+          backgroundColor: ['#C30044', '#FF0062', '#DA0052', '#FFF2F6'],
         },
       ],
     },
@@ -318,7 +297,7 @@ const renderPieChart2 = async () => {
   chartInstance2 = new Chart(pieChart2.value, {
     type: 'doughnut',
     data: {
-      labels: ['금융자산', '전자기기', '브랜드', '명품', '기타'],
+      labels: ['자동차', '전자기기', '브랜드', '명품', '기타'],
       datasets: [
         {
           data: [45, 15, 20, 10, 10],
@@ -367,6 +346,7 @@ const createModal = ref(null); // 금융 자산
 const editModal = ref(null);
 const editModal2 = ref(null); // 현물 자산
 const createModal2 = ref(null);
+const checkModal = ref(null);
 
 const openCreateModal = () => {
   if (createModal.value) {
@@ -387,9 +367,16 @@ const openEditModal = () => {
   }
 };
 
-const openEditModal2 = () => {
+const openEditModal2 = (asset) => {
   if (editModal2.value) {
-    editModal2.value.show();
+    editModal2.value.show(asset); 
+  }
+};
+
+// 모달 열기 함수
+const openCheckModal = (assetType) => {
+  if (checkModal.value) {
+    checkModal.value.show(assetType);  // 모달의 show 메서드를 호출하며 assetType 전달
   }
 };
 
@@ -404,6 +391,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 .tab-bar {
     width : 1704px;
     margin-left : 80px;
@@ -502,6 +490,8 @@ onMounted(() => {
 }
 
 .asset-item {
+  display: flex;
+  flex-direction: column;
   width: 300px;
   height: 190px;
   background-color: white;
@@ -525,6 +515,85 @@ onMounted(() => {
     margin-top: 44px;
     padding-bottom: 80px;
 }
+
+.list-box {
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.asset-item {
+  width: 300px;
+  height: 200px;
+  background-color: white;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+  border-radius: 20px;
+  padding: 20px;
+  margin-right: 20px;
+  text-align: center;
+}
+
+.asset-category {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.asset-name {
+  font-size: 18px;
+  margin-top: 0px;
+}
+
+.asset-price {
+  margin-top: 0px;
+  font-weight: bold;
+  font-size: 24px;
+  color: #FF0062;
+}
+
+.price {
+  margin-right: 4px;
+}
+
+.currency {
+  font-size: 18px;
+  color: #8A8AA8;
+}
+
+.asset-icon {
+  font-size: 50px;
+  margin-top: 0px;
+}
+
+.carousel-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.control-btn {
+  background-color: #C30044;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.control-btn:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.control-btn:hover:not(:disabled) {
+  background-color: #ff0055;
+}
+
 </style>
 
 <style>

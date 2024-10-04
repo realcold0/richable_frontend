@@ -49,13 +49,13 @@
             </div>
 
             <div v-if="isIncomeMenuOpen" class="subButton">
-                <router-link to="/budget/list" class="button">
+                <router-link to="/budget/consume/analysis" class="button">
                 <span class="text">소비 분석</span>
                 </router-link>
                 <router-link to="/budget/consume/compare" class="button">
                 <span class="text">평균 소비 비교</span>
                 </router-link>
-                <router-link to="/budget/consume/analysis" class="button">
+                <router-link to="/budget/list" class="button">
                 <span class="text">소득/소비 관리</span>
                 </router-link>
             </div>

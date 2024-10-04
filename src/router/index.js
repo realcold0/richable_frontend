@@ -133,17 +133,4 @@ const router = createRouter({
   routes
 });
 
-// 페이지 이동 시마다 로그인 상태 확인
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token && to.name !== 'signIn') {
-    // 토큰이 없고 로그인 페이지가 아닐 경우 로그인 페이지로 이동
-    next({ name: 'signIn' });
-  } else {
-    // 그 외의 경우는 계속 진행
-    next();
-  }
-});
-
 export default router;

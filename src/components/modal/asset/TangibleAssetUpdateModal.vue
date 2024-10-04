@@ -1,4 +1,3 @@
-<!-- RC-P-13 -->
 <template>
     <div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetLabel" aria-hidden="true"
         ref="modal">
@@ -13,7 +12,7 @@
                     <div class="mb-3" style="display: flex;">
                         <label for="assetType" class="form-label"
                             style="font-weight: bold; width: 70px; letter-spacing: 13px; padding-top: 8px;">분류</label>
-                        <select class=" form-select" id="assetType">
+                        <select class="form-select" id="assetType" v-model="editedAsset.category">
                             <option value="asset">금융 자산</option>
                             <option value="tech">전자기기</option>
                             <option value="brand">브랜드</option>
@@ -23,10 +22,10 @@
                     </div>
                     <!-- 자산명 입력 -->
                     <div class="mb-3" style="display: flex;">
-                        <label for="assetAmount" class="form-label"
+                        <label for="assetName" class="form-label"
                             style="font-weight: bold; width: 70px; padding-top: 8px;">자산명</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="assetAmount" value="에어팟 맥스">
+                            <input type="text" class="form-control" id="assetName" v-model="editedAsset.name">
                         </div>
                     </div>
                     <!-- 자산량 입력 -->
@@ -34,14 +33,12 @@
                         <label for="assetAmount" class="form-label"
                             style="font-weight: bold; width: 70px; padding-top: 8px;">자산량</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="assetAmount" value="1,000,000">
+                            <input type="text" class="form-control" id="assetAmount" v-model="editedAsset.price">
                             <span class="input-group-text">원</span>
                         </div>
                     </div>
                     <div class="mb-3" style="padding-top: 14px; color : #6C757D; font-size: 14px;">
-                        <div>
-                            자산 항목을 다음과 같이 수정하시겠습니까?
-                        </div>
+                        <div>자산 항목을 다음과 같이 수정하시겠습니까?</div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -52,7 +49,7 @@
                         <button type="button" class="btn" data-bs-dismiss="modal"
                             style="background-color: white; border: 1px solid #020202; color : #020202; font-weight: bold; margin-right: 12px; width: 62px;">취소</button>
                         <button type="button" class="btn text-white"
-                            style="background-color: #FF0062; width: 62px;">수정</button>
+                            style="background-color: #FF0062; width: 62px;" @click="updateAsset">수정</button>
                     </div>
                 </div>
             </div>
@@ -61,14 +58,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose } from 'vue';
+import { ref } from 'vue';
 import { Modal } from 'bootstrap';
 
 const modal = ref(null);
 let modalInstance = null;
+const editedAsset = ref({
+  category: '',
+  name: '',
+  price: ''
+});
 
-// 모달 열기 함수
-const show = () => {
+// 모달 열기 함수 (선택된 자산 데이터를 받음)
+const show = (asset) => {
+  editedAsset.value = { ...asset }; // 선택한 자산 데이터를 editedAsset에 복사하여 입력 필드에 바인딩
+
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
       backdrop: 'static', // 명시적으로 backdrop 설정
@@ -80,18 +84,12 @@ const show = () => {
   }
 };
 
-// 컴포넌트가 마운트될 때 모달 초기화
-onMounted(() => {
-  // setTimeout을 사용하여 DOM이 완전히 준비된 후 모달 초기화
-  setTimeout(() => {
-    if (modal.value && !modalInstance) {
-      modalInstance = new Modal(modal.value, {
-        backdrop: 'static',
-        keyboard: true,
-      });
-    }
-  }, 500); // 500ms 정도 딜레이를 줌
-});
+// 자산 수정 함수
+const updateAsset = () => {
+  // 업데이트된 자산 데이터를 처리 (API 호출 등)
+  console.log('Updated asset:', editedAsset.value);
+  modalInstance.hide(); // 수정 후 모달 닫기
+};
 
 defineExpose({ show });
 </script>
@@ -99,6 +97,6 @@ defineExpose({ show });
 <style scoped>
 /* 커스텀 스타일 추가 */
 .btn-pink {
-    background-color: #ff007f;
+  background-color: #ff007f;
 }
 </style>
