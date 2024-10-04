@@ -29,7 +29,7 @@
               @click="openCreateModal" /></div>
 
           <div class="list-box">
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('bank')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">예/적금</div>
               </div>
@@ -42,7 +42,7 @@
                 <font-awesome-icon icon="piggy-bank" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('stock')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">주식</div>
               </div>
@@ -55,7 +55,7 @@
                 <font-awesome-icon icon="chart-line" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('bond')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">채권</div>
               </div>
@@ -68,7 +68,7 @@
                 <font-awesome-icon icon="money-check-dollar" />
               </div>
             </div>
-            <div class="asset-item">
+            <div class="asset-item" @click="openCheckModal('coin')">
               <div style="display: flex; justify-content: center; align-items: center;">
                 <div style="font-weight: bold; font-size: 18px;">코인</div>
               </div>
@@ -138,6 +138,7 @@
     <AssetUpdateModal ref="editModal" />
     <TangibleAssetCreateModal ref="createModal2" />
     <TangibleAssetUpdateModal ref="editModal2" />
+    <AssetCheckModal ref="checkModal"/>
   </div>
 </template>
 
@@ -147,6 +148,7 @@ import { Tooltip as BootstrapTooltip } from 'bootstrap';
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js';
 import AssetCreateModal from '../../components/modal/asset/AssetCreateModal.vue';
 import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue';
+import AssetCheckModal from '../../components/modal/asset/AssetCheckModal.vue';
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue';
 import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue';
 import axios from 'axios';
@@ -162,7 +164,7 @@ const tooltipMessage = ref('금융 자산은 [예/적금], [주식], [채권], [
 
 // 현재 페이지 인덱스
 const currentSlide = ref(0);
-const itemsPerPage = 3; // 한 페이지에 보여줄 항목 수
+const itemsPerPage = 4; // 한 페이지에 보여줄 항목 수
 
 // 목업 데이터
 const tangibleAssets = ref([
@@ -194,6 +196,7 @@ const formatCurrency = (amount) => {
 // 카테고리에 따른 아이콘 매핑
 const getIcon = (category) => {
   switch (category) {
+    case '자동차': return 'car'
     case '전자기기': return 'desktop';
     case '명품': return 'fa-gem';
     case '브랜드': return 'tags';
@@ -294,7 +297,7 @@ const renderPieChart2 = async () => {
   chartInstance2 = new Chart(pieChart2.value, {
     type: 'doughnut',
     data: {
-      labels: ['금융자산', '전자기기', '브랜드', '명품', '기타'],
+      labels: ['자동차', '전자기기', '브랜드', '명품', '기타'],
       datasets: [
         {
           data: [45, 15, 20, 10, 10],
@@ -343,6 +346,7 @@ const createModal = ref(null); // 금융 자산
 const editModal = ref(null);
 const editModal2 = ref(null); // 현물 자산
 const createModal2 = ref(null);
+const checkModal = ref(null);
 
 const openCreateModal = () => {
   if (createModal.value) {
@@ -369,6 +373,12 @@ const openEditModal2 = (asset) => {
   }
 };
 
+// 모달 열기 함수
+const openCheckModal = (assetType) => {
+  if (checkModal.value) {
+    checkModal.value.show(assetType);  // 모달의 show 메서드를 호출하며 assetType 전달
+  }
+};
 
 
 onMounted(() => {
