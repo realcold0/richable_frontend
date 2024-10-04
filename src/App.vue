@@ -63,6 +63,8 @@ const route = useRoute()
 
 .page-view {
  min-height: 100vh;
+
+ border-spacing: 200px;
 }
 
 /* 푸터 스타일 */

@@ -40,7 +40,7 @@
     </div>
 
     <!-- 추천 카드 리스트 -->
-    <div class="row text-center mb-5">
+    <div class="row text-center mb-4">
       <div class="col-md-3">
         <div class="card mb-4 shadow-sm">
           <div class="card-body">
