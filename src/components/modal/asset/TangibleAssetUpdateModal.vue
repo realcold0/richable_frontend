@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn">
+                    <button type="button" class="btn" @click="deleteAsset">
                         <font-awesome-icon icon="trash-can" />
                     </button>
                     <div>
@@ -61,9 +61,13 @@
 import { ref } from 'vue';
 import { Modal } from 'bootstrap';
 
+// 이벤트를 상위 컴포넌트로 전달하기 위한 emit 정의
+const emit = defineEmits(['update-asset', 'delete-asset']);
+
 const modal = ref(null);
 let modalInstance = null;
 const editedAsset = ref({
+  id: '',
   category: '',
   name: '',
   price: ''
@@ -86,12 +90,21 @@ const show = (asset) => {
 
 // 자산 수정 함수
 const updateAsset = () => {
-  // 업데이트된 자산 데이터를 처리 (API 호출 등)
-  console.log('Updated asset:', editedAsset.value);
+  // 수정된 자산 데이터를 상위 컴포넌트로 전달
+  emit('update-asset', { ...editedAsset.value });
   modalInstance.hide(); // 수정 후 모달 닫기
 };
 
+// 자산 삭제 함수
+const deleteAsset = () => {
+  // 삭제된 자산의 id를 상위 컴포넌트로 전달
+  emit('delete-asset', { id: editedAsset.value.id });
+  modalInstance.hide(); // 삭제 후 모달 닫기
+};
+
+// 모달 표시 함수 내보내기
 defineExpose({ show });
+
 </script>
 
 <style scoped>
