@@ -31,7 +31,7 @@
           <!-- You can add visibility icons here -->
         </span>
       </div>
-      <button type="submit" class="btn btn-secondary login-btn" :disabled="!id || !password">
+      <button type="submit" class="login-btn" :disabled="!id || !password">
         로그인
       </button>
     </form>
@@ -47,6 +47,8 @@
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
       <div  id="naver_id_login" @click="naverLogin"></div>
+      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
+    </img>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
@@ -80,8 +82,8 @@ const naverLogin = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/naverlogin`);
     if (response.data.redirectUrl) {
-      // 받은 state를 localStorage에 저장
-      localStorage.setItem('naverState', response.data.state);
+      // 받은 state를 세션 스토리지에 저장
+      sessionStorage.setItem('naverState', response.data.state);
       window.location.href = response.data.redirectUrl;
     }
   } catch (error) {
@@ -116,83 +118,49 @@ const login = async () => {
 
 const handleNaverCallback = async (code, state) => {
   try {
-    const savedState = localStorage.getItem('naverState');
     const response = await axios.get(`${BASE_URL}/naverCallback`, {
-      params: { 
-        code, 
-        state,
-        savedState // 저장된 state를 함께 전송
-      }
-    });
+      params: { code, state }
+    })
     if (response.status === 200) {
-        if (response.data.token) {
-          // Existing user
-          console.log('Naver login success:', response.data);
-          localStorage.setItem('authToken', response.data.token);
-          alert('네이버 로그인 성공!');
-          router.push({ name: 'home' });
-        } else {
-          // New user
-          console.log('New user data:', response.data);
-          // Store the user data in localStorage or Vuex store
-          localStorage.setItem('naverUserData', JSON.stringify(response.data));
-          alert('회원가입이 필요합니다.');
-          router.push({ name: 'signup', query: { naver: 'true' } });
-        }
-      }
-    } catch (error) {
-      console.error('Naver login callback failed:', error);
-      alert('네이버 로그인 처리 중 오류가 발생했습니다.');
-    } finally {
-      localStorage.removeItem('naverState');
+      console.log('Naver login success:', response.data)
+      // 여기서 받은 사용자 정보를 처리 (예: 로컬 스토리지에 저장)
+      alert('네이버 로그인 성공!')
+      router.push({ name: 'home' })
     }
-  //   if (response.status === 200) {
-  //     console.log('Naver login success:', response.data);
-  //     // 받은 토큰을 localStorage에 저장
-  //     localStorage.setItem('authToken', response.data.token);
-  //     alert('네이버 로그인 성공!');
-  //     router.push({ name: 'home' });
-  //   }
-  // } catch (error) {
-  //   console.error('Naver login callback failed:', error);
-  //   alert('네이버 로그인 처리 중 오류가 발생했습니다.');
-  // } finally {
-  //   // 사용 후 state 제거
-  //   // localStorage.removeItem('naverState');
-  // }
+  } catch (error) {
+    console.error('Naver login callback failed:', error)
+    alert('네이버 로그인 처리 중 오류가 발생했습니다.')
+  }
 }
 
 onMounted(() => {
+  // Check for Naver login callback
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
   // 네이버 로그인 스크립트 로드
   const naverScript = document.createElement('script');
-    naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
-    naverScript.charset = 'utf-8';
-    
-    // jQuery 스크립트 로드
-    const jqueryScript = document.createElement('script');
-    jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
-    
-    // jQuery 먼저 로드 후 네이버 스크립트 로드
-    document.head.appendChild(jqueryScript);
-    jqueryScript.onload = () => {
-      document.head.appendChild(naverScript);
-      naverScript.onload = () => {
+        naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
+        naverScript.charset = 'utf-8';
+        document.head.appendChild(naverScript);
+  
+        // jQuery 스크립트 로드
+        const jqueryScript = document.createElement('script');
+        jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
+        document.head.appendChild(jqueryScript);
+
+        // 스크립트 로드 완료 후 네이버 로그인 초기화
+    naverScript.onload = () => {
+      jqueryScript.onload = () => {
         const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, NAVER_CALLBACK_URL);
-        naver_id_login.setButton("green", 1, 40); // 버튼 색상을 녹색으로 변경
+        naver_id_login.setButton("white", 1, 40);
         naver_id_login.init_naver_id_login();
       };
     };
-  
-    // Check for Naver login callback
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    console.log('code',code);
-    console.log('state',state);
-  
-    if (code && state) {
-      handleNaverCallback(code, state);
-    }
+  if (code && state) {
+    handleNaverCallback(code, state)
+  }
 })
 
 
@@ -201,7 +169,7 @@ onMounted(() => {
 <style scoped>
 body {
   width: 500px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'pretendard', sans-serif;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
@@ -216,7 +184,9 @@ body {
 }
 .join-link {
   font-size: 0.9rem;
-  color: #0d6efd;
+  color: #777777;
+  font-weight: 500;
+  text-decoration: underline; /* 밑줄 추가 */
 }
 .form-label {
   padding: 0.5rem;
@@ -233,8 +203,13 @@ body {
   margin: 5% auto;
 }
 .login-btn {
+  border: none;
+  color : white;
+  border-radius: 5px;
   width: 100%;
+  height: 40px;
   margin-top: 1rem;
+  background-color: #FF0062;
 }
 .or-divider {
   margin: 1.5rem 0;
@@ -259,7 +234,9 @@ body {
   margin: 0 5px;
 }
 .form-control:focus {
+  border-color: #FF0062; /* 원하는 테두리 색상 */
   box-shadow: none;
+  outline: none; /* 기본 아웃라인 제거 */
 }
 .naver-btn {
   width: 40px;
@@ -277,5 +254,10 @@ a {
 #naver_id_login {
   display: inline-block;
   vertical-align: middle;
+}
+
+::placeholder {
+  color: #999999; /* 원하는 색상으로 변경 */
+  opacity: 1; /* 투명도 조절 */
 }
 </style>

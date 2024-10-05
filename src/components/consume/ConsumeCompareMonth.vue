@@ -38,18 +38,19 @@ const renderLineChart = async() => {
         chartInstance.destroy()
     }
 
-    await axios.get(`http://localhost:8080/consume/category/dailysum/${month.year}/${month.month}`)
+    await axios.get(`http://localhost:8080/outcome/category/dailysum/${month.year}/${month.month}`)
     .then( response => {
-        curMonth.value = response.data.prices;
+        curMonth.value = response.data.response.data.prices;
         console.log(response.data.cntYear, response.data.cntMonth);
     }).catch(error => {
         console.log(error);
     });
 
-    await axios.get(`http://localhost:8080/consume/category/dailysum/${month.getPrevMonth.year}/${month.getPrevMonth.month}`)
+    await axios.get(`http://localhost:8080/outcome/category/dailysum/${month.getPrevMonth.year}/${month.getPrevMonth.month}`)
     .then( response => {
-        prevMonth.value = response.data.prices;
-        console.log(response.data.cntYear, response.data.cntMonth);
+        
+        prevMonth.value = response.data.response.data.prices;
+        console.log(response.data);
     }).catch(error => {
         console.log(error);
     })
@@ -102,13 +103,14 @@ watch(() => month.month, (newValue, oldVlaue) =>{
 
 </script>
 <style scoped>
+
     .consumeCompareWrapper {
         width: 864px;
         padding: 30px 20px;
         /* background-color: red; */
     }
     .consumeCompareTitle {
-        font-size: 32px;
+        font-size: 18px;
     }
 
     .graphWrapper {

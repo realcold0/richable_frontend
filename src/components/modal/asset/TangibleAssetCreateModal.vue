@@ -1,4 +1,3 @@
-<!-- RC-P-12 -->
 <template>
     <div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetLabel" aria-hidden="true"
         ref="modal">
@@ -13,20 +12,20 @@
                     <div class="mb-3" style="display: flex;">
                         <label for="assetType" class="form-label"
                             style="font-weight: bold; width: 70px; letter-spacing: 13px; padding-top: 8px; ">분류</label>
-                        <select class="form-select" id="assetType" placeholder="자산 유형을 선택해주세요">
-                            <option value="asset">금융 자산</option>
-                            <option value="tech">전자기기</option>
-                            <option value="brand">브랜드</option>
-                            <option value="luxury">명품</option>
-                            <option value="etc">기타</option>
+                        <select class="form-select" id="assetType" v-model="selectedCategory" placeholder="자산 유형을 선택해주세요">
+                            <option value="금융 자산">금융 자산</option>
+                            <option value="전자기기">전자기기</option>
+                            <option value="브랜드">브랜드</option>
+                            <option value="명품">명품</option>
+                            <option value="기타">기타</option>
                         </select>
                     </div>
                     <!-- 자산명 입력 -->
                     <div class="mb-3" style="display: flex;">
-                        <label for="assetAmount" class="form-label"
+                        <label for="assetName" class="form-label"
                             style="font-weight: bold; width: 70px; padding-top: 8px;">자산명</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="assetAmount" placeholder="자산명을 입력해주세요">
+                            <input type="text" class="form-control" id="assetName" v-model="editedAsset.name" placeholder="자산명을 입력해주세요">
                         </div>
                     </div>
                     <!-- 자산량 입력 -->
@@ -34,7 +33,7 @@
                         <label for="assetAmount" class="form-label"
                             style="font-weight: bold; width: 70px; padding-top: 8px;">자산량</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="assetAmount" placeholder="자산량을 입력해주세요">
+                            <input type="text" class="form-control" id="assetAmount" v-model="editedAsset.price" placeholder="자산량을 입력해주세요">
                             <span class="input-group-text">원</span>
                         </div>
                     </div>
@@ -49,7 +48,7 @@
                         <button type="button" class="btn" data-bs-dismiss="modal"
                             style="background-color: white; border: 1px solid #020202; color : #020202; font-weight: bold; margin-right: 12px; width: 62px;">취소</button>
                         <button type="button" class="btn text-white"
-                            style="background-color: #FF0062; width: 62px;">등록</button>
+                            style="background-color: #FF0062; width: 62px;" @click="createAsset">등록</button>
                     </div>
                 </div>
             </div>
@@ -61,8 +60,29 @@
 import { ref, onMounted, defineExpose } from 'vue';
 import { Modal } from 'bootstrap';
 
+const emit = defineEmits(['create-asset']);
+
 const modal = ref(null);
 let modalInstance = null;
+
+// 선택한 카테고리를 저장하는 ref
+const selectedCategory = ref('');
+
+// 자산 정보
+const editedAsset = ref({
+  id: '',
+  category: '',
+  name: '',
+  price: ''
+});
+
+
+// 숫자에 쉼표를 추가하는 함수
+const formatCurrency = (value) => {
+  if (!value) return '';
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 
 // 모달 열기 함수
 const show = () => {
@@ -77,17 +97,33 @@ const show = () => {
   }
 };
 
+// 자산 등록 함수
+const createAsset = () => {
+  // 선택된 카테고리 값을 자산 정보에 적용
+  editedAsset.value.category = selectedCategory.value;
+
+  // 입력된 자산 데이터를 상위 컴포넌트로 전달
+  emit('create-asset', { ...editedAsset.value });
+  modalInstance.hide(); // 등록 후 모달 닫기
+
+  // 자산 정보 초기화 (다음 등록을 위해)
+  editedAsset.value = {
+    id: '',
+    category: '',
+    name: '',
+    price: ''
+  };
+  selectedCategory.value = ''; // 카테고리도 초기화
+};
+
 // 컴포넌트가 마운트될 때 모달 초기화
 onMounted(() => {
-  // setTimeout을 사용하여 DOM이 완전히 준비된 후 모달 초기화
-  setTimeout(() => {
-    if (modal.value && !modalInstance) {
-      modalInstance = new Modal(modal.value, {
-        backdrop: 'static',
-        keyboard: true,
-      });
-    }
-  }, 500); // 500ms 정도 딜레이를 줌
+  if (modal.value && !modalInstance) {
+    modalInstance = new Modal(modal.value, {
+      backdrop: 'static',
+      keyboard: true,
+    });
+  }
 });
 
 defineExpose({ show });
