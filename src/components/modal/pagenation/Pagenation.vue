@@ -78,26 +78,33 @@ watch([pageNumbers, totalPages], () => {
 *{
   border: none;
 }
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: 20px;
+
   margin-top: 20px;
 }
+
 .page-item {
   margin: 0 10px;
   overflow : auto;
 }
+
 .page-item.active .page-link {
   background-color: #FF0062;
   color: white;
   border-radius: 12px;
   justify-content: center; /* 가로 중앙 정렬 */
   align-items: center; /* 세로 중앙 정렬 */
+
 }
+
 .page-link {
   color: #414158;
   cursor: pointer;
+
   display: flex;
   justify-content: center; /* 가로 중앙 정렬 */
   align-items: center; /* 세로 중앙 정렬 */
@@ -118,6 +125,7 @@ watch([pageNumbers, totalPages], () => {
   outline: none;  /* 포커스 시 나타나는 윤곽선 제거 */
 }
 
+
 .page-link.no-btn {
   background: none;
   border: none;
@@ -129,6 +137,7 @@ watch([pageNumbers, totalPages], () => {
   font-weight: 400;
   line-height: 150%; /* 25.5px */
 }
+
 .page-item.disabled .page-link.no-btn {
   color: #ccc;
   pointer-events: none;

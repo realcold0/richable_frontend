@@ -26,6 +26,11 @@ const routes = [
     component: () => import('../views/user/SignUpPage.vue')
   },
   {
+    path: '/user/master',
+    name: 'master',
+    component: () => import('../views/user/master.vue')
+  },
+  {
     path: '/user/findpassword',
     name: 'findpassword',
     component: () => import('../views/user/FindPassWord.vue')
@@ -125,12 +130,12 @@ const routes = [
     name: 'knowhowUpdate',
     component: () => import('../views/knowhow/KnowHowUpdatePage.vue')
   }
-];
+]
 
 // 라우터 생성
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
-});
+})
 
-export default router;
+export default router
