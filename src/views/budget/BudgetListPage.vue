@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
 import Pagination from '@/components/modal/pagenation/Pagenation.vue';
 import IncomeCreateModal from '@/components/modal/budget/IncomeCreateModal.vue'; 
@@ -142,7 +142,21 @@ const currentPage = ref(1);
 const itemsPerPage = ref(9);
 const totalExpenses = computed(() => expenses.value.length);
 const totalIncomes = computed(() => incomes.value.length);
+const errorMessage = ref('');
 
+// Axios 인터셉터 설정 (JWT 토큰 포함)
+axios.interceptors.request.use(
+  config => {
+    const authToken = localStorage.getItem('eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bmRlcl9hdHRhY2siLCJ1aWQiOiJGelNzem1lVCtRbHhRWEVta1lnVXRBPT0iLCJuaWNrbmFtZSI6InJpY2hhYmxlbWFuYWdlckBnbWFpbC5jb20iLCJpYXQiOjE3MjgwOTYzNzcsImV4cCI6MTcyODA5OTk3N30.SLyYQIHvy8Wx2aKYsEwk8XxCyxqIEd-Vr1X6r8SYyUsUj0w-MRo3E-fcxKUCRbyFUEpbxE_zk33I_jaDbtaVog'); // JWT 토큰을 localStorage에서 가져옴
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`; // 요청 헤더에 토큰 포함
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
+// 소비 데이터 불러오기
 const fetchExpenses = async () => {
   try {
     const response = await axios.get('http://localhost:8080/outcome/all');
@@ -153,9 +167,11 @@ const fetchExpenses = async () => {
     }
   } catch (error) {
     console.error('소비 리스트 불러오기 실패:', error);
+    errorMessage.value = '소비 데이터를 불러오는 중 오류가 발생했습니다.';
   }
 };
 
+// 소득 데이터 불러오기
 const fetchIncomes = async () => {
   try {
     const response = await axios.get('http://localhost:8080/income/all');
@@ -166,8 +182,27 @@ const fetchIncomes = async () => {
     }
   } catch (error) {
     console.error('소득 리스트 불러오기 실패:', error);
+    errorMessage.value = '소득 데이터를 불러오는 중 오류가 발생했습니다.';
   }
 };
+
+// 탭 변경 시 데이터 로드
+watch(selectedTab, (newTab) => {
+  if (newTab === 'expense') {
+    fetchExpenses();
+  } else if (newTab === 'income') {
+    fetchIncomes();
+  }
+});
+onMounted(() => {
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+    window.location.href = '/login'; // 토큰이 없으면 로그인 페이지로 리다이렉트
+  } else {
+    fetchExpenses(); // 기본으로 소비 데이터를 먼저 로드
+  }
+});
 
 // 모달 관련 상태
 const createModal = ref(null);
@@ -235,18 +270,6 @@ const paginatedIncomes = computed(() => {
 const updatePage = (newPage) => {
   currentPage.value = newPage;
 };
-
-// 탭 변경 시 데이터 로드
-watch(selectedTab, (newTab) => {
-  if (newTab === 'expense') {
-    fetchExpenses();
-  } else if (newTab === 'income') {
-    fetchIncomes();
-  }
-});
-
-// 초기 데이터 로드
-fetchExpenses(); 
 </script>
 
 <style scoped>
