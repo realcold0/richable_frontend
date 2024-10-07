@@ -20,7 +20,7 @@
       >
         <p class="goal-description">
           김리치님의 목표 자산 현황<br />
-          <strong>{{ assetGoal.totalAmount.toLocaleString() }}원</strong>까지
+          <strong>{{ assetGoal.title }} : {{ assetGoal.totalAmount.toLocaleString() }}원</strong>까지
           <strong>{{ assetGoal.remaindate }}</strong>일 남았습니다 💪
         </p>
         <p>
@@ -82,6 +82,7 @@ import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreat
 import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue'
 import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailModal.vue'
 import AssetGoalCreateModal from '../../components/modal/goal/AssetGoalCreateModal.vue'
+import Instance from '@/axiosInstance.js';
 
 // 목표 데이터
 const goals = ref([])
@@ -180,14 +181,14 @@ const deleteGoal = (goalId) => {
 // 자산 목표를 API에서 가져오는 함수
 const fetchAssetGoal = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/goal');
+    const response = await Instance.get('/goal');
     console.log("Asset goal API response:", response.data); // 응답 데이터 확인
     if (response.data && response.data.response && response.data.response.data) {
       const assetGoalData = response.data.response.data;
       assetGoal.value = {
         index: assetGoalData.index, // index 추가
         totalAmount: assetGoalData.amount,
-        currentAmount: assetGoalData.gather || 0,
+        currentAmount: assetGoalData.gather,
         remaindate: assetGoalData.remaindate,
         category: '자산' // category 추가 (혹은 적절한 값으로 대체)
       };
@@ -204,7 +205,7 @@ const fetchAssetGoal = async () => {
 // API를 통한 소비목표 데이터 가져오기
 const fetchGoals = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/goal/outcome')
+    const response = await Instance.get('/goal/outcome')
     if (response.data.success) {
       const fetchedGoals = response.data.response.data
         .map(goal => ({

@@ -44,6 +44,7 @@
 import { ref, defineEmits } from 'vue';
 import axios from 'axios';
 import { Modal } from 'bootstrap';
+import Instance from '@/axiosInstance.js';
 
 // 등록할 목표 자산 데이터를 위한 formData 상태 관리
 const formData = ref({
@@ -76,7 +77,7 @@ const submitGoal = async () => {
   if (formData.value.amount && formData.value.amount > 0 && formData.value.title) {
     try {
       // 서버로 목표 자산 생성 요청 보내기
-      const response = await axios.post('http://localhost:8080/goal/set', {
+      const response = await Instance.post('/goal/set', {
         category: formData.value.type,  // 카테고리 "자산 형성" 전송
         amount: formData.value.amount,  // 목표 금액 전송
         title: formData.value.title,    // 사용자 입력 목표명 전송

@@ -66,6 +66,7 @@
 import { ref, computed, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
 import axios from 'axios'
+import Instance from '@/axiosInstance.js';
 
 // emit 함수 정의 (Vue 3)
 const emit = defineEmits(['goalDeleted', 'goalUpdated'])
@@ -114,7 +115,7 @@ const show = (goalData) => {
 // 목표 자산을 수정하는 함수 (PUT 요청)
 const submitGoal = async () => {
   try {
-    const response = await axios.put(`http://localhost:8080/goal/${goalDetail.value.index}`, {
+    const response = await Instance.put(`/goal/${goalDetail.value.index}`, {
       amount: goalDetail.value.amount // 수정된 목표량 전송
     })
 
@@ -141,9 +142,9 @@ const deleteGoal = async () => {
   try {
     console.log("Attempting to delete goal with index:", goalDetail.value.index);
 
-    const response = await axios({
+    const response = await Instance({
       method: 'delete',
-      url: 'http://localhost:8080/goal/delete',
+      url: '/goal/delete',
       data: { 
         index: goalDetail.value.index,   
         category: goalDetail.value.category  
@@ -161,7 +162,6 @@ const deleteGoal = async () => {
     console.error('Error deleting goal:', error);
   }
 };
-
 
 defineExpose({ show })
 </script>

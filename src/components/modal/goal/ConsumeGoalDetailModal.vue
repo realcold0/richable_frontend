@@ -72,6 +72,7 @@
 import { ref, computed, defineEmits, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
 import axios from 'axios' 
+import Instance from '@/axiosInstance.js';
 
 // 목표 상세 데이터
 const goalDetail = ref({
@@ -120,9 +121,9 @@ const deleteGoalHandler = async () => {
   try {
     console.log("Attempting to delete goal with index:", goalDetail.value.index);  // 로그 출력
 
-    const response = await axios({
+    const response = await Instance({
       method: 'delete',
-      url: 'http://localhost:8080/goal/delete',
+      url: '/goal/delete',
       data: { 
         index: goalDetail.value.index,   // index 값 전송
         category: goalDetail.value.type  // type을 category로 사용하여 전송
@@ -152,9 +153,9 @@ const achieveGoalHandler = async () => {
   if (progress === 100) {
     try {
       // PUT 요청으로 목표 달성 상태를 업데이트
-      const response = await axios({
+      const response = await Instance({
         method: 'put',
-        url: 'http://localhost:8080/goal/set', // 목표 달성 API 경로
+        url: '/goal/set', // 목표 달성 API 경로
         data: {
           index: goalDetail.value.index, // index 값을 전달
           isAchive: true                 // isAchive 값을 true로 설정

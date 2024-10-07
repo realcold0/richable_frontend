@@ -50,6 +50,7 @@
 import { ref } from 'vue'
 import { Modal } from 'bootstrap'
 import axios from 'axios'
+import Instance from '@/axiosInstance.js';
 
 // 새 목표 정보
 const newGoal = ref({
@@ -67,7 +68,7 @@ const emit = defineEmits(['registerGoal'])
 const submitGoal = async () => {
   if (newGoal.value.title && newGoal.value.totalAmount > 0) {
     try {
-      const response = await axios.post('http://localhost:8080/goal/set', {
+      const response = await Instance.post('/goal/set', {
         category: newGoal.value.type,
         title: newGoal.value.title,
         amount: newGoal.value.totalAmount
