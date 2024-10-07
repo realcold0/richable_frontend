@@ -23,7 +23,8 @@
         <div class="modal-body" style="padding: 32px; padding-bottom: 12px">
           <div class="mb-3" style="display: flex; justify-content: space-between">
             <label class="form-label" style="font-weight: bold">분 류</label>
-            <div>{{ goalDetail.title }}</div> <!-- 제목 표시 -->
+            <div>{{ goalDetail.title }}</div>
+            <!-- 제목 표시 -->
           </div>
           <div class="mb-3" style="display: flex; justify-content: space-between">
             <label class="form-label" style="font-weight: bold">목표량</label>
@@ -39,7 +40,12 @@
             type="button"
             class="btn"
             @click="deleteGoal"
-            style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold;"
+            style="
+              background-color: white;
+              border: 1px solid #020202;
+              color: #020202;
+              font-weight: bold;
+            "
           >
             <font-awesome-icon icon="trash" />
           </button>
@@ -48,11 +54,22 @@
               type="button"
               class="btn"
               data-bs-dismiss="modal"
-              style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px;"
+              style="
+                background-color: white;
+                border: 1px solid #020202;
+                color: #020202;
+                font-weight: bold;
+                margin-right: 12px;
+              "
             >
               취소
             </button>
-            <button type="button" class="btn text-white" style="background-color: #ff0062" @click="submitGoal">
+            <button
+              type="button"
+              class="btn text-white"
+              style="background-color: #ff0062"
+              @click="submitGoal"
+            >
               수정
             </button>
           </div>
@@ -63,10 +80,10 @@
 </template>
 
 <script setup>
-import { ref, computed, defineExpose } from 'vue'
+import { ref, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
-import axios from 'axios'
-import Instance from '@/axiosInstance.js';
+// import axios from 'axios'
+import Instance from '@/axiosInstance.js'
 
 // emit 함수 정의 (Vue 3)
 const emit = defineEmits(['goalDeleted', 'goalUpdated'])
@@ -78,39 +95,30 @@ const goalDetail = ref({
   amount: 100000000 // 목표량
 })
 
-// 목표량을 포맷팅
-const formattedAmount = computed(() => {
-  return goalDetail.value.amount.toLocaleString() // 포맷: "100,000,000"
-})
-
 const modal = ref(null)
 let modalInstance = null
 
 // 모달 열기 함수
 const show = (goalData) => {
   goalDetail.value = {
-    index: goalData.index || null,   // index 값이 제대로 들어왔는지 확인
-    title: goalData.title || '자산 형성',  // title 할당
-    amount: goalData.amount || 0,    // amount 할당
-    category: goalData.category || '자산'  // category 할당
-  };
+    index: goalData.index || null, // index 값이 제대로 들어왔는지 확인
+    title: goalData.title || '자산 형성', // title 할당
+    amount: goalData.amount || 0, // amount 할당
+    category: goalData.category || '자산' // category 할당
+  }
 
-  console.log("Goal Detail Set:", goalDetail.value); // index와 category가 제대로 들어왔는지 로그로 확인
+  console.log('Goal Detail Set:', goalDetail.value) // index와 category가 제대로 들어왔는지 로그로 확인
 
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
       backdrop: 'static',
       keyboard: true
-    });
-    modalInstance.show();
+    })
+    modalInstance.show()
   } else if (modalInstance) {
-    modalInstance.show();
+    modalInstance.show()
   }
-};
-
-
-
-
+}
 
 // 목표 자산을 수정하는 함수 (PUT 요청)
 const submitGoal = async () => {
@@ -134,34 +142,34 @@ const submitGoal = async () => {
 // 목표 삭제 함수 (DELETE 요청)
 const deleteGoal = async () => {
   if (goalDetail.value.index === null || !goalDetail.value.category) {
-    console.error('Invalid index or category, cannot delete goal.');
-    alert('새로고침 후 다시 시도해주세요.');
-    return;
+    console.error('Invalid index or category, cannot delete goal.')
+    alert('새로고침 후 다시 시도해주세요.')
+    return
   }
 
   try {
-    console.log("Attempting to delete goal with index:", goalDetail.value.index);
+    console.log('Attempting to delete goal with index:', goalDetail.value.index)
 
     const response = await Instance({
       method: 'delete',
       url: '/goal/delete',
-      data: { 
-        index: goalDetail.value.index,   
-        category: goalDetail.value.category  
+      data: {
+        index: goalDetail.value.index,
+        category: goalDetail.value.category
       }
-    });
+    })
 
     if (response.data && response.data.success) {
-      emit('goalDeleted'); 
-      modalInstance.hide();
+      emit('goalDeleted')
+      modalInstance.hide()
     } else {
-      console.error('Failed to delete goal:', response.data);
-      alert('새로고침 후 다시 시도해주세요.');
+      console.error('Failed to delete goal:', response.data)
+      alert('새로고침 후 다시 시도해주세요.')
     }
   } catch (error) {
-    console.error('Error deleting goal:', error);
+    console.error('Error deleting goal:', error)
   }
-};
+}
 
 defineExpose({ show })
 </script>

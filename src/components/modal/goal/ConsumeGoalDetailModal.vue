@@ -22,15 +22,21 @@
         </div>
         <div class="modal-body" style="padding: 32px; padding-bottom: 12px">
           <div class="mb-3" style="display: flex">
-            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px">분류</label>
+            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px"
+              >분류</label
+            >
             <div>{{ goalDetail.type }}</div>
           </div>
           <div class="mb-3" style="display: flex">
-            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px">목표명</label>
+            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px"
+              >목표명</label
+            >
             <div>{{ goalDetail.name }}</div>
           </div>
           <div class="mb-3" style="display: flex">
-            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px">목표량</label>
+            <label class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px"
+              >목표량</label
+            >
             <div class="input-group">
               <div>{{ formattedAmount }}</div>
               <span class="input-group-text">원</span>
@@ -42,7 +48,13 @@
             type="button"
             class="btn"
             @click="deleteGoalHandler"
-            style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px;"
+            style="
+              background-color: white;
+              border: 1px solid #020202;
+              color: #020202;
+              font-weight: bold;
+              margin-right: 12px;
+            "
           >
             <font-awesome-icon icon="trash" />
           </button>
@@ -50,7 +62,13 @@
             type="button"
             class="btn"
             data-bs-dismiss="modal"
-            style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px;"
+            style="
+              background-color: white;
+              border: 1px solid #020202;
+              color: #020202;
+              font-weight: bold;
+              margin-right: 12px;
+            "
           >
             취소
           </button>
@@ -71,8 +89,8 @@
 <script setup>
 import { ref, computed, defineEmits, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
-import axios from 'axios' 
-import Instance from '@/axiosInstance.js';
+// import axios from 'axios'
+import Instance from '@/axiosInstance.js'
 
 // 목표 상세 데이터
 const goalDetail = ref({
@@ -91,63 +109,59 @@ let modalInstance = null
 // 모달 열기 함수
 // 모달 열기 함수
 const show = (goalData) => {
-  console.log("Received goalData:", goalData);  // goalData가 정확한지 확인
+  console.log('Received goalData:', goalData) // goalData가 정확한지 확인
 
   // index 값이 있는지 확인하고 추가
-  goalDetail.value = { 
+  goalDetail.value = {
     id: goalData.id,
-    index: goalData.index || goalData.id,  // index가 없으면 id를 사용
+    index: goalData.index || goalData.id, // index가 없으면 id를 사용
     type: goalData.type,
     name: goalData.name,
     amount: goalData.amount,
-    progress: goalData.progress 
-  };
+    progress: goalData.progress
+  }
 
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
       backdrop: 'static',
       keyboard: true
-    });
-    modalInstance.show();
+    })
+    modalInstance.show()
   } else if (modalInstance) {
-    modalInstance.show();
+    modalInstance.show()
   }
 
-  console.log("Goal detail set to:", goalDetail.value);  // goalDetail 값 로그 출력
-};
-
+  console.log('Goal detail set to:', goalDetail.value) // goalDetail 값 로그 출력
+}
 
 const deleteGoalHandler = async () => {
   try {
-    console.log("Attempting to delete goal with index:", goalDetail.value.index);  // 로그 출력
+    console.log('Attempting to delete goal with index:', goalDetail.value.index) // 로그 출력
 
     const response = await Instance({
       method: 'delete',
       url: '/goal/delete',
-      data: { 
-        index: goalDetail.value.index,   // index 값 전송
-        category: goalDetail.value.type  // type을 category로 사용하여 전송
+      data: {
+        index: goalDetail.value.index, // index 값 전송
+        category: goalDetail.value.type // type을 category로 사용하여 전송
       }
-    });
+    })
 
     if (response.data && response.data.success) {
       // UI에서 목표 삭제 처리
-      emit('deleteGoal', goalDetail.value.id);
-      modalInstance.hide();
+      emit('deleteGoal', goalDetail.value.id)
+      modalInstance.hide()
     } else {
-      console.error('Failed to delete goal:', response.data);
-      alert('새로고침 후 다시 시도해주세요.');
+      console.error('Failed to delete goal:', response.data)
+      alert('새로고침 후 다시 시도해주세요.')
     }
   } catch (error) {
-    console.error('Error deleting goal:', error);
+    console.error('Error deleting goal:', error)
   }
-};
-
-
-
+}
 
 const achieveGoalHandler = async () => {
-  const progress = Number(goalDetail.value.progress);
+  const progress = Number(goalDetail.value.progress)
 
   // 목표가 정확히 100% 달성되었는지 확인
   if (progress === 100) {
@@ -158,30 +172,25 @@ const achieveGoalHandler = async () => {
         url: '/goal/set', // 목표 달성 API 경로
         data: {
           index: goalDetail.value.index, // index 값을 전달
-          isAchive: true                 // isAchive 값을 true로 설정
+          isAchive: true // isAchive 값을 true로 설정
         }
-      });
+      })
 
       if (response.data.success) {
-        alert('목표가 달성되었습니다.');
-        emit('achieveGoal', goalDetail.value.index); // 부모 컴포넌트로 목표 index 전달
-        modalInstance.hide();
+        alert('목표가 달성되었습니다.')
+        emit('achieveGoal', goalDetail.value.index) // 부모 컴포넌트로 목표 index 전달
+        modalInstance.hide()
       } else {
-        console.error('Goal achievement failed:', response.data);
-        alert('목표 달성에 실패했습니다.');
+        console.error('Goal achievement failed:', response.data)
+        alert('목표 달성에 실패했습니다.')
       }
     } catch (error) {
-      console.error('Error achieving goal:', error);
+      console.error('Error achieving goal:', error)
     }
   } else {
-    alert('목표가 아직 달성되지 않았습니다.');
+    alert('목표가 아직 달성되지 않았습니다.')
   }
-};
-
-
-
-
-
+}
 
 // 이벤트 emit 정의
 const emit = defineEmits(['deleteGoal', 'achieveGoal'])

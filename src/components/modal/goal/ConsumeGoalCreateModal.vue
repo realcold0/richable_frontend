@@ -30,11 +30,21 @@
           </div>
           <div class="mb-3">
             <label class="form-label" style="font-weight: bold">목표명</label>
-            <input v-model="newGoal.title" type="text" class="form-control" placeholder="목표명을 입력해주세요" />
+            <input
+              v-model="newGoal.title"
+              type="text"
+              class="form-control"
+              placeholder="목표명을 입력해주세요"
+            />
           </div>
           <div class="mb-3">
             <label class="form-label" style="font-weight: bold">목표량</label>
-            <input v-model="newGoal.totalAmount" type="number" class="form-control" placeholder="목표량을 입력해주세요" />
+            <input
+              v-model="newGoal.totalAmount"
+              type="number"
+              class="form-control"
+              placeholder="목표량을 입력해주세요"
+            />
           </div>
         </div>
         <div class="modal-footer d-flex">
@@ -49,8 +59,8 @@
 <script setup>
 import { ref } from 'vue'
 import { Modal } from 'bootstrap'
-import axios from 'axios'
-import Instance from '@/axiosInstance.js';
+// import axios from 'axios'
+import Instance from '@/axiosInstance.js'
 
 // 새 목표 정보
 const newGoal = ref({
