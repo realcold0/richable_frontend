@@ -1,6 +1,6 @@
 <template>
   <div class="top-return-asset-page container">
-    <!-- Filters Section -->
+    <!-- 필터 섹션 -->
     <div class="filters">
       <button
         v-for="(filter, index) in filters"
@@ -14,15 +14,16 @@
 
     <!-- 상위 수익 자산 카드 -->
     <div class="card-container">
-      <div v-for="(asset, index) in topAssets" :key="index" class="asset-card card">
+      <div v-if="topAssets.length === 0">상위 자산이 없습니다.</div>
+      <div v-else v-for="(asset, index) in topAssets" :key="index" class="asset-card card">
         <h5 class="rank"> {{ index + 1 }} {{ asset.name }} </h5>
-        <p class="type">{{ asset.type }}</p>
-        <h3 class="return-rate">{{ asset.returnRate }}%</h3>
+        <p class="type">{{ asset.category }}</p>
+        <h3 class="return-rate">{{ asset.rate }} %</h3>
         <p class="price">{{ asset.price }}원</p>
       </div>
     </div>
 
-    <!-- 표를 카드로 감싸기 -->
+    <!-- 자산 목록 표 -->
     <div class="table-card card">
       <table class="table">
         <thead class="thead-light">
@@ -36,11 +37,11 @@
         </thead>
         <tbody>
           <tr v-for="(asset, index) in filteredAssets" :key="index">
-            <td>{{ index + 4 }}</td>
-            <td>{{ asset.type }}</td>
+            <td>{{ index+1  }}</td>
+            <td>{{ asset.category }}</td>
             <td>{{ asset.name }}</td>
             <td>{{ asset.price }}원</td>
-            <td class="return-rate">{{ asset.returnRate }}%</td>
+            <td class="return-rate">{{ asset.rate }} %</td>
           </tr>
         </tbody>
       </table>
@@ -49,50 +50,83 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+// JWT 토큰을 저장 (예: 로그인 후 받은 토큰)
+const token = localStorage.getItem('authToken');
 
 // 필터 항목들
-const filters = ['전체', '주식', '예/적금', '채권', '코인']
+const filters = ['전체', '주식', '코인']
 const selectedFilter = ref('전체')
 
-// 상위 수익 자산 데이터 (주식, 예적금, 채권, 코인)
-const topAssets = [
-  { type: '주식', name: '에이치엘사이언스', returnRate: 30.0, price: '17,160' },
-  { type: '주식', name: '영풍정밀', returnRate: 29.9, price: '12,180' },
-  { type: '주식', name: '골드앤에스', returnRate: 29.9, price: '542' }
-]
+// 상위 수익 자산 데이터
+const topAssets = ref([])
 
-// 더미 데이터 추가 (다양한 유형)
-const otherAssets = [
-  { type: '예/적금', name: '한국은행 적금', returnRate: 1.5, price: '1,000,000' },
-  { type: '채권', name: '국채 10년물', returnRate: 2.0, price: '1,500,000' },
-  { type: '코인', name: '비트코인', returnRate: -5.0, price: '50,000,000' },
-  { type: '주식', name: '하이트론', returnRate: 29.9, price: '3,535' },
-  { type: '주식', name: '영풍', returnRate: 29.9, price: '386,000' },
-  { type: '예/적금', name: '카카오뱅크 적금', returnRate: 1.8, price: '500,000' },
-  { type: '채권', name: '국채 20년물', returnRate: 2.3, price: '2,000,000' },
-  { type: '코인', name: '이더리움', returnRate: -2.5, price: '4,000,000' },
-  { type: '주식', name: '삼성전자', returnRate: 5.3, price: '68,000' }
-]
+// 필터링된 자산 목록
+const filteredAssets = ref([])
+
+// 전체 자산 데이터 (API 호출 결과를 저장할 변수)
+let allAssets = ref([])
 
 // 필터 클릭 시 실행되는 함수
-const filterAssets = (filter) => {
-  selectedFilter.value = filter
+const filterAssets = async (filter) => {
+  selectedFilter.value = filter;
+  let url = 'http://localhost:8080/invest/highreturn'; // 전체 조회
+
+  if (filter === '주식') {
+    url = 'http://localhost:8080/invest/highreturn/stock';
+  } else if (filter === '코인') {
+    url = 'http://localhost:8080/invest/highreturn/coin';
+  }
+
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`  // JWT 토큰을 Authorization 헤더에 추가
+      }
+    });
+    if (response.data.success) {
+      allAssets.value = response.data.response.data.map(item => ({
+        name: item.name,
+        category: item.category,
+        rate: parseFloat(item.rate.replace('%', '')), // 수익률을 숫자로 변환
+        price: item.price.toLocaleString() // 천 단위 구분 추가
+      }));
+      filterAssetsByType();
+    } else {
+      console.error('API 응답 실패:', response.data.message);
+    }
+  } catch (error) {
+    console.error('자산 데이터를 불러오는 중 오류 발생:', error);
+  }
 }
 
-// 필터링된 자산 목록 계산
-const filteredAssets = computed(() => {
-  if (selectedFilter.value === '전체') {
-    return otherAssets // 전체 선택 시 모든 자산을 표시
+// 선택된 필터에 따른 자산 필터링 및 정렬
+const filterAssetsByType = () => {
+  let filtered = allAssets.value;
+  
+  if (selectedFilter.value !== '전체') {
+    filtered = allAssets.value.filter(asset => asset.category === selectedFilter.value);
   }
-  return otherAssets.filter(asset => asset.type === selectedFilter.value) // 필터에 맞는 자산만 표시
+
+  // 수익률 기준으로 내림차순 정렬
+  filtered.sort((a, b) => b.rate - a.rate);
+
+  filteredAssets.value = filtered;
+  topAssets.value = filteredAssets.value.slice(0, 3); // 상위 3개만 topAssets에 저장
+}
+
+// 페이지 로드 시 전체 자산을 불러옴
+onMounted(() => {
+  filterAssets('전체'); // 초기 로드 시 전체 자산 조회
 })
 </script>
 
 <style scoped>
 /* 전체 페이지 여백 */
 .top-return-asset-page {
-  margin-top: 40px; /* 상단에서 40px 만큼 떨어지게 */
+  margin-top: 40px;
   padding: 20px;
 }
 
@@ -107,7 +141,7 @@ const filteredAssets = computed(() => {
   padding: 15px 25px;
   border: none;
   background-color: transparent;
-  font-size: 18px; /* 크기 증가 */
+  font-size: 18px;
   font-weight: bold;
   color: #9e9e9e;
   cursor: pointer;
@@ -124,14 +158,14 @@ const filteredAssets = computed(() => {
 }
 
 .filter-btn + .filter-btn {
-  margin-left: 15px; /* 필터 간 간격을 조금 더 크게 */
+  margin-left: 15px;
 }
 
 /* 카드 스타일 */
 .card-container {
   display: flex;
-  gap: 30px; /* 카드 간격을 넓게 */
-  margin-top: 40px; /* 상단에서 더 떨어지도록 */
+  gap: 30px;
+  margin-top: 40px;
 }
 
 .asset-card {
@@ -141,7 +175,7 @@ const filteredAssets = computed(() => {
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   text-align: center;
-  font-size: 18px; /* 카드 내 텍스트 크기 증가 */
+  font-size: 18px;
 }
 
 .rank {
@@ -156,7 +190,7 @@ const filteredAssets = computed(() => {
 }
 
 .return-rate {
-  font-size: 26px; /* 수익률 글씨 크기 증가 */
+  font-size: 26px;
   color: red;
   margin-bottom: 5px;
 }
@@ -166,14 +200,14 @@ const filteredAssets = computed(() => {
   color: #555;
 }
 
-/* 표를 감싸는 카드 */
+/* 표 스타일 */
 .table-card {
-  margin-top: 40px; /* 표 상단에서 더 내려오도록 */
+  margin-top: 40px;
   padding: 30px;
   background-color: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
-  font-size: 18px; /* 표 글씨 크기 증가 */
+  font-size: 18px;
 }
 
 .table {
@@ -183,7 +217,7 @@ const filteredAssets = computed(() => {
 
 .table th, .table td {
   text-align: center;
-  padding: 12px; /* 표 내 셀 패딩 증가 */
+  padding: 12px;
 }
 
 .return-rate {
