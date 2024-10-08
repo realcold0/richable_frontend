@@ -44,10 +44,8 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <div  id="naver_id_login" @click="naverLogin"></div>
-      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
-    </img>
+
+      <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
@@ -107,7 +105,9 @@ const login = async () => {
     if (response.status === 200) {
       alert('Login successful!')
       localStorage.setItem('authToken', response.data.token)
-      router.push({ name: 'home' })
+      // 리디렉션 경로 처리 (기본값으로 '/'로 이동)
+      const redirectPath = router.currentRoute.value.query.redirect || '/asset/analysis';
+      router.push(redirectPath);
     }
   } catch (error) {
     console.error('Login failed:', error)
