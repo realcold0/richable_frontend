@@ -87,50 +87,48 @@ const errorMessage = ref('');
 
 // 자산 현황 (금융 자산 합계) 데이터를 가져오는 함수
 const fetchFinancialAssetsSum = async () => {
-  loading.value = true; // 로딩 시작
-  errorMessage.value = ''; // 오류 메시지 초기화
+  loading.value = true;
+  errorMessage.value = '';
   try {
   
-    const response = await axiosInstance.get('/finance/fin/sum');
+    const response = await axiosInstance.get('/finance/fin/sum')
 
-    // 데이터 구조에 맞게 수정
     if (response.data && response.data.response && response.data.response.data && response.data.response.data.data) {
       const total = response.data.response.data.data.amount;
-      currentAsset.value = total; // amount 값을 currentAsset에 저장
+      currentAsset.value = total;
     } else {
-      errorMessage.value = '자산 데이터가 올바르지 않습니다.'; // 구조가 다를 경우 오류 메시지
+      errorMessage.value = '자산 데이터가 올바르지 않습니다.';
     }
   } catch (error) {
-    errorMessage.value = '금융 자산을 가져오는 데 실패했습니다.'; // 오류 메시지 설정
+    errorMessage.value = '금융 자산을 가져오는 데 실패했습니다.';
     console.error('Error fetching financial asset sum:', error);
   } finally {
-    loading.value = false; // 로딩 종료
+    loading.value = false;
   }
 };
 
 // 20대 평균 자산 데이터를 가져오는 함수
 const fetchPeerData = async () => {
-  loading.value = true; // 로딩 시작
-  errorMessage.value = ''; // 오류 메시지 초기화
+  loading.value = true;
+  errorMessage.value = '';
   try {
-    const response = await axiosInstance.get('/finance/peer');
-
+    const response = await axiosInstance.get('/finance/peer')
     const data = response.data.response.data;
-    peerAverageAsset.value = data.spotAvgAmount; // 20대 평균 자산
+    peerAverageAsset.value = data.spotAvgAmount;
     assetDifference.value = (currentAsset.value - peerAverageAsset.value) / 10000; // 만원 단위로 차이 계산
   } catch (error) {
-    errorMessage.value = '동료 자산 데이터를 가져오는 데 실패했습니다.'; // 오류 메시지 설정
+    errorMessage.value = '동료 자산 데이터를 가져오는 데 실패했습니다.';
     console.error('Error fetching peer data:', error);
   } finally {
-    loading.value = false; // 로딩 종료
+    loading.value = false;
   }
 };
 
 
 // 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
 const fetchPeerFinanceData = async () => {
-  loading.value = true; // 로딩 시작
-  errorMessage.value = ''; // 오류 메시지 초기화
+  loading.value = true;
+  errorMessage.value = '';
   try {
     const response = await axiosInstance.get('/finance/peer/finance');
     const financeData = response.data.response.data;
@@ -140,7 +138,7 @@ const fetchPeerFinanceData = async () => {
         category: item.category,
         myAsset: item.bsAmount,
         averageAsset: item.spotAvgAmount,
-        difference: item.bsAmount - item.spotAvgAmount // 차이 계산
+        difference: item.bsAmount - item.spotAvgAmount
       }));
     } else {
       console.error("Expected an array but got: ", financeData);
@@ -161,11 +159,24 @@ const createCharts = () => {
   const radarCtx = document.getElementById('radarChart').getContext('2d');
 
   // 카테고리별 자산 데이터 가져오기
-  const categories = assetList.value.map(item => item.category); // 카테고리 이름
-  const myAssets = assetList.value.map(item => item.myAsset / 10000); // 나의 자산 (만원 단위)
-  const avgAssets = assetList.value.map(item => item.averageAsset / 10000); // 평균 자산 (만원 단위)
+  const categories = assetList.value.map(item => item.category);
+  const myAssets = assetList.value.map(item => item.myAsset / 10000);
+  const avgAssets = assetList.value.map(item => item.averageAsset / 10000);
 
-  // 막대 차트 (20대 평균 자산과 나의 자산 비교)
+  // 그라디언트 색상 설정
+  const gradientBar = barCtx.createLinearGradient(0, 0, 0, 400);
+  gradientBar.addColorStop(0, '#ff0062');
+  gradientBar.addColorStop(1, '#ff80b2');
+
+  const gradientRadarMyAssets = radarCtx.createLinearGradient(0, 0, 0, 400);
+  gradientRadarMyAssets.addColorStop(0, '#ff6384');
+  gradientRadarMyAssets.addColorStop(1, '#ff80b2');
+
+  const gradientRadarAvgAssets = radarCtx.createLinearGradient(0, 0, 0, 400);
+  gradientRadarAvgAssets.addColorStop(0, '#4bc0c0');
+  gradientRadarAvgAssets.addColorStop(1, '#80e1e1');
+
+  // 막대 차트
   new Chart(barCtx, {
     type: 'bar',
     data: {
@@ -173,8 +184,13 @@ const createCharts = () => {
       datasets: [
         {
           label: '자산 비교',
-          data: [peerAverageAsset.value, currentAsset.value], // 20대 평균 자산과 내 자산
-          backgroundColor: ['rgba(211, 211, 211, 0.7)', 'rgba(255, 0, 98, 0.7)'],
+          data: [peerAverageAsset.value, currentAsset.value],
+          backgroundColor: [gradientBar, 'rgba(255, 0, 98, 0.7)'],
+          borderColor: '#ff0062',
+          borderWidth: 2,
+          hoverBorderWidth: 3, // 호버 시 강조 효과
+          hoverBorderColor: '#ff4081', // 호버 시 색상
+          borderRadius: 20, // 막대 모서리 둥글게
         }
       ]
     },
@@ -185,6 +201,10 @@ const createCharts = () => {
         y: {
           display: true,
           beginAtZero: true,
+          grid: {
+            drawBorder: true,
+            color: 'rgba(200, 200, 200, 0.3)', // y축 그리드 라인 색상
+          },
         },
         x: {
           grid: {
@@ -203,29 +223,44 @@ const createCharts = () => {
         legend: {
           display: false,
         },
+        tooltip: {
+          backgroundColor: '#ff4081', // 툴팁 배경색
+          titleFont: {
+            size: 16,
+          },
+          bodyFont: {
+            size: 14,
+          },
+        },
       },
     },
   });
 
-  // 레이더 차트 (카테고리별 자산 비교)
+  // 레이더 차트
   new Chart(radarCtx, {
     type: 'radar',
     data: {
-      labels: categories, // 카테고리 이름
+      labels: categories,
       datasets: [
         {
           label: '나의 자산',
-          data: myAssets,  // 만원 단위로 변환
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          data: myAssets,
+          backgroundColor: gradientRadarMyAssets,
           borderColor: '#ff6384',
           borderWidth: 2,
+          pointBackgroundColor: '#ff6384', // 포인트 색상
+          pointHoverRadius: 7, // 포인트 호버 반경
+          pointHoverBackgroundColor: '#ff0062', // 포인트 호버 색상
         },
         {
           label: '평균 자산',
-          data: avgAssets,  // 만원 단위로 변환
-          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          data: avgAssets,
+          backgroundColor: gradientRadarAvgAssets,
           borderColor: '#4bc0c0',
           borderWidth: 2,
+          pointBackgroundColor: '#4bc0c0', // 포인트 색상
+          pointHoverRadius: 7, // 포인트 호버 반경
+          pointHoverBackgroundColor: '#2bc0c0', // 포인트 호버 색상
         }
       ],
     },
@@ -236,25 +271,35 @@ const createCharts = () => {
         r: {
           beginAtZero: true,
           min: 0,
-          max: 100, // 데이터 범위에 맞게 조정
+          max: Math.max(...myAssets, ...avgAssets),
           ticks: {
-            stepSize: 2,
+            stepSize: 1000,
             font: {
-              size: 12 // 텍스트 크기 조정
+              size: 11,
             }
           },
         },
       },
+      plugins: {
+        legend: {
+          labels: {
+            font: {
+              size: 14,
+              family: "'Pretendard', sans-serif",
+            }
+          }
+        }
+      }
     },
   });
 };
 
 // 데이터 가져오기 후 차트 생성 및 테이블 반영
 onMounted(async () => {
-  await fetchFinancialAssetsSum(); // 금융 자산 합계 불러오기
-  await fetchPeerData();           // 20대 평균 자산 데이터 불러오기 및 비교
-  await fetchPeerFinanceData();    // 금융 자산별 또래 자산 비교 불러오기
-  createCharts();                  // 차트 생성
+  await fetchFinancialAssetsSum();
+  await fetchPeerData();
+  await fetchPeerFinanceData();
+  createCharts(); // 차트 생성을 데이터 fetch 후에 실행
 });
 </script>
 

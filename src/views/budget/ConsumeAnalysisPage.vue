@@ -20,7 +20,7 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue'
   display: flex;
 }
 
-ConsumeCategorySum {
+.ConsumeCategorySum {
   margin: 64px 0;
 }
 </style>
