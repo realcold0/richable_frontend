@@ -2,8 +2,10 @@
     <div class="wrapper">
         <div class="analyzeWrapper">
             <div class="analyzeText">
+
                 <span id="month">{{ month.month }}월</span>에는 
                 <span id="mostCategory">{{ topCategories[0]?.category || '데이터 없음' }}</span>에 가장 많은 소비를 하였습니다.
+
             </div>
         
             <div class="analyze">
@@ -13,18 +15,22 @@
 
                 <div class="consumeSummary">
                     <div class="totalConsumeAmount">
+
                         <div>총 소비</div>
                         <div>{{ totalSum !== null ? totalSum.toLocaleString() : '0' }} 원</div>
+
                     </div>
                     
                     <table class="consumeList">
                         <tbody>
+
                             <tr v-for="(category, index) in topCategories" :key="index" @click="showDetail(category)">
                                 <td><font-awesome-icon :icon="['fas', 'circle']" class="icon" :style="{ color: iconColors[index] || '#000' }" /></td>
                                 <td>{{ category.category || '없음' }}</td>
                                 <td>{{ totalSum > 0 ? Math.round((category.sum / totalSum) * 100) : 0 }}%</td>
                                 <td>{{ category.sum !== null ? category.sum.toLocaleString() : '0' }} 원 </td>
                                 <td> ></td>
+
                             </tr>
                         </tbody>
                     </table>
@@ -52,6 +58,7 @@
     </div>
 
 </template>
+
 
 <script setup>
 import { useMonthStore } from '@/stores/consume/curMonth';
@@ -157,6 +164,7 @@ const processCategories = () => {
 const renderDoughnutChart = async () => {
     await nextTick();
 
+
     if (chartInstance) {
         chartInstance.destroy();
     }
@@ -178,6 +186,7 @@ const renderDoughnutChart = async () => {
         topCategories.value = [];
     }
 
+
     chartInstance = new ChartJS(doughnutChart.value, {
         type: 'doughnut',
         data: {
@@ -190,6 +199,7 @@ const renderDoughnutChart = async () => {
         },
         options: {
             responsive: true,
+
             plugins: {
                 legend: {
                     position: 'bottom',  // 범례를 아래에 표시
@@ -199,6 +209,7 @@ const renderDoughnutChart = async () => {
                     },
                 },
             },
+
         },
     });
 };
@@ -207,13 +218,16 @@ onMounted(() => {
     renderDoughnutChart();
 });
 
+
 watch(() => month.month, () => {
+
     renderDoughnutChart();
 });
 </script>
 
 
 <style scoped>
+
 * {
     font-family: 'Pretendard', sans-serif;
 }
@@ -242,6 +256,7 @@ watch(() => month.month, () => {
 .analyzeText #mostCategory {
     color: #FF0062; /* 강조 색상 */
     font-weight: bold;
+
 }
 
 .analyze {
@@ -355,5 +370,6 @@ watch(() => month.month, () => {
 
 .btn-pink:hover {
     background-color: #e60073;
+
 }
 </style>

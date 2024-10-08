@@ -60,9 +60,8 @@
   <canvas id="savingChart"></canvas>
 </div>
 
-
-
 </div>
+
 </div>
 </template>
 
@@ -72,7 +71,6 @@ import { Chart, registerables } from 'chart.js';
 import axios from 'axios';
 import { nextTick } from 'vue';
 import axiosInstance from '@/AxiosInstance';
-
 
 // 차트.js 등록
 Chart.register(...registerables)

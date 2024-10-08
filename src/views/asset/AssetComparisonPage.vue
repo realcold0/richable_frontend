@@ -67,7 +67,6 @@ import { ref, onMounted } from 'vue';
 import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 
-
 Chart.register(...registerables);
 
 // 사용자 이름
@@ -127,13 +126,13 @@ const fetchPeerData = async () => {
   }
 };
 
+
 // 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
 const fetchPeerFinanceData = async () => {
   loading.value = true; // 로딩 시작
   errorMessage.value = ''; // 오류 메시지 초기화
   try {
     const response = await axiosInstance.get('/finance/peer/finance');
-
     const financeData = response.data.response.data.response.data;
 
     if (Array.isArray(financeData)) {

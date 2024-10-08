@@ -243,7 +243,6 @@ import AssetCheckModal from '../../components/modal/asset/AssetCheckModal.vue'
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue'
 import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue'
 
-
 // Chart.js에 필요한 컴포넌트(컨트롤러, 요소, 플러그인) 등록
 Chart.register(PieController, ArcElement, Tooltip, Legend)
 
@@ -583,8 +582,8 @@ const spotTotalAmount = ref(0);
 // 총 현물 자산 현황 연동
 const fetchSpotTotalAmount = async () => {
   try {
-    const response = await axiosInstance.get('/finance/spot/sum')
 
+    const response = await axiosInstance.get('/finance/spot/sum')
     console.log(response.data.response.data.amount)
     spotTotalAmount.value = response.data.response.data.amount;
     
@@ -602,6 +601,7 @@ const spotEtcAmount = ref(0)
 // 카테고리별 현물 자산 총합 조회
 const fetchSpotList = async (category) => {
   try {
+
     const response = await axiosInstance.get(`finance/spot/${category}/sum`)
 
     const data = response.data.response.data.amount

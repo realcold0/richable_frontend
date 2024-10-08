@@ -12,6 +12,7 @@ const axiosInstance = axios.create({
 // 응답 인터셉터 설정
 axiosInstance.interceptors.response.use(
   (response) => {
+
     // 응답이 성공적인 경우 그대로 반환
     return response;
   },
@@ -40,11 +41,13 @@ axiosInstance.interceptors.response.use(
         // 리프레시 토큰도 만료되었으면 로그인 페이지로 이동
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
+
         
         // 원래 요청 URL을 리디렉션 쿼리로 전달
         router.push({
           path: '/user/signin',
           query: { redirect: originalRequest.url } // 원래 요청한 경로를 쿼리로 전달
+
         });
       }
     }
@@ -55,3 +58,4 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
+

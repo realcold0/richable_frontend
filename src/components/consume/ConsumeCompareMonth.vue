@@ -39,6 +39,7 @@ const currentMonth = today.getMonth() + 1; // 현재 월 (0부터 시작하므�
 const currentDay = today.getDate(); // 오늘의 일(day)만 추출
 const days = Array.from({ length: 31 }, (_, i) => i + 1); // 전체 31일까지의 날짜 배열 생성
 
+
 // 차이 계산 후 메시지 출력
 const differenceMessage = ref('');
 

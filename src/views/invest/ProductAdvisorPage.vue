@@ -63,6 +63,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import axiosInstance from '@/AxiosInstance';
 
+
 const availableCash = ref(0); // 여유 자금
 const availablePercentage = ref(0); // 여유 자금 비율
 const recommendedProducts = ref([]); // 추천 상품
@@ -75,6 +76,7 @@ onMounted(() => {
   if (token) {
     // 여유 자금 및 비율 가져오기
     axiosInstance.get('/invest/available')
+
     .then(response => {
       if (response.data.success) {
         availableCash.value = response.data.response.data.availableCash; // 여유 자금 설정

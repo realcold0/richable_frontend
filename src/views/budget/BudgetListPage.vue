@@ -190,7 +190,6 @@ import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue';
 import ConsumeCreateModal from '@/components/modal/budget/ConsumeCreateModal.vue'; 
 import ConsumeDetailModal from '@/components/modal/budget/ConsumeDetailModal.vue';
 import ConsumeUpdateModal from '@/components/modal/budget/ConsumeUpdateModal.vue';
-
 import axiosInstance from '@/AxiosInstance';
 
 const selectedTab = ref('expense');
@@ -206,12 +205,11 @@ const totalIncomes = computed(() => incomes.value.length);
 const sortOrder = ref('desc');  // 최신순(desc) 또는 오래된순(asc)을 저장할 변수
 const errorMessage = ref('');
 
-
 // 소비 데이터 불러오기
-
 const fetchExpenses = async () => {
   try {
     const response = await axiosInstance.get('/outcome/all');
+
     if (Array.isArray(response.data.response.data)) {
       expenses.value = response.data.response.data;
     } else {
@@ -227,6 +225,7 @@ const fetchExpenses = async () => {
 const fetchIncomes = async () => {
   try {
     const response = await axiosInstance.get('/income/all');
+
     if (Array.isArray(response.data.response.data)) {
       incomes.value = response.data.response.data;
     } else {
@@ -256,6 +255,7 @@ const fetchIncomes = async () => {
 //     fetchExpenses(); // 기본으로 소비 데이터를 먼저 로드
 //   }
 // });
+
 
 
 // 모달 관련 상태
@@ -456,7 +456,7 @@ fetchExpenses();
   text-align: center;
   border-collapse: separate;
   border-spacing: 0 10px;
-}
+  }
 
 .table th, .table td {
   padding: 15px;
@@ -477,6 +477,7 @@ fetchExpenses();
   width: 180px;
   border-radius: 10px 10px 0px 0px;
 }
+
 
 .table tbody tr {
   background-color: white;

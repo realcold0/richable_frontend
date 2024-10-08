@@ -1,18 +1,15 @@
 <template>
   <div class="pageWrapper">
-    <SelectMonth/>
-    <ConsumeCategorySum/>
-    <ConsumeCompareMonth/>
+    <SelectMonth />
+    <ConsumeCategorySum />
+    <ConsumeCompareMonth />
   </div>
 </template>
 <script setup>
-import SelectMonth from '@/components/consume/SelectMonth.vue';
-import ConsumeCategorySum from '@/components/consume/ConsumeCategorySum.vue';
-import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
+import SelectMonth from '@/components/consume/SelectMonth.vue'
+import ConsumeCategorySum from '@/components/consume/ConsumeCategorySum.vue'
+import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue'
 </script>
-
-
-
 
 <style scoped>
 .pageWrapper {
@@ -26,7 +23,4 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue';
 ConsumeCategorySum {
   margin: 64px 0;
 }
-
-
-
 </style>
