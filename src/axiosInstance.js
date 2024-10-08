@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // Axios 인스턴스 생성 (공통 헤더에 토큰 추가)
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,  // .env 파일에서 가져온 값 사용

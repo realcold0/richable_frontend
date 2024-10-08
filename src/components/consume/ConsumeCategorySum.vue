@@ -75,6 +75,7 @@ import {
 } from 'chart.js';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import axiosinstance from '@/AxiosInstance';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, DoughnutController);
 
@@ -170,7 +171,7 @@ const renderDoughnutChart = async () => {
     }
 
     try {
-        const response = await axios.get(`http://localhost:8080/outcome/category/sum/${month.year}/${month.month}`);
+        const response = await axiosinstance.get(`/outcome/category/sum/${month.year}/${month.month}`);
         const responseData = response.data.response.data;
 
         categories.value = responseData.categorys || [];
