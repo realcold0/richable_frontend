@@ -101,29 +101,42 @@ const onDragStart = (goal, event) => {
 
 // 드롭 시 호출
 const onDrop = async (targetGoal) => {
-  const draggedIndex = goals.value.indexOf(draggedGoal)
-  const targetIndex = goals.value.indexOf(targetGoal)
+  const draggedIndex = goals.value.indexOf(draggedGoal);
+  const targetIndex = goals.value.indexOf(targetGoal);
 
-  // 카드를 서로 교환
-  goals.value.splice(draggedIndex, 1)
-  goals.value.splice(targetIndex, 0, draggedGoal)
+  // 목표를 드래그한 후 새로운 위치로 이동
+  goals.value.splice(draggedIndex, 1); // 기존 위치에서 삭제
+  goals.value.splice(targetIndex, 0, draggedGoal); // 새 위치에 삽입
 
-  // 가장 왼쪽 상단에 놓인 카드의 priority 값을 2로 설정
-  if (targetIndex === 0) {
-    draggedGoal.priority = 2
+  // 드래그 후 모든 목표의 priority 값을 다시 설정
+  for (let i = 0; i < goals.value.length; i++) {
+    goals.value[i].priority = i + 1;
+  }
+
+  // 개별 목표에 대한 PUT 요청
+  for (const goal of goals.value) {
+    const priorityUpdate = {
+      index: goal.id, // 목표의 id
+      priority: goal.priority, // 새롭게 설정된 우선순위
+    };
+
     try {
-      await Instance.post('/goal/update-priority', {
-        id: draggedGoal.id,
-        priority: 2
-      })
-      console.log(`Priority of ${draggedGoal.title} has been updated to 2`)
+      const response = await Instance.put('/goal/priority', priorityUpdate, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Priority updated successfully for goal:', response.data);
     } catch (error) {
-      console.error('Failed to update priority', error)
+      console.error('Failed to update priority for goal:', goal.id, error);
     }
   }
 
-  draggedGoal = null
-}
+  // 목표 데이터를 다시 불러옴
+  await fetchGoals();
+
+  draggedGoal = null;
+};
 
 // assetGoal 변수 정의 (자산 목표 데이터를 관리)
 const assetGoal = ref(null)
