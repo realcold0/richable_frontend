@@ -2,8 +2,8 @@
   <div class="content-container">
     <!-- 상단 자산 정보 -->
     <div class="total-asset">
-      <div class="asset-title">김리치님의 자산 현황 😎</div>
-      <div class="asset-amount">{{ currentAsset.toLocaleString() }}원</div>
+      <div class="asset-title">{{ userName }}님의 자산 현황 😎</div>
+      <div class="asset-amount">{{ currentAsset ? currentAsset.toLocaleString() : 0 }}원</div>
     </div>
 
     <!-- 전체 자산 비교 -->
@@ -11,27 +11,26 @@
       <div class="asset-analysis-nav">
         <div class="asset-title">전체 자산 비교</div>
       </div>
-      
+
       <div class="asset-graph-container2">
+        <!-- 20대 평균 자산과 나의 자산 비교 (막대 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            김리치님의 자산은 <br/>
-             20대 평균보다 <strong style="color:#ff0062">{{ assetDifference.toLocaleString() }}만원 많습니다.</strong>
+            {{ userName }}님의 자산은 <br />
+            20대 평균보다 <strong style="color:#ff0062">{{ assetDifference > 0 ? assetDifference.toLocaleString() + '만원 많습니다.' : Math.abs(assetDifference).toLocaleString() + '만원 적습니다.' }}</strong>
           </div>
           <canvas id="barChart" class="chart-size"></canvas>
         </div>
-      
+
+        <!-- 카테고리별 자산 비교 (레이더 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            김리치님의 자산은 <br/>
-            20대 평균보다 <strong style="color:#ff0062">{{ assetDifference.toLocaleString() }}만원 많습니다.</strong>
+            {{ userName }}님의 카테고리별 자산 비교
           </div>
           <canvas id="radarChart" class="chart-size"></canvas>
         </div>
       </div>
     </div>
-
-
 
     <!-- 자산 비교 테이블 -->
     <div class="compare-table">
@@ -47,159 +46,215 @@
         <tbody>
           <tr v-for="(item, index) in assetList" :key="index">
             <td>{{ item.category }}</td>
-            <td>{{ item.myAsset.toLocaleString() }}원</td>
-            <td>{{ item.averageAsset.toLocaleString() }}원</td>
-            <td>{{ item.difference.toLocaleString() }}원이 더 적습니다.</td>
+            <td>{{ item.myAsset ? item.myAsset.toLocaleString() : 0 }}원</td>
+            <td>{{ item.averageAsset ? item.averageAsset.toLocaleString() : 0 }}원</td>
+            <td>
+              {{ item.difference > 0 ? item.difference.toLocaleString() + '원이 더 적습니다.' : Math.abs(item.difference).toLocaleString() + '원이 더 많습니다.' }}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- 로딩 및 오류 메시지 -->
+    <div v-if="loading">로딩 중...</div>
+    <div v-if="errorMessage">{{ errorMessage }}</div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Chart, registerables } from 'chart.js';
+import axiosInstance from '@/AxiosInstance.js';
 
 Chart.register(...registerables);
 
-// 현재 자산 정보
-const currentAsset = ref(12100000);
-const assetDifference = ref(1000);
+// 사용자 이름
+const userName = "김리치";
 
-// 자산 리스트
-const assetList = ref([
-  { category: '적금', myAsset: 10000, averageAsset: 10000, difference: 10000 },
-  { category: '예금', myAsset: 10000, averageAsset: 10000, difference: 10000 },
-  { category: '주식', myAsset: 10000, averageAsset: 10000, difference: 10000 },
-  { category: '코인', myAsset: 10000, averageAsset: 10000, difference: 10000 },
-  { category: '채권', myAsset: 10000, averageAsset: 10000, difference: 10000 },
-  { category: '입출금', myAsset: 10000, averageAsset: 10000, difference: 10000 }
-]);
+// 현재 자산 정보 및 자산 차이
+const currentAsset = ref(0);
+const peerAverageAsset = ref(0); // 20대 평균 자산
+const assetDifference = ref(0); // 내 자산과 20대 평균 자산의 차이
+
+// 자산 리스트 (카테고리별)
+const assetList = ref([]);
+
+// 로딩 상태 및 오류 메시지
+const loading = ref(false);
+const errorMessage = ref('');
+
+
+// 자산 현황 (금융 자산 합계) 데이터를 가져오는 함수
+const fetchFinancialAssetsSum = async () => {
+  loading.value = true; // 로딩 시작
+  errorMessage.value = ''; // 오류 메시지 초기화
+  try {
+  
+    const response = await axiosInstance.get('/finance/fin/sum');
+
+    // 데이터 구조에 맞게 수정
+    if (response.data && response.data.response && response.data.response.data && response.data.response.data.data) {
+      const total = response.data.response.data.data.amount;
+      currentAsset.value = total; // amount 값을 currentAsset에 저장
+    } else {
+      errorMessage.value = '자산 데이터가 올바르지 않습니다.'; // 구조가 다를 경우 오류 메시지
+    }
+  } catch (error) {
+    errorMessage.value = '금융 자산을 가져오는 데 실패했습니다.'; // 오류 메시지 설정
+    console.error('Error fetching financial asset sum:', error);
+  } finally {
+    loading.value = false; // 로딩 종료
+  }
+};
+
+// 20대 평균 자산 데이터를 가져오는 함수
+const fetchPeerData = async () => {
+  loading.value = true; // 로딩 시작
+  errorMessage.value = ''; // 오류 메시지 초기화
+  try {
+    const response = await axiosInstance.get('/finance/peer');
+
+    const data = response.data.response.data;
+    peerAverageAsset.value = data.spotAvgAmount; // 20대 평균 자산
+    assetDifference.value = (currentAsset.value - peerAverageAsset.value) / 10000; // 만원 단위로 차이 계산
+  } catch (error) {
+    errorMessage.value = '동료 자산 데이터를 가져오는 데 실패했습니다.'; // 오류 메시지 설정
+    console.error('Error fetching peer data:', error);
+  } finally {
+    loading.value = false; // 로딩 종료
+  }
+};
+
+
+// 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
+const fetchPeerFinanceData = async () => {
+  loading.value = true; // 로딩 시작
+  errorMessage.value = ''; // 오류 메시지 초기화
+  try {
+    const response = await axiosInstance.get('/finance/peer/finance');
+    const financeData = response.data.response.data.response.data;
+
+    if (Array.isArray(financeData)) {
+      assetList.value = financeData.map(item => ({
+        category: item.category,
+        myAsset: item.bsAmount,
+        averageAsset: item.spotAvgAmount,
+        difference: item.bsAmount - item.spotAvgAmount // 차이 계산
+      }));
+    } else {
+      console.error("Expected an array but got: ", financeData);
+      errorMessage.value = "예상한 배열을 받지 못했습니다.";
+      assetList.value = [];
+    }
+  } catch (error) {
+    errorMessage.value = '금융 자산 비교 데이터를 가져오는 데 실패했습니다.';
+    console.error('Error fetching peer finance data:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 
 // 차트 생성 함수
 const createCharts = () => {
   const barCtx = document.getElementById('barChart').getContext('2d');
   const radarCtx = document.getElementById('radarChart').getContext('2d');
 
-  // 막대 차트
+  // 카테고리별 자산 데이터 가져오기
+  const categories = assetList.value.map(item => item.category); // 카테고리 이름
+  const myAssets = assetList.value.map(item => item.myAsset / 10000); // 나의 자산 (만원 단위)
+  const avgAssets = assetList.value.map(item => item.averageAsset / 10000); // 평균 자산 (만원 단위)
+
+  // 막대 차트 (20대 평균 자산과 나의 자산 비교)
   new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels: ['20대 평균', '나의 자산'],
-    datasets: [
-      {
-        label: '자산 비교',
-        data: [4900, 5900],
-        borderColor : ['rgba(211, 211, 211)','rgba(255, 0, 98)'],
-        borderWidth: 1, // 테두리 두께
-        backgroundColor: ['rgba(211, 211, 211, 0.7)', 'rgba(255, 0, 98, 0.7)'], // 투명도 적용
-        borderRadius: 20, // 막대 끝을 둥글게 처리
-        barThickness: 80, // 막대 두께 설정
-      }
-    ],
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false, // 가로세로 비율 유지 안함
-    scales: {
-      y: {
-        display:false,
-        beginAtZero: true,
-        grid: {
-          display: false, // y축 배경선 숨기기
+    type: 'bar',
+    data: {
+      labels: ['20대 평균', '나의 자산'],
+      datasets: [
+        {
+          label: '자산 비교',
+          data: [peerAverageAsset.value, currentAsset.value], // 20대 평균 자산과 내 자산
+          backgroundColor: ['rgba(211, 211, 211, 0.7)', 'rgba(255, 0, 98, 0.7)'],
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          display: true,
+          beginAtZero: true,
         },
-        ticks: {
-          display: false, // y축 눈금 숨기기
-        },
-      },
-      x: {
-        grid: {
-          display: false, // x축 배경선 숨기기
-        },
-        ticks: {
-          color: '#666', // x축 라벨 색상
-          font: {
-            size: 16,
-            weight: 'bold',
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: '#666',
+            font: {
+              size: 16,
+              weight: 'bold',
+            },
           },
         },
       },
-    },
-    plugins: {
-      legend: {
-        display: false, // 범례 숨기기
+      plugins: {
+        legend: {
+          display: false,
+        },
       },
     },
-    animation: {
-      onComplete: function () {
-        const chartInstance = this.chart,
-          ctx = chartInstance.ctx;
-        ctx.font = Chart.helpers.fontString(16, 'bold', Chart.defaults.font.family);
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillStyle = '#666'; // 텍스트 색상 설정
+  });
 
-        this.data.datasets.forEach(function (dataset, i) {
-          const meta = chartInstance.getDatasetMeta(i);
-          meta.data.forEach(function (bar, index) {
-            const data = dataset.data[index];
-            ctx.fillText(data.toLocaleString(), bar.x, bar.y - 10); // 막대 위에 값 표시
-          });
-        });
-      },
-    },
-    layout: {
-      padding: {
-        top: 20, // 차트 상단 여백 설정
-        bottom: 0,
-      },
-    },
-  },
-});
-
-
-  // 레이더 차트
+  // 레이더 차트 (카테고리별 자산 비교)
   new Chart(radarCtx, {
     type: 'radar',
     data: {
-      labels: ['예금', '적금', '주식', '코인', '채권', '펀드'],
+      labels: categories, // 카테고리 이름
       datasets: [
         {
           label: '나의 자산',
-          data: [10, 9, 7, 6, 5, 4],
+          data: myAssets,  // 만원 단위로 변환
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
           borderColor: '#ff6384',
           borderWidth: 2,
         },
         {
           label: '평균 자산',
-          data: [9, 8, 6, 5, 4, 3],
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
-          borderColor: '#ff6384',
+          data: avgAssets,  // 만원 단위로 변환
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          borderColor: '#4bc0c0',
           borderWidth: 2,
         }
       ],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false, // 가로세로 비율 유지 안함
+      maintainAspectRatio: false,
       scales: {
         r: {
           beginAtZero: true,
-          min: 0,       // 최소 값
-          max: 10,      // 최대 값
+          min: 0,
+          max: 100, // 데이터 범위에 맞게 조정
           ticks: {
-            stepSize: 2,  // 2 단위로 설정
-          }
-        }
+            stepSize: 2,
+            font: {
+              size: 12 // 텍스트 크기 조정
+            }
+          },
+        },
       },
     },
   });
 };
 
-onMounted(() => {
-  createCharts();
+// 데이터 가져오기 후 차트 생성 및 테이블 반영
+onMounted(async () => {
+  await fetchFinancialAssetsSum(); // 금융 자산 합계 불러오기
+  await fetchPeerData();           // 20대 평균 자산 데이터 불러오기 및 비교
+  await fetchPeerFinanceData();    // 금융 자산별 또래 자산 비교 불러오기
+  createCharts();                  // 차트 생성
 });
 </script>
 
@@ -210,40 +265,40 @@ onMounted(() => {
   font-family: 'Pretendard', sans-serif;
 }
 
-.content-container{
-  margin : 40px auto;
+.content-container {
+  margin: 40px auto;
   max-width: 1440px;
-  padding : 0 40px; /* 좌우 간격을 40px로 설정하여 1440px에 맞게 배치 */
+  padding: 0 40px;
 }
 
-.total-asset{
+.total-asset {
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 20px;
-  margin-bottom: 40px; /* 간격을 조금 더 넓힘 */
+  margin-bottom: 40px;
 }
 
-.asset-title{
+.asset-title {
   font-size: 20px;
   font-weight: 500;
   margin-top: 10px;
 }
 
-.asset-amount{
+.asset-amount {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 10px;
 }
 
-.asset-graph-container{
-  margin-top: 40px; /* 간격을 넓힘 */
+.asset-graph-container {
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 }
 
-.asset-analysis-nav{
+.asset-analysis-nav {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -251,48 +306,46 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.graph-container-title{
-    font-size: 18px;
-    padding: 30px;
-    background-color: #f9f9f9;
-    border: 1px solid #f8f8f8;
-    color: var(--black-default, #19181D);
-    text-align: center;
-    font-feature-settings: 'dlig' on;
-    font-family: Pretendard;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 32px; /* 177.778% */
-    border-radius: 20px;
-  }
+.graph-container-title {
+  font-size: 18px;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border: 1px solid #f8f8f8;
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px;
+  border-radius: 20px;
+}
 
-.asset-graph-container2{
+.asset-graph-container2 {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 40px 0; /* 위 아래 간격 40px */
+  margin-bottom: 40px;
 }
 
-.graph-container{
-  margin: 0 20px; /* 좌우 간격을 20px로 설정하여 컴포넌트 간 균형 맞춤 */
-  width:580px;
-  height:460px;
+.graph-container {
+  margin: 0 20px;
+  width: 450px; /* 폭 조정 */
+  height: 400px; /* 높이 조정 */
 }
 
-
-.chart-size{
+.chart-size {
   margin-top: 20px;
   border: 1px solid #f8f8f8;
   border-radius: 20px;
   width: 100%;
-  height:330px;
+  height: 300px; /* 차트 크기 축소 */
 }
 
-.compare-table{
-  margin-top: 150px; /* 테이블과 위쪽 차트 간 간격을 조금 더 넓힘 */
+.compare-table {
+  margin-top: 150px;
 }
 
 table {
@@ -319,15 +372,5 @@ th {
 td {
   font-size: 16px;
   color: #555;
-}
-
-@media (max-width: 768px) {
-  .asset-graph-wrapper {
-    grid-template-columns: 1fr;
-  }
-  
-  .graph-container {
-    margin: 0 auto;
-  }
 }
 </style>
