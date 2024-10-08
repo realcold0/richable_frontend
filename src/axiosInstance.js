@@ -1,9 +1,7 @@
 import axios from 'axios';
-import router from './router'; // Vue Router 가져오기
-
-// Axios 인스턴스 생성
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // 환경 변수에서 API의 기본 URL 가져오기
+// Axios 인스턴스 생성 (공통 헤더에 토큰 추가)
+const instance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,  // .env 파일에서 가져온 값 사용
   headers: {
     Authorization: `Bearer ${localStorage.getItem('authToken') || ''}` // JWT 토큰 설정, 없으면 빈 문자열
   }
