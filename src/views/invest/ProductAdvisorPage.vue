@@ -61,6 +61,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import axiosInstance from '@/AxiosInstance';
+
 
 const availableCash = ref(0); // 여유 자금
 const availablePercentage = ref(0); // 여유 자금 비율
@@ -73,11 +75,8 @@ onMounted(() => {
 
   if (token) {
     // 여유 자금 및 비율 가져오기
-    axios.get('http://localhost:8080/invest/available', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+    axiosInstance.get('/invest/available')
+
     .then(response => {
       if (response.data.success) {
         availableCash.value = response.data.response.data.availableCash; // 여유 자금 설정
@@ -91,11 +90,7 @@ onMounted(() => {
     });
 
     // 추천 상품 가져오기
-    axios.get('http://localhost:8080/invest/recommended', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+    axiosInstance.get('/invest/recommended')
     .then(response => {
       if (response.data.success) {
         recommendedProducts.value = response.data.response.data; // 추천 상품 설정
@@ -108,11 +103,7 @@ onMounted(() => {
     });
 
     // 투자 성향 및 카테고리 데이터 가져오기
-    axios.get('http://localhost:8080/invest/tendency', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+    axiosInstance.get('/invest/tendency')
     .then(response => {
       if (response.data.success) {
         tendency.value = response.data.response.data.tendency; // 투자 성향 데이터 설정

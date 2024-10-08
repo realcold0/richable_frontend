@@ -9,7 +9,7 @@
           v-model="id"
           class="form-control"
           id="id"
-          placeholder="이메일 주소를 입력해주세요"
+          placeholder="아이디를 입력해주세요"
           required
         />
       </div>
@@ -41,12 +41,11 @@
       <span class="mx-2"> | </span>
       <router-link to="/user/findpassword" class="join-link">비밀번호 찾기</router-link>
     </div>
-
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
+
       <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
-    </img>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
@@ -116,6 +115,7 @@ const login = async () => {
     alert('Login failed. Please check your credentials.');
   }
 }
+
 const handleNaverCallback = async (code, state) => {
   try {
     const response = await axios.get(`${BASE_URL}/naverCallback`, {
