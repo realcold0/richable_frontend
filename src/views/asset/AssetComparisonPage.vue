@@ -130,7 +130,7 @@ const fetchPeerFinanceData = async () => {
   loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await axiosInstance.get('/finance/peer/finance')
+    const response = await axiosInstance.get('/finance/peer/finance');
     const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
