@@ -95,25 +95,27 @@ const login = async () => {
     alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
-
   try {
     const response = await axios.post('http://localhost:8080/member/login', {
       id: id.value,
       password: password.value
-    })
-    console.log('Token received:', response.data.token)
-
-    if (response.status === 200) {
-      alert('Login successful!')
-      localStorage.setItem('authToken', response.data.token)
-      router.push({ name: 'home' })
+    });
+    // 응답 데이터 구조에 따라 토큰 추출
+    if (response.data.success && response.data.response?.data?.token) {
+      const token = response.data.response.data.token;
+      console.log('Token received:', token);
+      // 로그인 성공 시 처리
+      alert('Login successful!');
+      localStorage.setItem('authToken', token);
+      router.push({ name: 'home' });
+    } else {
+      throw new Error('Invalid response format');
     }
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
+    console.error('Login failed:', error);
+    alert('Login failed. Please check your credentials.');
   }
 }
-
 const handleNaverCallback = async (code, state) => {
   try {
     const response = await axios.get(`${BASE_URL}/naverCallback`, {

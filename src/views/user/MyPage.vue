@@ -6,7 +6,7 @@
         <div class="profile">
           <img :src="profileImageUrl" />
           <h2 class="mt-3">{{ userProfile.name }}</h2>
-          <button class="btn btn-danger mt-3" @click="openModal" style="background-color: #FF0062; border-color: #FF0062;">프로필 수정</button>
+          <button class="btn btn-danger mt-3" @click="openProfileModal" style="background-color: #FF0062; border-color: #FF0062;">프로필 수정</button>
         </div>
       </section>
 
@@ -76,24 +76,21 @@
       </div>
     </section>
 
-    <div class="modal fade" id="badgeModal" tabindex="-1" aria-labelledby="badgeModalLabel" aria-hidden="true">
+    <!-- 회원 탈퇴 확인 모달 -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="badgeModalLabel">내 뱃지 전체보기</h5>
+            <h5 class="modal-title" id="deleteModalLabel">회원 탈퇴 확인</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="badge-list-container">
-              <div class="row">
-                <div class="col-4" v-for="(badge, index) in badges" :key="badge.id">
-                  <div class="badge-item text-center">
-                    <img :src="badge.imageUrl" class="badge-image" />
-                    <p>{{ badge.name }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p>정말로 회원 탈퇴하시겠습니까?</p><br>
+            <p>모든 정보가 삭제됩니다.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cancelDeletion">아니오</button>
+            <button type="button" class="btn btn-danger" @click="deleteAccount">예</button>
           </div>
         </div>
       </div>
@@ -110,7 +107,7 @@
         </div>
         <div class="modal-body">
           <div class="profile-edit text-center">
-            <img :src="profileImageUrl" class="img-thumbnail" style="width: 400px; height: 400px;"/><br>
+            <img :src="profileImageUrl" class="img-thumbnail" style="width: 400px; height: 400px;" /><br>
             <button class="btn btn-outline-secondary mt-1 bold-text" @click="triggerFileUpload">프로필 이미지 변경</button>
             <input type="file" ref="fileInput" @change="onFileChange" accept="image/*" style="display: none" />
 
@@ -128,15 +125,12 @@
             </div>
             <div class="form-group mt-2 d-flex align-items-center">
               <label for="gender">성별</label>
-              <select class="form-control" id="gender" v-model="userProfile.gender" style="width: auto;flex-grow: 1;">
-                <option value="남성">남성</option>
-                <option value="여성">여성</option>
-              </select>
+              <input class="form-control" id="gender" :value="genderLabel" style="width: auto;flex-grow: 1;" readonly>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" style="position: absolute; left: 10px; background-color: #FF0062;" @click="deleteAccount">회원 탈퇴</button>
+          <button type="button" class="btn btn-danger" style="position: absolute; left: 10px; background-color: #FF0062;" @click="openDeleteModal">회원 탈퇴</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
           <button type="button" class="btn btn-danger" @click="saveProfile" style="background-color: #FF0062; border-color: #FF0062;">수정</button>
         </div>
@@ -152,16 +146,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import badge1 from '@/assets/images/badge-apple-rich.png';
-import badge2 from '@/assets/images/badge-car-rich.png';
-import badge3 from '@/assets/images/badge-coin-box-rich.png';
-import badge4 from '@/assets/images/badge-luxury-rich.png';
+// JWT 토큰을 localStorage에서 가져오기
+const token = localStorage.getItem('authToken');
 
+// 프로필 및 API 키 관리용 변수
 const userProfile = ref({
-  name: '강혜린',
-  email: 'test01@gmail.com',
-  birthYear: '2006',
-  gender: '여성',
+  id: '',  // ID 값 추가
+  name: '',
+  email: '',
+  birthYear: '',
+  gender: '',
   profileImage: '/images/profile.jpg',
 });
 
@@ -170,20 +164,15 @@ const showApiKeyInput = ref(false);
 const currentApiKeyLabel = ref('');
 const newApiKey = ref('');
 
+// API 키 입력 창 토글
 const toggleApiKeyInput = () => {
   showApiKeyInput.value = !showApiKeyInput.value;
 };
 
 const openApiKeyInput = (type) => {
-  if (type === 'bank') {
-    currentApiKeyLabel.value = '은행';
-  } else if (type === 'stock') {
-    currentApiKeyLabel.value = '증권';
-  } else if (type === 'crypto') {
-    currentApiKeyLabel.value = '암호화폐';
-  } else if (type === 'consent') {
-    currentApiKeyLabel.value = '동의';
-  }
+  currentApiKeyLabel.value = type === 'bank' ? '은행' :
+                             type === 'stock' ? '증권' :
+                             type === 'crypto' ? '암호화폐' : '동의';
   showApiKeyInput.value = true;
 };
 
@@ -198,6 +187,20 @@ const saveApiKey = () => {
   showApiKeyInput.value = false;
 };
 
+// 성별 표시용 computed
+const genderLabel = computed(() => userProfile.value.gender === 'M' ? '남자' :
+                                           userProfile.value.gender === 'F' ? '여자' : '성별 정보 없음');
+
+// Axios 인터셉터 설정 (JWT 토큰 포함)
+axios.interceptors.request.use(
+  (config) => {
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// 프로필 이미지 업로드 트리거
 const triggerFileUpload = () => {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
@@ -208,71 +211,120 @@ const triggerFileUpload = () => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        profileImageUrl.value = e.target.result;
-      };
+      reader.onload = (e) => profileImageUrl.value = e.target.result;
       reader.readAsDataURL(file);
     }
   });
 };
 
+// 사용자 ID를 userProfile에서 가져오는지 확인합니다.
 const deleteAccount = () => {
-  alert("회원 탈퇴가 완료되었습니다.");
+  const userId = userProfile.value.name;
+  console.log("닉네임:", userId); // 로그로 확인
+  if (!userId) {
+    alert("사용자 ID가 없습니다.");
+    return;
+  }
+
+  axios
+    .delete(`http://localhost:8080/member/delete/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(() => {
+      alert('회원 탈퇴가 완료되었습니다.');
+      localStorage.removeItem('authToken');
+      window.location.href = '/user/SignIn';
+    })
+    .catch((error) => {
+      console.error('회원 탈퇴 중 에러 발생:', error);
+      alert('회원 탈퇴에 실패했습니다.');
+    });
 };
 
-const openModal = () => {
+
+
+// "아니오" 버튼 클릭 시 프로필 수정 모달 다시 열기
+const cancelDeletion = () => {
+  const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+  if (deleteModal) deleteModal.hide();
+
+  const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+  profileModal.show();
+};
+
+// 모달 오픈 함수들
+const openProfileModal = () => {
   const modal = new bootstrap.Modal(document.getElementById('profileModal'));
   modal.show();
 };
 
-const openBadgeModal = () => {
-  const modal = new bootstrap.Modal(document.getElementById('badgeModal'));
-  modal.show();
+const openDeleteModal = () => {
+  const profileModal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+  if (profileModal) profileModal.hide(); // 프로필 모달 닫기
+
+  const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  deleteModal.show(); // 회원 탈퇴 모달 열기
 };
 
-const saveProfile = () => {
-  console.log('프로필 저장:', userProfile.value);
-};
 
+// API 키 및 사용자 정보 초기화
 const apiKeys = ref({
-  bankApiKey: '설정되지 않음',
-  stockApiKey: '설정되지 않음',
-  cryptoApiKey: '설정됨',
-  consentStatus: '설정됨',
+  bankApiKey: '',
+  stockApiKey: '',
+  cryptoApiKey: '',
+  consentStatus: '',
 });
 
+// 뱃지 관련 데이터 및 함수
 const badges = ref([
-  { id: 1, name: '사과러버 리치', imageUrl: badge1, isSelected: false },
-  { id: 2, name: '부릉부릉 리치', imageUrl: badge2, isSelected: false },
-  { id: 3, name: '저금통 리치', imageUrl: badge3, isSelected: false },
-  { id: 4, name: '럭셔리 리치', imageUrl: badge4, isSelected: false },
+  { id: 1, name: '사과러버 리치', imageUrl: '/images/badge-apple-rich.png', isSelected: false },
+  { id: 2, name: '부릉부릉 리치', imageUrl: '/images/badge-car-rich.png', isSelected: false },
+  { id: 3, name: '저금통 리치', imageUrl: '/images/badge-coin-box-rich.png', isSelected: false },
+  { id: 4, name: '럭셔리 리치', imageUrl: '/images/badge-luxury-rich.png', isSelected: false },
 ]);
 
 const selectedBadgeId = ref(null);
 
-const selectedBadge = computed(() => {
-  return badges.value.find(badge => badge.id === selectedBadgeId.value);
-});
+const selectedBadge = computed(() => badges.value.find(badge => badge.id === selectedBadgeId.value));
 
-const selectBadge = (badge) => {
-  selectedBadgeId.value = badge.id;
-};
+const selectBadge = (badge) => selectedBadgeId.value = badge.id;
 
 const toggleBadgeSelection = (badge) => {
-  if (!badge.isSelected) {
-    selectedBadgeId.value = null;
-  }
+  if (!badge.isSelected) selectedBadgeId.value = null;
 };
 
+// 사용자 정보 로드
 onMounted(() => {
-  axios.get('/api/user/profile').then((response) => {
-    userProfile.value = response.data;
-    profileImageUrl.value = userProfile.value.profileImage;
-  });
+  axios.get('http://localhost:8080/member/info')
+    .then((response) => {
+      const responseData = response.data.response.data?.data || {};
+      userProfile.value = {
+        id: responseData.id || '', // ID 값 추가
+        name: responseData.nickname || '이름 없음',
+        email: responseData.email || '이메일 없음',
+        birthYear: responseData.birthYear || '',
+        gender: responseData.gender || '',
+        profileImage: responseData.img || '/images/default-profile.png',
+      };
+      profileImageUrl.value = userProfile.value.profileImage;
 
-  axios.get('/api/user/api-keys').then((response) => {
-    apiKeys.value = response.data;
-  });
+      if (responseData.api) {
+        apiKeys.value = {
+          bankApiKey: responseData.api.bank || 'API 키 없음',
+          stockApiKey: responseData.api.stock?.base || 'API 키 없음',
+          cryptoApiKey: responseData.api.coin?.base || 'API 키 없음',
+          consentStatus: responseData.certification ? '동의함' : '동의 안함',
+        };
+      } else {
+        apiKeys.value = {
+          bankApiKey: 'API 키 없음',
+          stockApiKey: 'API 키 없음',
+          cryptoApiKey: 'API 키 없음',
+          consentStatus: '동의 안함',
+        };
+      }
+    })
+    .catch((error) => console.error('프로필 정보와 API 키를 가져오는 중 오류 발생:', error));
 });
 </script>
 
