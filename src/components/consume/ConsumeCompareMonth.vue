@@ -24,6 +24,7 @@ import {
     Chart as ChartJS, LineElement, PointElement, LineController, CategoryScale, LinearScale
 } from 'chart.js';
 import { nextTick, onMounted, ref, watch } from 'vue';
+import axiosinstance from '@/AxiosInstance';
 
 ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale);
 
@@ -50,7 +51,7 @@ const renderLineChart = async () => {
         chartInstance.destroy();
     }
 
-    await axios.get(`http://localhost:8080/outcome/category/dailysum/${month.year}/${month.month}`)
+    await axiosinstance.get(`/outcome/category/dailysum/${month.year}/${month.month}`)
         .then(response => {
             // 현재 월과 년도와 같은 경우에만 오늘 날짜까지만 자름
             if (month.year === currentYear && month.month === currentMonth) {
@@ -64,7 +65,7 @@ const renderLineChart = async () => {
         });
 
     // 지난 달 데이터 가져오기 (전체)
-    await axios.get(`http://localhost:8080/outcome/category/dailysum/${month.getPrevMonth.year}/${month.getPrevMonth.month}`)
+    await axiosinstance.get(`/outcome/category/dailysum/${month.getPrevMonth.year}/${month.getPrevMonth.month}`)
         .then(response => {
             prevMonth.value = response.data.response.data.prices; // 전체 데이터 사용
             console.log(prevMonth.value);
