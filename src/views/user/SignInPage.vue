@@ -106,11 +106,18 @@ const handleNaverCallback = async () => {
         console.log('Naver login success:', token)
         alert('네이버 로그인 성공!')
         sessionStorage.setItem('authToken', token)
-        if (userInfo) {
-          sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
-        }
         localStorage.removeItem('naverState') // 사용 후 state 제거
-        router.push({ name: 'home' })
+        // 인증 헤더 설정
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+        localStorage.removeItem('naverState') // 사용 후 state 제거
+
+        // 리다이렉트 URL로 이동
+        if (redirectUrl) {
+          window.location.href = redirectUrl // 전체 페이지 리로드
+        } else {
+          router.push({ name: 'home' })
+        }
       } else {
         throw new Error('Invalid response format')
       }
@@ -150,6 +157,11 @@ const login = async () => {
 }
 onMounted(() => {
   handleNaverCallback()
+  // 페이지 로드 시 저장된 토큰이 있다면 axios 헤더에 설정
+  const token = localStorage.getItem('authToken')
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  }
 })
 </script>
 
