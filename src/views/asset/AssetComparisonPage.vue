@@ -133,7 +133,7 @@ const fetchPeerFinanceData = async () => {
   errorMessage.value = ''; // 오류 메시지 초기화
   try {
     const response = await axiosInstance.get('/finance/peer/finance');
-    const financeData = response.data.response.data.response.data;
+    const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
       assetList.value = financeData.map(item => ({

@@ -60,7 +60,7 @@
 import { ref } from 'vue'
 import { Modal } from 'bootstrap'
 // import axios from 'axios'
-import Instance from '@/axiosInstance.js'
+import Instance from '@/AxiosInstance.js'
 
 // 새 목표 정보
 const newGoal = ref({

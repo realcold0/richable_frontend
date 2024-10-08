@@ -83,7 +83,7 @@
 import { ref, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
 // import axios from 'axios'
-import Instance from '@/axiosInstance.js'
+import Instance from '@/AxiosInstance.js'
 
 // emit 함수 정의 (Vue 3)
 const emit = defineEmits(['goalDeleted', 'goalUpdated'])

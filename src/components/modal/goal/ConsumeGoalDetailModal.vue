@@ -90,7 +90,7 @@
 import { ref, computed, defineEmits, defineExpose } from 'vue'
 import { Modal } from 'bootstrap'
 // import axios from 'axios'
-import Instance from '@/axiosInstance.js'
+import Instance from '@/AxiosInstance.js'
 
 // 목표 상세 데이터
 const goalDetail = ref({

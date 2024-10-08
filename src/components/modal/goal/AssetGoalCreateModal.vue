@@ -44,7 +44,7 @@
 import { ref, defineEmits } from 'vue';
 import axios from 'axios';
 import { Modal } from 'bootstrap';
-import Instance from '@/axiosInstance.js';
+import Instance from '@/AxiosInstance.js';
 
 // 등록할 목표 자산 데이터를 위한 formData 상태 관리
 const formData = ref({

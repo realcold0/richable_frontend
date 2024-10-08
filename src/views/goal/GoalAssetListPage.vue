@@ -88,7 +88,7 @@ import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreat
 import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue'
 import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailModal.vue'
 import AssetGoalCreateModal from '../../components/modal/goal/AssetGoalCreateModal.vue'
-import Instance from '@/axiosInstance.js'
+import Instance from '@/AxiosInstance.js'
 
 // 목표 데이터
 const goals = ref([])
