@@ -535,12 +535,7 @@ const bondAssetAmount = ref(0)
 // 금융 자산별 합 조회 연동
 const fetchFinanceAmount = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/finance/fin', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}` // JWT 토큰을 Authorization 헤더에 추가
-      }
-    })
-
+    const response = await axiosInstance.get('/finance/fin')
     const data = response.data.response.data.data
 
     // 예적금
@@ -559,11 +554,7 @@ const fetchFinanceAmount = async () => {
 // 금융 자산별 목록 조회
 const fetchFinanceList = async (category) => {
   try {
-    const response = await axios.get(`http://localhost:8080/asset/${category}/all`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}` // JWT 토큰을 Authorization 헤더에 추가
-      }
-    })
+    const response = await axiosInstance.get(`/asset/${category}/all`)
 
     console.log(response.data.response.data)
 
@@ -591,12 +582,8 @@ const spotTotalAmount = ref(0);
 // 총 현물 자산 현황 연동
 const fetchSpotTotalAmount = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/finance/spot/sum', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}` // JWT 토큰을 Authorization 헤더에 추가
-      }
-    })
 
+    const response = await axiosInstance.get('/finance/spot/sum')
     console.log(response.data.response.data.amount)
     spotTotalAmount.value = response.data.response.data.amount;
     
@@ -614,11 +601,8 @@ const spotEtcAmount = ref(0)
 // 카테고리별 현물 자산 총합 조회
 const fetchSpotList = async (category) => {
   try {
-    const response = await axios.get(`http://localhost:8080/finance/spot/${category}/sum`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}` // JWT 토큰을 Authorization 헤더에 추가
-      }
-    })
+
+    const response = await axiosInstance.get(`finance/spot/${category}/sum`)
 
     const data = response.data.response.data.amount
 
@@ -642,11 +626,7 @@ const fetchSpotList = async (category) => {
 // 현물 자산 목록 조회
 const fetchFinanceSpotList = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/finance/spot/all', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}` // JWT 토큰을 Authorization 헤더에 추가
-      }
-    })
+    const response = await axiosInstance.get('/finance/spot/all')
 
     console.log(response.data.response.data)
     tangibleAssets.value = response.data.response.data

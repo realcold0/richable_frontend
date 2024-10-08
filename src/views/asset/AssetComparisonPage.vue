@@ -65,7 +65,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Chart, registerables } from 'chart.js';
-import axios from 'axios';
+import axiosInstance from '@/AxiosInstance.js';
 
 Chart.register(...registerables);
 
@@ -84,22 +84,14 @@ const assetList = ref([]);
 const loading = ref(false);
 const errorMessage = ref('');
 
-// JWT 토큰을 localStorage에서 가져오는 함수
-const getToken = () => {
-  return localStorage.getItem('authToken'); // JWT 토큰을 localStorage에서 가져옴
-};
 
 // 자산 현황 (금융 자산 합계) 데이터를 가져오는 함수
 const fetchFinancialAssetsSum = async () => {
   loading.value = true; // 로딩 시작
   errorMessage.value = ''; // 오류 메시지 초기화
   try {
-    const token = getToken();
-    const response = await axios.get('http://localhost:8080/finance/fin/sum', {
-      headers: {
-        Authorization: `Bearer ${token}` // Authorization 헤더 추가
-      }
-    });
+  
+    const response = await axiosInstance.get('/finance/fin/sum');
 
     // 데이터 구조에 맞게 수정
     if (response.data && response.data.response && response.data.response.data && response.data.response.data.data) {
@@ -121,12 +113,7 @@ const fetchPeerData = async () => {
   loading.value = true; // 로딩 시작
   errorMessage.value = ''; // 오류 메시지 초기화
   try {
-    const token = getToken();
-    const response = await axios.get('http://localhost:8080/finance/peer', {
-      headers: {
-        Authorization: `Bearer ${token}` // Authorization 헤더 추가
-      }
-    });
+    const response = await axiosInstance.get('/finance/peer');
 
     const data = response.data.response.data;
     peerAverageAsset.value = data.spotAvgAmount; // 20대 평균 자산
@@ -139,18 +126,13 @@ const fetchPeerData = async () => {
   }
 };
 
+
 // 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
 const fetchPeerFinanceData = async () => {
   loading.value = true; // 로딩 시작
   errorMessage.value = ''; // 오류 메시지 초기화
   try {
-    const token = getToken();
-    const response = await axios.get('http://localhost:8080/finance/peer/finance', {
-      headers: {
-        Authorization: `Bearer ${token}` // Authorization 헤더 추가
-      }
-    });
-
+    const response = await axiosInstance.get('/finance/peer/finance');
     const financeData = response.data.response.data.response.data;
 
     if (Array.isArray(financeData)) {

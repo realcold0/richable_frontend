@@ -52,6 +52,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import axiosInstance from '@/AxiosInstance';
 
 // JWT 토큰을 저장 (예: 로그인 후 받은 토큰)
 const token = localStorage.getItem('authToken');

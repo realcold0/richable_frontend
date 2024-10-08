@@ -117,7 +117,8 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { Chart, PieController, ArcElement, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement } from 'chart.js';
-import instance from '@/axiosInstance.js';
+
+import instance from '@/AxiosInstance.js';
 // import instance from '@/axiosInstance'; 
 
 
