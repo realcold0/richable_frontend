@@ -1,6 +1,6 @@
 <template>
   <div id="findid" class="find-id-container">
-    <h2 class="text-center mb-4" style="font-size: 20px;">아이디 찾기</h2>
+    <h2 class="text-center mb-4" style="font-size: 20px">아이디 찾기</h2>
 
     <form @submit.prevent="submitForm">
       <!-- Email Input Field -->
@@ -15,11 +15,7 @@
             placeholder="richable@email.com"
             required
           />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="sendVerificationCode"
-          >
+          <button type="button" class="btn btn-secondary" @click="sendVerificationCode">
             인증번호
           </button>
         </div>
@@ -37,25 +33,13 @@
             placeholder="인증 코드 6자를 입력하세요."
             required
           />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="verifyCode"
-          >
-            확인
-          </button>
+          <button type="button" class="btn btn-secondary" @click="verifyCode">확인</button>
         </div>
       </div>
 
       <!-- Continue Button -->
       <div class="mb-5">
-        <button
-          type="button"
-          class="btn btn-secondary w-100 mb-3"
-          @click="goNext"
-        >
-          계속
-        </button>
+        <button type="button" class="btn btn-secondary w-100 mb-3" @click="goNext">계속</button>
       </div>
 
       <!-- Additional Links -->
@@ -85,7 +69,7 @@ const sendVerificationCode = async () => {
   if (email.value) {
     try {
       const response = await axios.post(`${BASE_URL}/findid`, { email: email.value })
-      alert(response.data.message)
+      alert(response.data.response.data.message)
       isCodeSent.value = true
     } catch (error) {
       alert(error.response.data.message || '오류가 발생했습니다.')
@@ -131,11 +115,9 @@ const submitForm = () => {
 </script>
 
 <style scoped>
-.body{
-
-  color:#19181D;
+.body {
+  color: #19181d;
   font-family: pretendard;
-  
 }
 .find-id-container {
   width: 500px;
@@ -153,14 +135,16 @@ const submitForm = () => {
 }
 
 button {
-  background-color: #FF0062;
+  background-color: #ff0062;
   color: white; /* 버튼 텍스트 색상 */
   border: none; /* 버튼 테두리 제거 */
   padding: 10px 20px;
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease; /* 부드러운 전환 효과 */
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease; /* 부드러운 전환 효과 */
 }
 
 /* 버튼 호버 시 */
@@ -176,12 +160,14 @@ button:active {
 
 /* input-group 내 버튼 스타일 */
 .input-group .btn {
-  background-color: #FF0062;
+  background-color: #ff0062;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 0 5px 5px 0; /* 오른쪽만 둥글게 */
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
 }
 
 /* input-group 버튼 호버 시 */
@@ -196,7 +182,7 @@ button:active {
 }
 
 .form-control:focus {
-  border-color: #FF0062; /* 원하는 테두리 색상 */
+  border-color: #ff0062; /* 원하는 테두리 색상 */
   box-shadow: none;
   outline: none; /* 기본 아웃라인 제거 */
 }
@@ -211,6 +197,4 @@ button:active {
 .input-group .btn {
   width: 100px;
 }
-
-
 </style>
