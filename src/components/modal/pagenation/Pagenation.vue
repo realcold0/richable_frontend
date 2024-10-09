@@ -4,7 +4,8 @@
       <!-- 이전 버튼 -->
       <li class="page-item" :class="{ disabled: page === 1 }">
         <a class="page-link no-btn" href="#" @click.prevent="changePage(page - 1)">
-          < 이전
+          <font-awesome-icon :icon="['fas', 'chevron-left']" />
+          이전
         </a>
       </li>
 
@@ -23,7 +24,8 @@
       <!-- 다음 버튼 -->
       <li class="page-item" :class="{ disabled: page === totalPages }">
         <a class="page-link no-btn" href="#" @click.prevent="changePage(page + 1)">
-          다음 >
+          다음 
+          <font-awesome-icon :icon="['fas', 'chevron-right']" />
         </a>
       </li>
     </ul>
@@ -73,29 +75,69 @@ watch([pageNumbers, totalPages], () => {
 </script>
 
 <style scoped>
+*{
+  border: none;
+}
+
 .pagination {
   display: flex;
   justify-content: center;
+  align-items: 20px;
+
   margin-top: 20px;
 }
+
 .page-item {
   margin: 0 10px;
   overflow : auto;
 }
+
 .page-item.active .page-link {
   background-color: #FF0062;
   color: white;
   border-radius: 12px;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+
 }
+
 .page-link {
   color: #414158;
   cursor: pointer;
+
+  display: flex;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
 }
+
+.page-item:hover{
+  color: #414158;
+  background-color: transparent; /* 배경색 제거 */
+  box-shadow: none;  /* 박스 그림자 제거 */
+  outline: none;  /* 포커스 시 나타나는 윤곽선 제거 */
+}
+
+.page-link:active,
+.page-link:focus {
+  color: #414158;  /* 클릭 시에도 기본 색상 유지 */
+  background-color: transparent; /* 배경색 제거 */
+  box-shadow: none;  /* 박스 그림자 제거 */
+  outline: none;  /* 포커스 시 나타나는 윤곽선 제거 */
+}
+
+
 .page-link.no-btn {
   background: none;
   border: none;
   padding: 0;
+  color: var(--gray-gray-70, #555);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%; /* 25.5px */
 }
+
 .page-item.disabled .page-link.no-btn {
   color: #ccc;
   pointer-events: none;

@@ -46,7 +46,7 @@
 
     <div class="sns-buttons">
       <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <img src="../../assets/images/naver.png" alt="Kakao" @click="naverLogin" />
+      <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
     </div>
 
     <div class="mt-3">
@@ -134,25 +134,25 @@ const login = async () => {
     alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
-
   try {
     const response = await axios.post(`${BASE_URL}/login`, {
       id: id.value,
       password: password.value
-    })
-
+    });
+    // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
-      const token = response.data.response.data.token
-      console.log('Token received:', token)
-      alert('Login successful!')
-      localStorage.setItem('authToken', token)
-      router.push({ name: 'home' })
+      const token = response.data.response.data.token;
+      console.log('Token received:', token);
+      // 로그인 성공 시 처리
+      alert('Login successful!');
+      localStorage.setItem('authToken', token);
+      router.push({ name: 'home' });
     } else {
-      throw new Error('Invalid response format')
+      throw new Error('Invalid response format');
     }
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
+    console.error('Login failed:', error);
+    alert('Login failed. Please check your credentials.');
   }
 }
 onMounted(() => {
