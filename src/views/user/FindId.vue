@@ -72,12 +72,12 @@ const BASE_URL = 'http://localhost:8080/member'
 const sendVerificationCode = async () => {
   if (email.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/findid`, { email: email.value })
+      const response = await axios.post(`${BASE_URL}/find/id`, { email: email.value })
       if (response.data.success) {
-        alert(response.data.data.message)
+        alert(response.data.response?.data?.message)
         isCodeSent.value = true
       } else {
-        alert(response.data.data.message || '인증 코드 전송에 실패했습니다.')
+        alert(response.data.response?.data?.message || '인증 코드 전송에 실패했습니다.')
       }
     } catch (error) {
       console.error('Error sending verification code:', error)
@@ -91,20 +91,20 @@ const sendVerificationCode = async () => {
 const verifyCode = async () => {
   if (verificationCode.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/findid/auth`, {
+      const response = await axios.post(`${BASE_URL}/find/id/auth`, {
         email: email.value,
         code: verificationCode.value
       })
       if (response.data.success) {
-        foundId.value = response.data.data.id
-        isVerified.value = true
-        alert('이메일 인증이 성공적으로 완료되었습니다.')
+        foundId.value = response.data.response?.data?.id || '';
+        isVerified.value = true;
+        alert('이메일 인증이 성공적으로 완료되었습니다.');
       } else {
-        alert(response.data.data.message || '인증에 실패했습니다.')
+        alert(response.data.response?.data?.message || '인증에 실패했습니다.');
       }
     } catch (error) {
       console.error('Error verifying code:', error)
-      alert(error.response?.data?.data?.message || '인증 과정에서 오류가 발생했습니다.')
+      alert('인증 과정에서 오류가 발생했습니다.')
     }
   } else {
     alert('인증 코드를 입력해주세요.')
@@ -112,7 +112,7 @@ const verifyCode = async () => {
 }
 
 const goNext = async () => {
-  if (isVerified.value && foundId.value) {
+  if (isVerified.value) {
     router.push({ name: 'findid2', params: { id: foundId.value } })
   } else {
     alert('먼저 이메일 인증을 완료해주세요.')
