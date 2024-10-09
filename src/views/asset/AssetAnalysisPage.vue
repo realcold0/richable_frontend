@@ -243,7 +243,7 @@ const fetchData = async () => {
       instance.get('/finance/spot/car/sum'),
       // instance.get('/finance/spot/luxury/sum'),
       instance.get('/finance/spot/brand/sum'),
-      instance.get('/finance/return/income'),
+      //instance.get('/finance/return/income'),
       instance.get('/finance/return/bond'),
       instance.get('/finance/return/bond'),
       instance.get('/finance/return/stock')
@@ -512,7 +512,6 @@ onMounted(() => {
 .total-asset, .asset-analysis-container, .asset-level-container {
   max-width: 1704px;
   border-radius: 20px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 40px;
 }
 
@@ -546,7 +545,7 @@ onMounted(() => {
 .asset-level-container {
   background-color: #fff;
   padding: 30px;
-  border: 2px solid #e4ebf0;
+  border: 1px solid #e4ebf0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -572,7 +571,7 @@ onMounted(() => {
 .asset-analysis-container {
   background-color: #fff;
   padding: 50px;
-  border: 2px solid #e4ebf0;
+  border: 1px solid #e4ebf0;
   display: flex;
   flex-direction: column;
   align-items: center;
