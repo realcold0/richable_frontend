@@ -1,7 +1,7 @@
 <!-- RC-P-03.vue -->
 <template>
   <div id="signup" class="signup-container">
-    <h2 class="mb-4" style="font-size: 20px;">회원가입</h2>
+    <h2 class="mb-4" style="font-size: 20px">회원가입</h2>
 
     <form @submit.prevent="join">
       <!-- id Field -->
@@ -135,7 +135,9 @@
       <div class="d-flex justify-content-center">
         <router-link to="/user/signin" class="btn btn-light"> 취소</router-link>
         <span class="mx-2"></span>
-        <button type="submit" class="btn btn-light" style="background-color:#FF0062;  color : white">다음</button>
+        <button type="submit" class="btn btn-light" style="background-color: #ff0062; color: white">
+          다음
+        </button>
       </div>
     </form>
   </div>
@@ -180,8 +182,8 @@ const checkId = async () => {
   }
   try {
     const { data } = await axios.get(`${BASE_URL}/checkDupl/${member.id}`)
-    disableSubmit.value = data.exists
-    checkError.value = data.exists ? '이미 사용중인 ID입니다.' : '사용가능한 ID입니다.'
+    disableSubmit.value = data.success
+    checkError.value = data.success ? '이미 사용중인 ID입니다.' : '사용가능한 ID입니다.'
   } catch (error) {
     console.error('Error checking id:', error)
     checkError.value = '중복 체크에 실패했습니다. 다시 시도하세요.'
@@ -260,13 +262,12 @@ body {
   color: #999999; /* 통일된 색상으로 변경 */
 }
 
-
 .btn {
   width: 80px;
   margin-top: 1rem;
 }
 
 .error-message {
-  color: #DD303F;
+  color: #dd303f;
 }
 </style>

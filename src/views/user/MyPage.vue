@@ -4,7 +4,7 @@
       <section class="profile-section box">
         <h5 class="bold-text text-left">나의 프로필</h5>
         <div class="profile">
-          <img :src="profileImageUrl" />
+          <img :src="profileImageUrl" alt="프로필 이미지" />
           <h2 class="mt-3">{{ userProfile.name }}</h2>
           <button class="btn btn-danger mt-3" @click="openProfileModal" style="background-color: #FF0062; border-color: #FF0062;">프로필 수정</button>
         </div>
@@ -107,7 +107,7 @@
         </div>
         <div class="modal-body">
           <div class="profile-edit text-center">
-            <img :src="profileImageUrl" class="img-thumbnail" style="width: 400px; height: 400px;" /><br>
+            <img :src="profileImageUrl" alt="프로필 이미지" class="img-thumbnail" style="width: 400px; height: 400px;" /><br>
             <button class="btn btn-outline-secondary mt-1 bold-text" @click="triggerFileUpload">프로필 이미지 변경</button>
             <input type="file" ref="fileInput" @change="onFileChange" accept="image/*" style="display: none" />
 
@@ -142,6 +142,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import noprofileImage from '@/assets/images/noprofile1.png'; // 이미지 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -156,7 +157,7 @@ const userProfile = ref({
   email: '',
   birthYear: '',
   gender: '',
-  profileImage: '/images/profile.jpg',
+  profileImage: noprofileImage, // 기본 프로필 이미지 설정
 });
 
 const profileImageUrl = ref(userProfile.value.profileImage);
@@ -241,8 +242,6 @@ const deleteAccount = () => {
     });
 };
 
-
-
 // "아니오" 버튼 클릭 시 프로필 수정 모달 다시 열기
 const cancelDeletion = () => {
   const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
@@ -265,7 +264,6 @@ const openDeleteModal = () => {
   const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
   deleteModal.show(); // 회원 탈퇴 모달 열기
 };
-
 
 // API 키 및 사용자 정보 초기화
 const apiKeys = ref({
@@ -304,7 +302,7 @@ onMounted(() => {
         email: responseData.email || '이메일 없음',
         birthYear: responseData.birthYear || '',
         gender: responseData.gender || '',
-        profileImage: responseData.img || '/images/default-profile.png',
+        profileImage: responseData.img || noprofileImage, // 기본 이미지 설정
       };
       profileImageUrl.value = userProfile.value.profileImage;
 
