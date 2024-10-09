@@ -85,10 +85,15 @@ const sendVerificationCode = async () => {
   if (email.value) {
     try {
       const response = await axios.post(`${BASE_URL}/findid`, { email: email.value })
-      alert(response.data.message)
-      isCodeSent.value = true
+      if (response.data.success) {
+        alert(response.data.data.message)
+        isCodeSent.value = true
+      } else {
+        alert(response.data.data.message || '인증 코드 전송에 실패했습니다.')
+      }
     } catch (error) {
-      alert(error.response.data.message || '오류가 발생했습니다.')
+      console.error('Error sending verification code:', error)
+      alert(error.response?.data?.data?.message || '오류가 발생했습니다.')
     }
   } else {
     alert('이메일을 입력해주세요.')
@@ -102,11 +107,16 @@ const verifyCode = async () => {
         email: email.value,
         code: verificationCode.value
       })
-      foundId.value = response.data.id
-      isVerified.value = true
-      alert(`이메일 인증 성공`)
+      if (response.data.success) {
+        foundId.value = response.data.data.id
+        isVerified.value = true
+        alert('이메일 인증이 성공적으로 완료되었습니다.')
+      } else {
+        alert(response.data.data.message || '인증에 실패했습니다.')
+      }
     } catch (error) {
-      alert(error.response.data.message || '인증 코드가 일치하지 않습니다.')
+      console.error('Error verifying code:', error)
+      alert(error.response?.data?.data?.message || '인증 과정에서 오류가 발생했습니다.')
     }
   } else {
     alert('인증 코드를 입력해주세요.')
