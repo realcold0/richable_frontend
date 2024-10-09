@@ -23,10 +23,12 @@
 
 
     <!-- 카테고리 선택 및 비교 -->
-    <div class="text-left mb-4 category-comparison">
-      <div>대한민국 평균 소비금액을 기준으로 비교해요</div>
-      <h5>나는 평균 대비 얼마나 지출할까요?</h5>
-    </div>
+    <div class="avg-content">
+
+      <div class="text-left category-comparison">
+        <div class="sub-title">대한민국 평균 소비금액을 기준으로 비교해요</div>
+        <div class="main-title">나는 평균 대비 얼마나 지출할까요?</div>
+      </div>
 
     <div class="text-center">
       <p>
@@ -58,18 +60,17 @@
   <canvas id="savingChart"></canvas>
 </div>
 
-
-
+</div>
 
 </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { Chart, registerables } from 'chart.js'
-import axios from 'axios'
+import { ref, computed, onMounted, watch } from 'vue';
+import { Chart, registerables } from 'chart.js';
+import axios from 'axios';
 import { nextTick } from 'vue';
-
+import axiosInstance from '@/AxiosInstance';
 
 // 차트.js 등록
 Chart.register(...registerables)
@@ -141,7 +142,7 @@ const cntMonth = currentMonthIndex.value + 1; // currentMonthIndex는 0부터 �
 try {
   const tempCategory = mapColumnToKeyword2(category.value); // category의 매핑된 값을 가져옴
   const encodedCategory = encodeURIComponent(tempCategory); // 카테고리를 URL 인코딩
-  const response = await axios.get(`http://localhost:8080/outcome/compare/${cntYear}/${cntMonth}/${encodedCategory}`);
+  const response = await axiosInstance.get(`/outcome/compare/${cntYear}/${cntMonth}/${encodedCategory}`);
   
   const data = response.data.response.data;
   userSpending.value = data.mySum;
@@ -159,7 +160,7 @@ const fetchCouldSaving = async () => {
 const cntYear = 2024; // 고정된 연도 값
 const cntMonth = currentMonthIndex.value + 1; // currentMonthIndex는 0부터 시작하므로 1을 더함
 try {
-  const response = await axios.get(`http://localhost:8080/outcome/review/sum/${cntYear}/${cntMonth}`);
+  const response = await axiosInstance.get(`/outcome/review/sum/${cntYear}/${cntMonth}`);
   const data = response.data.response.data;
   couldsaving.value = data.possibleSaveAmount;
 } catch (error) {
@@ -171,7 +172,7 @@ const fetchSimulationData = async () => {
   const cntYear = 2024; // 고정된 연도 값
   const cntMonth = 10; // 10월로 설정
   try {
-    const response = await axios.get(`http://localhost:8080/outcome/simulation/${cntYear}/${cntMonth}`);
+    const response = await axiosInstance.get(`/outcome/simulation/${cntYear}/${cntMonth}`);
     const data = response.data.response.data;
 
     console.log(data);
@@ -316,7 +317,82 @@ onMounted(() => {
 <style scoped>
 * {
   font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 30px */
+  letter-spacing: -0.4px;
 }
+
+.asset-amount {
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 36px */
+  letter-spacing: -0.48px;
+}
+
+.total-consume{
+  margin-top: 21px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: #FAFAFB;
+  display: flex;
+  height: 125px;
+  padding: 10px 10px 10px 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  height: 150px;
+  border: 1px solid #f8f8f8;
+}
+
+.chart-container{
+  width: 1224px;
+  border-radius: 20px;
+  border: 1px solid #CFD9E8;
+  background: #FFF;
+  margin-top: 21px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: #FAFAFB;
+  display: flex;
+  height: 107px;
+  padding: 10px 10px 10px 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.consume-title{
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-feature-settings: 'dlig' on;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px; /* 177.778% */
+  letter-spacing: -0.8px;
+}
+
+.avg-content{
+  margin-top: 100px;
+}
+
+.saving-content{
+  margin-top: 100px;
+}
+
+#myChart{
+
+    height: 380px;
+}
+
 /* 월 네비게이션 */
 .month-navigation {
   display: flex;
@@ -328,6 +404,27 @@ onMounted(() => {
 .month-navigation h2 {
   margin: 0 20px;
   font-size: 24px;
+}
+
+.sub-title{
+  color: var(--3, #414158);
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 27px */
+  letter-spacing: -0.36px;
+}
+
+.main-title{
+  margin-top : 8xp;
+  color: var(--3, #414158);
+  font-feature-settings: 'dlig' on;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 27px; /* 135% */  
 }
 
 .custom-btn-left,

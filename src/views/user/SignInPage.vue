@@ -44,10 +44,8 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
-      <div  id="naver_id_login" @click="naverLogin"></div>
-      <!-- <button @click="naverLogin" class="btn btn-secondary naver-btn"><img src="../../assets/images/naver.png" alt="naver"/></button> -->
-    </img>
+
+      <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
@@ -96,22 +94,25 @@ const login = async () => {
     alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
-
   try {
     const response = await axios.post('http://localhost:8080/member/login', {
       id: id.value,
       password: password.value
-    })
-    console.log('Token received:', response.data.token)
-
-    if (response.status === 200) {
-      alert('Login successful!')
-      localStorage.setItem('authToken', response.data.token)
-      router.push({ name: 'home' })
+    });
+    // 응답 데이터 구조에 따라 토큰 추출
+    if (response.data.success && response.data.response?.data?.token) {
+      const token = response.data.response.data.token;
+      console.log('Token received:', token);
+      // 로그인 성공 시 처리
+      alert('Login successful!');
+      localStorage.setItem('authToken', token);
+      router.push({ name: 'home' });
+    } else {
+      throw new Error('Invalid response format');
     }
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
+    console.error('Login failed:', error);
+    alert('Login failed. Please check your credentials.');
   }
 }
 
