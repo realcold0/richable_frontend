@@ -259,13 +259,13 @@ const createComparisonChart = () => {
       responsive: true,
       layout: {
         padding: {
-          top: 20, // 위쪽에 20px의 여백을 추가합니다
-        }
+          top: 20, // 그래프 상단에 패딩 추가
+        },
       },
       scales: {
         y: {
           grid: {
-            display: false, // x축 배경선 숨기기
+            display: false, // y축 배경선 숨기기
           },
           beginAtZero: true,
           ticks: {
@@ -303,22 +303,21 @@ const createComparisonChart = () => {
           const { ctx, data, scales: { x, y } } = chart;
 
           ctx.save();
-          ctx.font = ' 12px pretendard';
+          ctx.font = '12px Pretendard';
           ctx.fillStyle = '#767676';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'bottom';
 
           data.datasets.forEach((dataset, i) => {
-  chart.getDatasetMeta(i).data.forEach((bar, index) => {
-    const value = dataset.data[index];
-    const formattedValue = value >= 100000 
-      ? `${Math.floor(value / 10000)}만원` // Use Math.floor() to truncate instead of rounding
-      : `${value.toLocaleString()}원`;
+            chart.getDatasetMeta(i).data.forEach((bar, index) => {
+              const value = dataset.data[index];
+              const formattedValue = value >= 100000 
+                ? `${Math.floor(value / 10000)}만원` // Use Math.floor() to truncate instead of rounding
+                : `${value.toLocaleString()}원`;
 
-    ctx.fillText(formattedValue, bar.x, bar.y - 5);
-  });
-});
-
+              ctx.fillText(formattedValue, bar.x, bar.y - 5);
+            });
+          });
 
           ctx.restore();
         },
@@ -326,7 +325,6 @@ const createComparisonChart = () => {
     ],
   });
 };
-
 
 
   const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
@@ -411,12 +409,11 @@ onMounted(() => {
   font-family: pretendard;
   color: #19181D;
   font-size: 20px;
+  max-width: 1704px;
 }
 
-.container{
-  margin-top: 80px;
-  margin-bottom: 100px;
-  margin-left : 98px;
+.container {
+ margin: 80px;
 }
 
 .total-asset {

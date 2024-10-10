@@ -48,7 +48,17 @@
       <div class="cha-title-main">{{ category }} 상품에 여유자금으로 투자하기</div>
     </div>
 
-    <div class="scroll-wrapper">
+<!-- 로딩 상태에 따른 투자 성향 및 카테고리 정보 표시 -->
+    <div v-if="isLoadingTendency" class="spinner-container">
+      <div class="spinner scroll-wrapper"></div>
+    </div>
+    <div v-else class="cha-title">
+      <div class="cha-title-sub">김리치님의 <p style="display: inline; color: #ff0062;">{{ tendency }}</p> 성향을 기반으로 추천드려요.</div>
+      <div class="cha-title-main">{{ category }} 상품에 여유자금으로 투자하기</div>
+    </div>
+
+    <!-- 스크롤 가능한 추천 상품 리스트 -->
+    <div v-else class="scroll-wrapper">
       <button @click="scrollLeft">
         <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-left']" />
       </button>
@@ -70,6 +80,7 @@
         <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-right']" />
       </button>
     </div>
+    
   </div>
 </template>
 
@@ -82,6 +93,7 @@ const availablePercentage = ref(0); // 여유 자금 비율
 const recommendedProducts = ref([]); // 추천 상품
 const tendency = ref(''); // 투자 성향 데이터
 const category = ref(''); // 카테고리 데이터
+const isLoadingTendency = ref(true);
 
 const scrollContainer = ref(null);
 
@@ -142,6 +154,7 @@ onMounted(() => {
     .then(response => {
       if (response.data.success) {
         recommendedProducts.value = response.data.response.data; // 추천 상품 설정
+        isLoadingTendency.value = false; // 데이터 로딩 완료 후 로딩 상태 변경
       } else {
         console.error("추천 상품을 가져오는데 실패했습니다.");
       }
@@ -150,22 +163,27 @@ onMounted(() => {
       console.error("추천 상품을 가져오는 중 에러 발생:", error);
     });
 
-    // 투자 성향 및 카테고리 데이터 가져오기
-    axiosInstance.get('/invest/tendency')
-    .then(response => {
-      if (response.data.success) {
-        tendency.value = response.data.response.data.tendency; // 투자 성향 데이터 설정
-        category.value = response.data.response.data.category; // 카테고리 데이터 설정
-      } else {
-        console.error("투자 성향 데이터를 가져오는데 실패했습니다.");
-      }
-    })
-    .catch(error => {
-      console.error("투자 성향 데이터를 가져오는 중 에러 발생:", error);
-    });
+     // 투자 성향 및 카테고리 데이터 가져오기
+     axiosInstance.get('/invest/tendency')
+      .then(response => {
+        if (response.data.success) {
+          tendency.value = response.data.response.data.tendency; // 투자 성향 데이터 설정
+          category.value = response.data.response.data.category; // 카테고리 데이터 설정ㄴ
+        } else {
+          console.error("투자 성향 데이터를 가져오는데 실패했습니다.");
+        }
+      
+      })
+      .catch(error => {
+        console.error("투자 성향 데이터를 가져오는 중 에러 발생:", error);
+      })
+      .finally(() => {
+       
+      });
 
   } else {
     console.error('JWT 토큰이 localStorage에 없습니다.');
+    isLoadingTendency.value = false; // 오류 발생 시에도 로딩 상태 변경
   }
 });
 
@@ -182,6 +200,7 @@ const calculatePercentage = (cash) => {
   /* text-align: center; */
   color: #19181d;
   font-family: 'Pretendard', sans-serif;
+  max-width: 1704px;
 }
 
 .container {
@@ -189,7 +208,6 @@ const calculatePercentage = (cash) => {
 }
 
 .total-asset {
-  max-width: 1704px;
   border-radius: 20px;
   margin-top: 18px;
   background-color: #f9f9f9;
@@ -456,6 +474,31 @@ button:hover {
 .disabled-button {
   background-color: #ccc !important;
   cursor: not-allowed;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* 로딩 스피너의 중앙 정렬을 위한 높이 */
+}
+
+.spinner {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #ff0062; /* Primary color */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 </style>

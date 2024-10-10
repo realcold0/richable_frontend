@@ -1,10 +1,21 @@
 <template>
-  <div class="wrap">
+<div class="wrap">
     <div class="intro_bg">
-      <div>
-        <button id="start-btn">시작하기</button>
+      
+      <div class="text-center main-container">
+        <div class="main-title">나만의 쉬운 금융메이트</div>
+        <div class="sub-title">리치블</div>
       </div>
+
+      <div class="img-container"> <!-- 이미지 감싸는 컨테이너 추가 -->
+        <div class="img"></div>
+      </div>
+
+      <button id="start-btn">시작하기</button>
+
     </div>
+
+
 
     <div class="mid">
       <ul class="mid-nav">
@@ -135,12 +146,58 @@ html {
 }
 
 .intro_bg {
-  background-image: url('../assets/images/home-bg(1).png');
-  background-size: cover;
+  background: linear-gradient(180deg, #FFF 0%, #FFF2F6 100%);
   width: 100%;
   height: 640px;
   position: relative;
+  display: flex; /* Flexbox를 사용하여 자식 요소 정렬 */
+  flex-direction: column; /* 세로 방향으로 정렬 */
+  align-items: center; /* 수평 중앙 정렬 */
 }
+
+.main-container{
+  margin-top: 100px;
+
+}
+
+.main-title{
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 60px */
+  letter-spacing: -0.8px;
+}
+
+.sub-title{
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 63px */
+}
+
+.img-container {
+  display: flex; /* 이미지만 중앙에 정렬하기 위해 Flexbox 사용 */
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
+  margin-top: 50px; /* 이미지 위쪽 여백 */
+  margin-right: 100px;
+}
+
+.img {
+
+  background-image: url('src/assets/images/rich.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 170px; /* 높이 설정 */
+  width: 188px; /* 너비 설정 */
+}
+
 
 #start-btn {
   width: 150px;

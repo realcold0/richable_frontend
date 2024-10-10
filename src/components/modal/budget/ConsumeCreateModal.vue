@@ -72,6 +72,7 @@
 import { ref, onMounted, defineExpose } from 'vue';
 import { Modal } from 'bootstrap';
 import axios from 'axios';
+import axiosInstance from '@/AxiosInstance.js'
 
 // 모달 초기화 변수
 const modal = ref(null);
@@ -82,6 +83,7 @@ const expenseCategory = ref('');        // 소비 유형
 const expenseAmount = ref('');      // 소비 가격
 const expenseDescript = ref('');     // 소비 내용
 const expenseMemo = ref('');        // 소비 메모
+const expenseDate = ref('');
 
 // 모달 열기 함수
 const show = () => {
@@ -111,11 +113,14 @@ const registerExpense = async () => {
       expCategory: expenseCategory.value,              
       amount: parseInt(expenseAmount.value),           
       descript: expenseDescript.value,                 
-      memo: expenseMemo.value,                         
+      memo: expenseMemo.value,             
+      date : expenseDate.value            
     };
 
-    const response = await axios.post('http://localhost:8080/outcome/add', expenseData);
+    console.log(expenseData);
 
+    const response = await axiosInstance.post('/outcome/add', expenseData);
+    console.log(response.data);
     if (response.data.success) {
       console.log("소비 등록 성공:", response.data.response.data);
       if (modalInstance) {
