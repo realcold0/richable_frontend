@@ -355,7 +355,7 @@ onMounted(async () => {
   font-size: 18px;
   padding: 30px;
   background-color: #f9f9f9;
-  border: 1px solid #f8f8f8;
+  border: 1px solid #e4ebf0;
   color: var(--black-default, #19181D);
   text-align: center;
   font-family: Pretendard;
@@ -382,8 +382,8 @@ onMounted(async () => {
 }
 
 .chart-size {
-  margin-top: 20px;
-  border: 1px solid #f8f8f8;
+  margin-top: 8px;
+  border: 1px solid #e4ebf0;
   border-radius: 20px;
   width: 100%;
   height: 300px; /* 차트 크기 축소 */
