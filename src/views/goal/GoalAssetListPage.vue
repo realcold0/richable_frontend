@@ -20,7 +20,7 @@
           >까지 <strong>{{ assetGoal.remaindate }}</strong
           >일 남았습니다 💪
         </p>
-        <p>
+        <p class="current-amount">
           현재 <strong>{{ assetGoal.currentAmount.toLocaleString() }}</strong
           >원 모았습니다 😁
         </p>
@@ -33,10 +33,11 @@
       </div>
     </section>
 
+    <div style="margin-top: 100px;">
     <!-- Middle Section: Consumption Suggestion -->
-    <section class="consumption-suggestion">
-      <p>소비 목표를 세워 목표 자금을 형성할 수 있어요</p>
-      <p>우선순위별로 소비 목표가 달성돼요 😁</p>
+    <section class="text-left">
+      <div class="main-title">소비 목표를 세워 목표 자금을 형성할 수 있어요</div>
+      <div class="sub_title">우선순위별로 소비 목표가 달성돼요 😁</div>
     </section>
 
     <!-- 목표 카드 리스트 -->
@@ -51,15 +52,15 @@
         @drop="onDrop(goal)"
         @click="openGoalDetailModal(goal)"
       >
-        <p>{{ index + 1 }}. {{ goal.title }}</p>
-        <p>{{ goal.totalAmount.toLocaleString() }}원 / {{ goal.gather.toLocaleString() }}원</p>
+        <p class="goal-index">{{ index + 1 }}. {{ goal.title }}</p>
+        <p class="goal-amount">{{ goal.totalAmount.toLocaleString() }}원 / {{ goal.gather.toLocaleString() }}원</p>
         <div class="progress-bar">
           <div
             class="progress"
             :style="{ width: (goal.gather / goal.totalAmount) * 100 + '%' }"
           ></div>
         </div>
-        <p>{{ ((goal.gather / goal.totalAmount) * 100).toFixed(2) }}% 달성</p>
+        <p class="goal-progress">{{ ((goal.gather / goal.totalAmount) * 100).toFixed(2) }}% 달성</p>
       </div>
 
       <!-- Add Goal Button -->
@@ -67,6 +68,12 @@
         <p>+</p>
       </div>
     </section>
+
+    <!-- 달성된 목표 축하 메시지 -->
+    <div v-if="goalAchieved" class="goal-achieved-message">
+      🎉 목표를 달성했습니다! 축하합니다! 🎉
+    </div>
+  </div>
 
     <!-- 모달 컴포넌트 -->
     <ConsumeGoalCreateModal ref="goalCreateModal" @registerGoal="addNewGoal" />
@@ -78,20 +85,27 @@
     <AssetGoalDetailModal ref="assetGoalDetailModal" @goalDeleted="onAssetGoalDeleted" />
     <AssetGoalCreateModal ref="assetGoalCreateModal" @registerGoal="addNewAssetGoal" />
   </div>
+
+  <!-- 로딩 상태 표시 -->
+  <div v-if="isLoading" class="loading-spinner">Loading...</div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-
-// import axios from 'axios'
 import ConsumeGoalCreateModal from '../../components/modal/goal/ConsumeGoalCreateModal.vue'
 import ConsumeGoalDetailModal from '../../components/modal/goal/ConsumeGoalDetailModal.vue'
 import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailModal.vue'
 import AssetGoalCreateModal from '../../components/modal/goal/AssetGoalCreateModal.vue'
 import Instance from '@/AxiosInstance.js'
 
+// 로딩 상태
+const isLoading = ref(false)
+
 // 목표 데이터
 const goals = ref([])
+
+// 목표 달성 상태
+const goalAchieved = ref(false)
 
 // 드래그 시작 시 호출
 let draggedGoal = null
@@ -113,30 +127,29 @@ const onDrop = async (targetGoal) => {
     goals.value[i].priority = i + 1;
   }
 
-  // 개별 목표에 대한 PUT 요청
-  for (const goal of goals.value) {
-    const priorityUpdate = {
-      index: goal.id, // 목표의 id
-      priority: goal.priority, // 새롭게 설정된 우선순위
-    };
-
-    try {
-      const response = await Instance.put('/goal/priority', priorityUpdate, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('Priority updated successfully for goal:', response.data);
-    } catch (error) {
-      console.error('Failed to update priority for goal:', goal.id, error);
-    }
+  // 목표 우선순위 업데이트 API 호출
+  try {
+    await Promise.all(
+      goals.value.map((goal) => {
+        const priorityUpdate = {
+          index: goal.id,
+          priority: goal.priority
+        }
+        return Instance.put('/goal/priority', priorityUpdate, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+      })
+    )
+    console.log('우선순위가 성공적으로 업데이트되었습니다.')
+  } catch (error) {
+    console.error('우선순위 업데이트에 실패했습니다.', error)
   }
 
-  // 목표 데이터를 다시 불러옴
-  await fetchGoals();
-
-  draggedGoal = null;
-};
+  draggedGoal = null
+  await fetchGoals()
+}
 
 // assetGoal 변수 정의 (자산 목표 데이터를 관리)
 const assetGoal = ref(null)
@@ -157,6 +170,7 @@ const addNewGoal = (newGoal) => {
     totalAmount: newGoal.totalAmount,
     gather: 0 // 새로운 목표는 현재 모금액 0으로 시작
   })
+  console.log('새로운 목표가 추가되었습니다!')
 }
 
 // 새로운 자산 목표 추가 함수
@@ -167,6 +181,7 @@ const addNewAssetGoal = (newAssetGoal) => {
     remaindate: newAssetGoal.remaindate || 0 // 나머지 날짜도 설정
   }
   assetGoalDeleted.value = false
+  console.log('자산 목표가 추가되었습니다!')
 }
 
 // 목표 소비 생성 모달 열기 함수
@@ -194,8 +209,8 @@ const openAssetGoalDetailModal = () => {
   const goalData = {
     type: '자산',
     amount: assetGoal.value.totalAmount,
-    index: assetGoal.value.index, // index 전달
-    category: assetGoal.value.category // category 전달
+    index: assetGoal.value.index, 
+    category: assetGoal.value.category 
   }
   assetGoalDetailModal.value.show(goalData)
 }
@@ -210,48 +225,54 @@ const openAssetGoalCreateModal = () => {
 // 자산 목표 삭제 후 처리
 const onAssetGoalDeleted = () => {
   assetGoalDeleted.value = true
+  console.log('자산 목표가 삭제되었습니다.')
 }
 
-// 목표 달성 처리 (달성 시 목표 목록에서 제거)
+// 목표 달성 처리
 const achieveGoal = (goalId) => {
   const goalIndex = goals.value.findIndex((goal) => goal.id === goalId)
-
   if (goalIndex !== -1) {
-    goals.value.splice(goalIndex, 1) // 목표 달성 시 목록에서 삭제
-    console.log(`Goal with ID ${goalId} achieved and removed.`)
+    goals.value.splice(goalIndex, 1)
+    console.log('목표를 달성했습니다!')
+    goalAchieved.value = true  // 목표가 달성되면 메시지를 표시
+    setTimeout(() => {
+      goalAchieved.value = false  // 3초 후 메시지를 숨김
+    }, 3000)
   }
 }
 
-// 목표 삭제 처리
+// 목표 삭제 처리 (사용자 확인 포함)
 const deleteGoal = (goalId) => {
-  goals.value = goals.value.filter((goal) => goal.id !== goalId)
+  if (confirm('정말로 이 목표를 삭제하시겠습니까?')) {
+    goals.value = goals.value.filter((goal) => goal.id !== goalId)
+    console.log('목표가 삭제되었습니다.')
+  }
 }
 
 // 자산 목표를 API에서 가져오는 함수
 const fetchAssetGoal = async () => {
   try {
     const response = await Instance.get('/goal/')
-    console.log('Asset goal API response:', response.data) // 응답 데이터 확인
     if (response.data && response.data.response && response.data.response.data) {
       const assetGoalData = response.data.response.data
       assetGoal.value = {
-        index: assetGoalData.index, // index 추가
+        index: assetGoalData.index,
         totalAmount: assetGoalData.amount,
         currentAmount: assetGoalData.gather,
         remaindate: assetGoalData.remaindate,
-        category: '자산' // category 추가 (혹은 적절한 값으로 대체)
+        category: '자산'
       }
-      console.log('Asset goal set to:', assetGoal.value) // assetGoal에 데이터가 제대로 할당되었는지 확인
     } else {
-      console.error('Failed to fetch asset goal:', response.data)
+      console.error('자산 목표를 불러오지 못했습니다.')
     }
   } catch (error) {
-    console.error('Error fetching asset goal:', error)
+    console.error('자산 목표 로드 중 오류가 발생했습니다.', error)
   }
 }
 
-// API를 통한 소비목표 데이터 가져오기
+// API를 통한 소비 목표 데이터 가져오기
 const fetchGoals = async () => {
+  isLoading.value = true
   try {
     const response = await Instance.get('/goal/outcome')
     if (response.data.success) {
@@ -264,13 +285,14 @@ const fetchGoals = async () => {
           priority: goal.priority,
           progress: (goal.gather / (goal.amount || 1)) * 100
         }))
-        // priority 순으로 정렬
         .sort((a, b) => a.priority - b.priority)
 
       goals.value = fetchedGoals
     }
   } catch (error) {
-    console.error('Failed to fetch goals:', error)
+    console.error('소비 목표를 불러오지 못했습니다.', error)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -282,51 +304,82 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+*{
+  font-family: pretendard;
+}
+
 .goal-asset-list-page {
   padding: 20px;
+  background-color: #FAFAFB;
+  min-height: 100vh;
 }
 
 .goal-card {
-  flex: 1 1 calc(33.333% - 10px);
   background-color: #ffffff;
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   cursor: pointer;
   font-size: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.goal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .progress-bar-container {
-  margin: 10px 0;
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: #FAFAFB;
+}
+
+.goal-description {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.current-amount {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6584;
 }
 
 .progress-bar {
   width: 100%;
-  background-color: #f0f0f0;
-  height: 15px;
-  border-radius: 5px;
-  margin: 10px 0;
+  background-color: #e0e0e0;
+  height: 20px;
+  border-radius: 10px;
+  margin: 15px 0;
 }
 
 .progress {
-  background-color: #ff6584;
+  background: linear-gradient(90deg, #ffb9c9,  #ff6584);
   height: 100%;
-  border-radius: 5px;
-}
-
-.goal-description {
-  font-size: 18px;
+  border-radius: 10px;
+  transition: width 0.3s ease;
 }
 
 .consumption-suggestion {
-  text-align: center;
-  margin-bottom: 20px;
+  text-align: left;
+  padding: 20px;
+  color: var(--4, #1D1616);
+font-feature-settings: 'dlig' on;
+font-family: Pretendard;
+font-size: 24px;
+font-style: normal;
+font-weight: 800;
+line-height: 27px; /* 112.5% */
 }
 
 .goal-cards {
+  margin-top: 16px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
 }
 
@@ -334,9 +387,85 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9f9f9;
+  background-color: #f0f0f0;
   border: 2px dashed #ccc;
+  font-size: 28px;
+  color: #aaa;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.add-goal:hover {
+  background-color: #e0e0e0;
+  color: #888;
+}
+
+.goal-index {
+  font-weight: bold;
+  font-size: 22px;
+  color: #414158;
+}
+
+.goal-amount {
+  font-size: 18px;
+  color: #8a8aa8;
+}
+
+.goal-progress {
+  font-size: 16px;
+  color: #414158;
+  margin-top: 10px;
+}
+
+.sub-title{
+  color: var(--3, #414158);
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 27px */
+  letter-spacing: -0.36px;
+}
+
+.main-title{
+  margin-top : 8xp;
+  color: var(--3, #414158);
+  font-feature-settings: 'dlig' on;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 27px; /* 135% */  
+}
+
+.loading-spinner {
+  text-align: center;
+  font-size: 20px;
+  color: #ff6584;
+}
+
+/* 목표 달성 시 축하 메시지 스타일 */
+.goal-achieved-message {
+  text-align: center;
   font-size: 24px;
-  color: #ccc;
+  color: #ff6584;
+  margin-top: 20px;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+/* 목표 달성 애니메이션 */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>
+

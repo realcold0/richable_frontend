@@ -9,17 +9,14 @@
       <button @click="nextMonth" class="btn custom-btn-right"></button>
     </div>
 
-<!-- 상단 소비 정보 -->
-<div class="text-center mb-4 saved-info">
-<div>이번 달에 아낄 수 있었던 비용이에요</div>
-
-<!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
-<div v-if="couldsaving <= 0" class="saved-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
-
-<!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
-<div v-else class="saved-amount">이번달은 잘 아껴 쓰셨네요!</div>
-</div>
-
+  <!-- 상단 소비 정보 -->
+  <div class="text-center total-asset">
+    <div class="asset-title">이번 달에 아낄 수 있었던 비용이에요 😢</div>
+    <!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
+    <div v-if="couldsaving <= 0" class="asset-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
+    <!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
+    <div v-else class="asset-amount">이번달은 잘 아껴 쓰셨네요!</div>
+  </div>
 
 
     <!-- 카테고리 선택 및 비교 -->
@@ -30,47 +27,71 @@
         <div class="main-title">나는 평균 대비 얼마나 지출할까요?</div>
       </div>
 
-    <div class="text-center">
-      <p>
-          나의 이번 달 
-          <select v-model="category" class="form-select custom-inline-select">
-          <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
-          </select>
-          소비는 평균보다
-          <strong :class="diffAmount > 0 ? 'text-success' : 'text-danger'">
-          {{ Math.abs(diffAmount).toLocaleString() }}원
-          </strong>
-          <span v-if="diffAmount > 0" class="text-success">많습니다</span>
-          <span v-else class="text-danger">적습니다</span>.
-      </p>
-      <canvas id="myChart"></canvas>
+      <div class="text-center">
+        <div class="total-consume">
+            
+          <div class="consume-title">
+            나의 이번 달 
+            <select v-model="category" class="form-select custom-inline-select"
+            style="font-size: 18px;font-weight: 700;background-color: none;">
+            <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
+            </select>
+            소비는 
+          </div>
+         
+          <div class="consume-title">
+            평균보다
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }">
+              {{ Math.abs(diffAmount).toLocaleString() }}원 
+            </span>
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }"  v-if="diffAmount > 0"> 많습니다</span>
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }" v-else>적습니다</span>.
+
+          </div>
+
+     
+        </div class="chart-container">
+        <canvas style="margin-top: 20px;" id="myChart"></canvas>
+        </div>
+    </div>
+    
+
+    <div class="saving-content">
+      <div class="summary-header">
+          <div class="main-title">6개월 간 소비를 절약했을 때</div>
+        </div>
+
+        <div v-if="possibleSaveAmount.length > 0" >
+
+          <div class="total-consume">
+            
+            <div class="consume-title">
+              이번 달 소비 중 줄일 수 있는 소비는
+              <span style="font-size: 18px; font-weight: 500; color: #FF0062;">  {{ formatCurrency(possibleSaveAmount[0]) }}</span>
+              이에요.
+            </div>
+
+            <div class="consume-title">
+              6개월 동안
+              <span style="font-size: 18px; font-weight: 500; color: #FF0062;">{{ formatCurrency(possibleSaveAmount[5]) }}</span> 절약이 가능해요!
+            </div>
+
+          </div>
+     
+          <canvas style="margin-top: 20px;" id="savingChart"></canvas>
       </div>
-
-
-      <div v-if="possibleSaveAmount.length > 0" class="savings-summary-container">
-  <div class="summary-header">
-    <h4>6개월 간 소비를 절약했을 때</h4>
+    </div>
+  
   </div>
-  <p>
-    이번 달 소비 중 줄일 수 있는 소비는
-    <strong class="highlight">{{ possibleSaveAmount[0].toLocaleString() }}원</strong>이에요.
-    <br />6개월 동안
-    <strong class="highlight">{{ possibleSaveAmount[possibleSaveAmount.length - 1].toLocaleString() }}원</strong> 절약이 가능해요!
-  </p>
-  <canvas id="savingChart"></canvas>
-</div>
-
-</div>
-
-</div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { Chart, registerables } from 'chart.js';
-import axios from 'axios';
-import { nextTick } from 'vue';
-import axiosInstance from '@/AxiosInstance';
+import { ref, computed, onMounted, watch } from 'vue'
+import { Chart, registerables } from 'chart.js'
+import axios from 'axios'
+import { nextTick } from 'vue'
+import axiosInstance from '@/AxiosInstance'
+
 
 // 차트.js 등록
 Chart.register(...registerables)
@@ -89,6 +110,14 @@ const averageSpending = ref(0)
 const diffAmount = computed(() =>  userSpending.value - averageSpending.value)
 const possibleSaveAmount = ref([]); // 빈 배열로 초기화
 const saveAmount = ref([]); // 빈 배열로 초기화
+
+const formatCurrency = (amount) => {
+  if (amount >= 100000) {
+    return `${(amount / 10000).toFixed(0)}만원`;
+  } else {
+    return `${amount.toLocaleString()}원`;
+  }
+};
 
 const wordMapping2 = {
 '식료품': '식료품 · 비주류음료',
@@ -199,9 +228,9 @@ const fetchSimulationData = async () => {
 
 // 막대 그래프 생성
 const createComparisonChart = () => {
-  const ctx1 = document.getElementById('myChart').getContext('2d')
+  const ctx1 = document.getElementById('myChart').getContext('2d');
 
-  if (myChart) myChart.destroy() // 이전 차트 삭제
+  if (myChart) myChart.destroy(); // 이전 차트 삭제
 
   // 카테고리 비교 차트
   myChart = new Chart(ctx1, {
@@ -223,11 +252,22 @@ const createComparisonChart = () => {
       responsive: true,
       scales: {
         y: {
+          grid: {
+            display: false, // x축 배경선 숨기기
+          },
           beginAtZero: true,
           ticks: {
             callback: function (value) {
-              return value.toLocaleString() + '원' // y축에 '원' 추가
+              return value.toLocaleString() + '원'; // y축에 '원' 추가
             },
+          },
+        },
+        x: {
+          grid: {
+            display: false, // x축 배경선 숨기기
+          },
+          ticks: {
+            color: '#767676', // x축 라벨 색상
           },
         },
       },
@@ -238,14 +278,43 @@ const createComparisonChart = () => {
         tooltip: {
           callbacks: {
             label: function (tooltipItem) {
-              return tooltipItem.raw.toLocaleString() + '원' // 툴팁에 '원' 추가
+              return tooltipItem.raw.toLocaleString() + '원'; // 툴팁에 '원' 추가
             },
           },
         },
       },
     },
-  })
-}
+    plugins: [
+      {
+        id: 'barLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales: { x, y } } = chart;
+
+          ctx.save();
+          ctx.font = ' 12px pretendard';
+          ctx.fillStyle = '#767676';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+
+          data.datasets.forEach((dataset, i) => {
+  chart.getDatasetMeta(i).data.forEach((bar, index) => {
+    const value = dataset.data[index];
+    const formattedValue = value >= 100000 
+      ? `${Math.floor(value / 10000)}만원` // Use Math.floor() to truncate instead of rounding
+      : `${value.toLocaleString()}원`;
+
+    ctx.fillText(formattedValue, bar.x, bar.y - 5);
+  });
+});
+
+
+          ctx.restore();
+        },
+      },
+    ],
+  });
+};
+
 // 절약 시뮬레이션 차트 생성 함수
 const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
   const ctx2 = document.getElementById('savingChart')?.getContext('2d');
@@ -292,7 +361,7 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
       },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'bottom', // 범례를 아래로 이동
         },
         tooltip: {
           callbacks: {
@@ -315,7 +384,40 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 * {
+  font-family: pretendard;
+  color: #19181D;
+  font-size: 20px;
+}
+
+.container{
+  margin-top: 80px;
+  margin-bottom: 100px;
+  margin-left : 98px;
+}
+
+.total-asset {
+  margin-top: 40px;
+  display: flex;
+  height: 107px;
+  padding: 10px 10px 10px 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  max-width: 1704px;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  height: 150px;
+  border: 1px solid #f8f8f8;
+}
+
+.asset-title {
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
   font-size: 20px;
   font-style: normal;
   font-weight: 400;

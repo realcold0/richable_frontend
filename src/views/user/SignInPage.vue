@@ -15,25 +15,26 @@
       </div>
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          v-model="password"
-          class="form-control"
-          id="password"
-          placeholder="비밀번호를 입력해주세요"
-          required
-        />
-        <span
-          @click="togglePassword"
-          class="position-absolute"
-          style="right: 10px; top: 36px; cursor: pointer"
-        >
-          <!-- You can add visibility icons here -->
-        </span>
+        <div class="password-input-wrapper position-relative">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="password"
+            class="form-control"
+            id="password"
+            placeholder="비밀번호를 입력해주세요"
+            required
+          />
+          <span
+            @click="togglePassword"
+            class="position-absolute top-50 end-0 translate-middle-y pe-2"
+            style="cursor: pointer"
+            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+          >
+            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+          </span>
+        </div>
       </div>
-      <button type="submit" class="login-btn" :disabled="!id || !password">
-        로그인
-      </button>
+      <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>
 
     <div class="d-flex justify-content-center mt-3">
@@ -44,17 +45,16 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-
-      <button @click="naverLogin" class="btn btn-secondary naver-btn" style><img src="../../assets/images/naver_logo.png" alt="naver"/></button>
+      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
+      <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
+    </div>
 
     <div class="mt-3">
       <span>Richable이 처음이에요?</span>
       <router-link to="/user/signup" class="join-link">가입하기</router-link>
     </div>
   </div>
-  </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -62,14 +62,10 @@ import axios from 'axios'
 
 const id = ref('')
 const password = ref('')
-const showPassword = ref(false)
+const showPassword = ref(true)
 const router = useRouter()
 
 const BASE_URL = 'http://localhost:8080/member'
-
-// 네이버 로그인 설정
-const NAVER_CLIENT_ID = '6lCwElPsJ16_JoPQSjSA'
-const NAVER_CALLBACK_URL = 'http://localhost:8080/member/naverCallback'
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -77,15 +73,59 @@ const togglePassword = () => {
 
 const naverLogin = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/naverlogin`);
-    if (response.data.redirectUrl) {
-      // 받은 state를 세션 스토리지에 저장
-      sessionStorage.setItem('naverState', response.data.state);
-      window.location.href = response.data.redirectUrl;
+    const response = await axios.get(`${BASE_URL}/naverlogin`)
+    console.log('Naver login response:', response.data)
+    if (response.data.success && response.data.response?.data?.redirectUrl) {
+      localStorage.setItem('naverState', response.data.response.data.state)
+      window.location.href = response.data.response.data.redirectUrl
+    } else {
+      console.error('Invalid response format:', response.data)
+      alert('네이버 로그인을 시작하는 데 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.')
     }
   } catch (error) {
-    console.error('Naver login initiation failed:', error);
-    alert('네이버 로그인을 시작하는 데 문제가 발생했습니다.');
+    console.error('Naver login initiation failed:', error)
+    alert(`네이버 로그인 초기화 중 오류: ${error.response?.data?.error || error.message}`)
+  }
+}
+
+const handleNaverCallback = async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
+  if (code && state) {
+    try {
+      const savedState = localStorage.getItem('naverState')
+      if (state !== savedState) {
+        throw new Error('Invalid state')
+      }
+
+      const response = await axios.get(`${BASE_URL}/naverCallback`, { params: { code, state } })
+      if (response.data.success && response.data.response?.data?.token) {
+        const { token, userInfo } = response.data.response.data
+        console.log('Naver login success:', token)
+        alert('네이버 로그인 성공!')
+        sessionStorage.setItem('authToken', token)
+        localStorage.removeItem('naverState') // 사용 후 state 제거
+        // 인증 헤더 설정
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+        localStorage.removeItem('naverState') // 사용 후 state 제거
+
+        // 리다이렉트 URL로 이동
+        if (redirectUrl) {
+          window.location.href = redirectUrl // 전체 페이지 리로드
+        } else {
+          router.push({ name: 'home' })
+        }
+      } else {
+        throw new Error('Invalid response format')
+      }
+    } catch (error) {
+      console.error('Naver login callback failed:', error)
+      alert(`네이버 로그인 처리 중 오류: ${error.response?.data?.error || error.message}`)
+      router.push({ name: 'login' }) // 로그인 페이지로 리다이렉트
+    }
   }
 }
 
@@ -95,7 +135,7 @@ const login = async () => {
     return
   }
   try {
-    const response = await axios.post('http://localhost:8080/member/login', {
+    const response = await axios.post(`${BASE_URL}/login`, {
       id: id.value,
       password: password.value
     });
@@ -115,55 +155,14 @@ const login = async () => {
     alert('Login failed. Please check your credentials.');
   }
 }
-
-const handleNaverCallback = async (code, state) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/naverCallback`, {
-      params: { code, state }
-    })
-    if (response.status === 200) {
-      console.log('Naver login success:', response.data)
-      // 여기서 받은 사용자 정보를 처리 (예: 로컬 스토리지에 저장)
-      alert('네이버 로그인 성공!')
-      router.push({ name: 'home' })
-    }
-  } catch (error) {
-    console.error('Naver login callback failed:', error)
-    alert('네이버 로그인 처리 중 오류가 발생했습니다.')
-  }
-}
-
 onMounted(() => {
-  // Check for Naver login callback
-  const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
-
-  // 네이버 로그인 스크립트 로드
-  const naverScript = document.createElement('script');
-        naverScript.src = 'https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js';
-        naverScript.charset = 'utf-8';
-        document.head.appendChild(naverScript);
-  
-        // jQuery 스크립트 로드
-        const jqueryScript = document.createElement('script');
-        jqueryScript.src = 'http://code.jquery.com/jquery-1.11.3.min.js';
-        document.head.appendChild(jqueryScript);
-
-        // 스크립트 로드 완료 후 네이버 로그인 초기화
-    naverScript.onload = () => {
-      jqueryScript.onload = () => {
-        const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, NAVER_CALLBACK_URL);
-        naver_id_login.setButton("white", 1, 40);
-        naver_id_login.init_naver_id_login();
-      };
-    };
-  if (code && state) {
-    handleNaverCallback(code, state)
+  handleNaverCallback()
+  // 페이지 로드 시 저장된 토큰이 있다면 axios 헤더에 설정
+  const token = localStorage.getItem('authToken')
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
   }
 })
-
-
 </script>
 
 <style scoped>
@@ -204,12 +203,12 @@ body {
 }
 .login-btn {
   border: none;
-  color : white;
+  color: white;
   border-radius: 5px;
   width: 100%;
   height: 40px;
   margin-top: 1rem;
-  background-color: #FF0062;
+  background-color: #ff0062;
 }
 .or-divider {
   margin: 1.5rem 0;
@@ -234,7 +233,7 @@ body {
   margin: 0 5px;
 }
 .form-control:focus {
-  border-color: #FF0062; /* 원하는 테두리 색상 */
+  border-color: #ff0062; /* 원하는 테두리 색상 */
   box-shadow: none;
   outline: none; /* 기본 아웃라인 제거 */
 }
