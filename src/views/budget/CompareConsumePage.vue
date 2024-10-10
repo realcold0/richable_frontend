@@ -327,9 +327,6 @@ const createComparisonChart = () => {
 };
 
 
-
-
-
   const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
   const ctx2 = document.getElementById('savingChart')?.getContext('2d');
   
