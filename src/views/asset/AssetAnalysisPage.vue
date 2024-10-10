@@ -66,12 +66,12 @@
           </div>
 
           <!-- 자산 변화 그래프 -->
-          <div class="asset-analysis-content-container2">
+          <div class="text-center asset-analysis-content-container2">
             <p>총자산이 지난달보다 <br /> 
               <strong>{{ assetDifferenceMessage }}</strong>
             </p>
             <div class="asset-analysis-graph-container2">
-              <canvas ref="barChart"></canvas>
+              <canvas class="text-center" ref="barChart"></canvas>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
 
           <div class="graph-container">
             <div class="graph-title">저축량</div>
-            <div class="graph-sum">{{returnIncomeSum}}원</div>
+            <div class="graph-sum">{{returnIncomeSum}}만원</div>
             <canvas class="graph" ref="lineChart3"></canvas>
           </div>
 
@@ -210,7 +210,7 @@ const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
   returnBondSum.value = returnBond.find(item => item.month === 1)?.earningRate || 0;
   returnCoinSum.value = returnCoin.find(item => item.month === 1)?.earningRate || 0;
   returnStockSum.value = returnStock.find(item => item.month === 1)?.earningRate || 0;
-  returnIncomeSum.value = returnIncome.find(item => item.month === 1)?.balance || 0; // 예시로 balance 사용
+  returnIncomeSum.value = ((returnIncome.find(item => item.month === "2024-10")?.balance)/10000).toFixed(0) || 0; // 예시로 balance 사용
 };
 
 const fetchData = async () => {
@@ -243,16 +243,16 @@ const fetchData = async () => {
       instance.get('/finance/spot/car/sum'),
       // instance.get('/finance/spot/luxury/sum'),
       instance.get('/finance/spot/brand/sum'),
-      //instance.get('/finance/return/income'),
+      instance.get('/finance/return/income'),
       instance.get('/finance/return/bond'),
-      instance.get('/finance/return/bond'),
+      instance.get('/finance/return/coin'),
       instance.get('/finance/return/stock')
     ]);   
 
     // 데이터 저장
-    finAsset.value = finAssetRes?.data?.response?.data?.data?.amount || 0;  // finAsset 값 설정
-    totalAsset.value = totalAssetRes?.data?.response?.data?.data?.amount || 0;  // totalAsset 값 설정
-    finAssetTotal.value = finAssetTotalRes?.data?.response?.data?.data || [];  // 값이 없을 경우 빈 배열을 할당
+    finAsset.value = finAssetRes?.data?.response?.data?.amount || 0;  // finAsset 값 설정
+    totalAsset.value = totalAssetRes?.data?.response?.data?.amount || 0;  // totalAsset 값 설정
+    finAssetTotal.value = finAssetTotalRes.data.response.data; // 값이 없을 경우 빈 배열을 할당
     changedFin.value = changedFinRes.data.response.data;
     changedSpot.value = changedSpotRes.data.response.data;
     electronicSpot.value = electronicSpotRes?.data?.response?.data || {};
@@ -282,7 +282,7 @@ const fetchData = async () => {
 
     const bondLabels = returnBond.value.map(item => mapMonthToLabel(item.month));
     const coinLabels = returnCoin.value.map(item => mapMonthToLabel(item.month));
-    const incomeLabels = returnIncome.value.map(item => mapMonthToLabel(item.month));
+    const incomeLabels = returnIncome.value.map(item => item.month);
     const stockLabels = returnStock.value.map(item => mapMonthToLabel(item.month));
 
     renderAllLineCharts(bondLabels, returnBond.value.map(item => item.earningRate), coinLabels, returnCoin.value.map(item => item.earningRate), incomeLabels, returnIncome.value.map(item => item.balance), stockLabels, returnStock.value.map(item => item.earningRate));
@@ -299,12 +299,28 @@ const calculateAssetDifference = () => {
   const lastMonthBalance = displayedSixMonth.value[1]?.balance || 0;
   const difference = currentMonthBalance - lastMonthBalance;
 
-  assetDifferenceMessage.value = difference > 0
-    ? `${Math.floor(difference / 10000)}만원 늘었어요 🥰`
-    : difference < 0
-      ? `${Math.floor(Math.abs(difference) / 10000)}만원 줄었어요 🥺`
-      : '변화가 없어요';
+  // Convert the difference to 억 (hundred million) and 만 (ten thousand)
+  const differenceInEok = Math.floor(difference / 100000000); // 1억 = 100,000,000
+  const differenceInMan = Math.floor((difference % 100000000) / 10000); // Remaining 만
+
+  // Constructing the message based on the difference
+  if (difference > 0) {
+    if (difference >= 100000000) {
+      assetDifferenceMessage.value = `${differenceInEok}억 ${differenceInMan}만원 늘었어요 🥰`;
+    } else {
+      assetDifferenceMessage.value = `${differenceInMan}만원 늘었어요 🥰`;
+    }
+  } else if (difference < 0) {
+    if (Math.abs(difference) >= 100000000) {
+      assetDifferenceMessage.value = `${Math.abs(differenceInEok)}억 ${Math.abs(differenceInMan)}만원 줄었어요 🥺`;
+    } else {
+      assetDifferenceMessage.value = `${Math.abs(differenceInMan)}만원 줄었어요 🥺`;
+    }
+  } else {
+    assetDifferenceMessage.value = '변화가 없어요';
+  }
 };
+
 
 const displayedAssetList = computed(() => {
   const assetList = includePhysicalAssets.value
@@ -316,13 +332,20 @@ const displayedAssetList = computed(() => {
         ...(carSpot.value ? [carSpot.value] : [])
       ]
     : Array.isArray(finAssetTotal.value) ? finAssetTotal.value : [];
-  
+
+  // 매핑된 자산 목록 생성
+  const mappedAssetList = assetList.map(asset => ({
+    ...asset,
+    prodCategory: categoryMapping[asset.prodCategory] || asset.prodCategory // 카테고리 매핑
+  }));
+
   // assetList가 빈 배열이 아닌지 확인
-  if (assetList.length === 0) {
-    console.error('displayedAssetList is empty:', assetList);
+  if (mappedAssetList.length === 0) {
+    console.error('displayedAssetList is empty:', mappedAssetList);
   }
-  return assetList;
+  return mappedAssetList;
 });
+
 
 const renderAllLineCharts = async (bondLabels, bondData, coinLabels, coinData, incomeLabels, incomeData, stockLabels, stockData) => {
   await nextTick();
@@ -510,7 +533,7 @@ onMounted(() => {
 }
 
 .total-asset, .asset-analysis-container, .asset-level-container {
-  max-width: 1704px;
+  max-width: 1764px;
   border-radius: 20px;
   margin-top: 40px;
 }

@@ -216,19 +216,18 @@
   
   <style scoped>
   * {
+    max-width: 1440px;
     font-family: 'Pretendard', sans-serif;
     font-size: 18px;
-    max-width: 1704px;
-
   }
   
   .wrapper {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
   }
   
   .analyzeWrapper {
+    width: 1000px;
     border-radius: 20px;
     border: 1px solid var(--1, #D9D9D9);
     background: #FFF;
@@ -237,6 +236,7 @@
   }
   
   .analyzeText {
+    text-align: center;
     margin-top: 8px;
     flex-shrink: 0;
     border-radius: 20px;
@@ -263,7 +263,6 @@
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 20px;
-  margin-bottom: 40px;
 }
 
 .asset-title {
@@ -285,13 +284,14 @@
   }
   
   .analyze {
+    width: 900px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
   }
   
   .chart {
-    width: 300px;
+    width: 450px;
     height: 300px;
   }
   

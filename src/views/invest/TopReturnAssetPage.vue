@@ -1,5 +1,5 @@
 <template>
-  <div class="top-return-asset-page container">
+  <div style="margin-bottom:100px;" class="top-return-asset-page container">
 
     <div class="total-asset">
       <div class="total-asset-sub">리치들이 투자한 상품 중 </div>
