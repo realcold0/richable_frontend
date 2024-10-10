@@ -37,28 +37,37 @@ const increaseMonth = () => {
 
 <style scoped>
 * {
+    text-align: center;
+    font-family: 'Pretendard', sans-serif;
     font-size: 18px;
 }
+
+.wrapper {
+    width: 1000px;
+}
+
 .monthWrapper {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center; /* 중앙에 정렬 */
     align-items: center;
     height: 83px;
-    width: 350px;
+    width: 1000px;
     border-radius: 31px;
 }
+
 .monthWrapper .date {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0 20px; /* 화살표와 텍스트 사이의 패딩을 최소화 */
 }
 
-#left, #right { 
+#left, #right {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
+    width: 30px; /* 화살표 버튼의 너비 조정 */
     height: 100%;
 }
 
@@ -89,4 +98,5 @@ const increaseMonth = () => {
     font-weight: 700;
     line-height: normal;
 }
+
 </style>

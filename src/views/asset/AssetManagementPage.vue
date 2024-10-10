@@ -519,8 +519,8 @@ const fetchFinanceAssetList = async () => {
     const response = await axiosInstance.get('/finance/fin/sum');
     console.log(response);
 
-    console.log(response.data.response.data.data.amount)
-    financeTotalAmount.value = response.data.response.data.data.amount
+    console.log(response.data.response.data.amount)
+    financeTotalAmount.value = response.data.response.data.amount
   } catch (error) {
     console.error('금융 자산 합 조회 api 호출을 실패하였습니다. ', error)
   }
@@ -536,7 +536,7 @@ const bondAssetAmount = ref(0)
 const fetchFinanceAmount = async () => {
   try {
     const response = await axiosInstance.get('/finance/fin')
-    const data = response.data.response.data.data
+    const data = response.data.response.data
 
     // 예적금
     bankAssetAmount.value = data[0] ? data[0].amount : 0
