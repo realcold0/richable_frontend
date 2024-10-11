@@ -49,13 +49,11 @@ jobs:
               env:
                 VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 
-            - name: Deploy   
-              uses: peaceiris/actions-gh-pages@v4
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
               with:
-                github_token: ${{ secrets.ACCESS_TOKEN_GIT }}
-                publish_dir: ./dist
-            
-
+                  # dist 디렉터리 업로드
+                  path: './dist'
             - name: Deploy to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4
