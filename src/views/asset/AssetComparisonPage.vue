@@ -84,18 +84,17 @@ const assetList = ref([]);
 const loading = ref(false);
 const errorMessage = ref('');
 
-
-// 자산 현황 (금융 자산 합계) 데이터를 가져오는 함수
 const fetchFinancialAssetsSum = async () => {
   loading.value = true;
   errorMessage.value = '';
   try {
-  
-    const response = await axiosInstance.get('/finance/fin/sum')
+    const response = await axiosInstance.get('/finance/fin/sum');
+    console.log('Financial Assets Sum Response:', response.data); // 응답 확인
 
-    if (response.data && response.data.response && response.data.response.data && response.data.response.data.data) {
-      const total = response.data.response.data.data.amount;
-      currentAsset.value = total;
+    if (response.data.success && response.data.response.data) {
+      const total = response.data.response.data.amount; // amount 추출
+      currentAsset.value = total; // 총 자산 값 설정
+      console.log('Current Asset:', currentAsset.value); // 자산 값 확인
     } else {
       errorMessage.value = '자산 데이터가 올바르지 않습니다.';
     }
@@ -112,10 +111,17 @@ const fetchPeerData = async () => {
   loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await axiosInstance.get('/finance/peer')
-    const data = response.data.response.data;
-    peerAverageAsset.value = data.spotAvgAmount;
-    assetDifference.value = (currentAsset.value - peerAverageAsset.value) / 10000; // 만원 단위로 차이 계산
+    const response = await axiosInstance.get('/finance/peer');
+    console.log('Peer Data Response:', response.data); // 응답 확인
+
+    if (response.data.success && response.data.response.data) {
+      peerAverageAsset.value = response.data.response.data.spotAvgAmount; // 평균 자산 설정
+      assetDifference.value = (currentAsset.value - peerAverageAsset.value) / 10000; // 만원 단위로 차이 계산
+      console.log('Peer Average Asset:', peerAverageAsset.value); // 평균 자산 값 확인
+      console.log('Asset Difference:', assetDifference.value); // 자산 차이 확인
+    } else {
+      errorMessage.value = '동료 자산 데이터를 가져오는 데 실패했습니다.';
+    }
   } catch (error) {
     errorMessage.value = '동료 자산 데이터를 가져오는 데 실패했습니다.';
     console.error('Error fetching peer data:', error);
@@ -125,12 +131,13 @@ const fetchPeerData = async () => {
 };
 
 
+
 // 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
 const fetchPeerFinanceData = async () => {
   loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await axiosInstance.get('/finance/peer/finance')
+    const response = await axiosInstance.get('/finance/peer/finance');
     const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
@@ -355,7 +362,7 @@ onMounted(async () => {
   font-size: 18px;
   padding: 30px;
   background-color: #f9f9f9;
-  border: 1px solid #f8f8f8;
+  border: 1px solid #e4ebf0;
   color: var(--black-default, #19181D);
   text-align: center;
   font-family: Pretendard;
@@ -382,8 +389,8 @@ onMounted(async () => {
 }
 
 .chart-size {
-  margin-top: 20px;
-  border: 1px solid #f8f8f8;
+  margin-top: 8px;
+  border: 1px solid #e4ebf0;
   border-radius: 20px;
   width: 100%;
   height: 300px; /* 차트 크기 축소 */

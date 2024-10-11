@@ -89,12 +89,13 @@ const login = async () => {
       id: id.value,
       password: password.value
     })
-    console.log('Token received:', response.data.token)
+    const token = response.data.response.data.token
+    console.log('Token received:', token)
 
     if ((response.status === 200) & (id.value == 'admin')) {
       alert('Login successful!')
       isAuthenticated.value = true
-      localStorage.setItem('authToken', response.data.token)
+      localStorage.setItem('authToken', token)
     } else {
       alert('권한 없음')
     }

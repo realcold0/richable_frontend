@@ -4,22 +4,16 @@
     <div class="month-navigation text-center">
       <!-- 이전 달 버튼 -->
       <button @click="previousMonth" class="btn custom-btn-left"></button>
-      <div>{{ months[currentMonthIndex] }}</div>
+      <div>{{ curMonth }}월</div>
       <!-- 다음 달 버튼 -->
       <button @click="nextMonth" class="btn custom-btn-right"></button>
     </div>
 
-<!-- 상단 소비 정보 -->
-<div class="text-center mb-4 saved-info">
-<div>이번 달에 아낄 수 있었던 비용이에요</div>
-
-<!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
-<div v-if="couldsaving <= 0" class="saved-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
-
-<!-- couldsaving 값이 0보다 작을 때 '잘 아껴 쓰셨네요!' 문구를 표시 -->
-<div v-else class="saved-amount">이번달은 잘 아껴 쓰셨네요!</div>
-</div>
-
+    <!-- 상단 소비 정보 -->
+    <div class="text-center total-asset">
+      <div class="asset-title">{{ diffAmount > 0 ? '이번 달에 아낄 수 있었던 비용이에요 😢' : '이번달에 아낀 비용이에요' }}</div>
+      <div class="asset-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
+    </div>
 
 
     <!-- 카테고리 선택 및 비교 -->
@@ -30,65 +24,99 @@
         <div class="main-title">나는 평균 대비 얼마나 지출할까요?</div>
       </div>
 
-    <div class="text-center">
-      <p>
-          나의 이번 달 
-          <select v-model="category" class="form-select custom-inline-select">
-          <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
-          </select>
-          소비는 평균보다
-          <strong :class="diffAmount > 0 ? 'text-success' : 'text-danger'">
-          {{ Math.abs(diffAmount).toLocaleString() }}원
-          </strong>
-          <span v-if="diffAmount > 0" class="text-success">많습니다</span>
-          <span v-else class="text-danger">적습니다</span>.
-      </p>
-      <canvas id="myChart"></canvas>
+      <div class="text-center">
+        <div class="total-consume">
+            
+          <div class="consume-title">
+            나의 이번 달 
+            <select v-model="category" class="form-select custom-inline-select"
+            style="font-size: 18px;font-weight: 700;background-color: none;">
+            <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
+            </select>
+            소비는 
+          </div>
+         
+          <div class="consume-title">
+            평균보다
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }">
+              {{ Math.abs(diffAmount).toLocaleString() }}원 
+            </span>
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }"  v-if="diffAmount > 0"> 많습니다</span>
+            <span :style="{ color: diffAmount > 0 ? '#EB003B' : '#2768FF', fontSize: '18px', fontWeight: '700' }" v-else>적습니다</span>.
+
+          </div>
+</div>
+     <!-- 차트 -->
+     <div class="chart-container">
+          <canvas style="margin-top: 20px;" id="myChart"></canvas>
+        </div>
       </div>
+    </div>
 
+    <!-- 6개월 절역 시뮬레이션 -->
+    <div class="saving-content">
+      <div class="summary-header">
+          <div class="main-title">6개월 간 소비를 절약했을 때</div>
+        </div>
 
-      <div v-if="possibleSaveAmount.length > 0" class="savings-summary-container">
-  <div class="summary-header">
-    <h4>6개월 간 소비를 절약했을 때</h4>
+        <div v-if="possibleSaveAmount.length > 0" >
+
+          <div class="total-consume">
+            
+            <div class="consume-title">
+              이번 달 소비 중 줄일 수 있는 소비는
+              <span style="font-size: 18px; font-weight: 500; color: #FF0062;">  {{  Math.abs(couldsaving).toLocaleString() }}</span>
+            원 이에요.
+            </div>
+
+            <div class="consume-title">
+              6개월 동안
+              <span style="font-size: 18px; font-weight: 500; color: #FF0062;">{{  Math.abs(couldsaving * 6).toLocaleString() }}</span> 원 절약이 가능해요!
+            </div>
+          </div>
+     
+       <!-- 절약 차트 -->
+       <canvas style="margin-top: 20px;" id="savingChart"></canvas>
+      </div>
+    </div>
   </div>
-  <p>
-    이번 달 소비 중 줄일 수 있는 소비는
-    <strong class="highlight">{{ possibleSaveAmount[0].toLocaleString() }}원</strong>이에요.
-    <br />6개월 동안
-    <strong class="highlight">{{ possibleSaveAmount[possibleSaveAmount.length - 1].toLocaleString() }}원</strong> 절약이 가능해요!
-  </p>
-  <canvas id="savingChart"></canvas>
-</div>
-
-</div>
-
-</div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { Chart, registerables } from 'chart.js';
-import axios from 'axios';
-import { nextTick } from 'vue';
-import axiosInstance from '@/AxiosInstance';
+import { ref, computed, onMounted, watch } from 'vue'
+import { Chart, registerables } from 'chart.js'
+import { nextTick } from 'vue'
+import axiosInstance from '@/AxiosInstance'
+import { useMonthStore } from '@/stores/consume/curMonth.js';
 
 // 차트.js 등록
 Chart.register(...registerables)
 
+
+// pinia store 사용
 // 달별 네비게이션
-const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-const currentMonthIndex = ref(8) // 현재 9월로 설정 (0부터 시작)
+const monthStore = useMonthStore(); // Pinia store 사용
+const curMonth = ref(monthStore.month); // store에서 월 가져오기
+const curYear = ref(monthStore.year);   // store에서 연도 가져오기
+console.log(curMonth, curYear);
 const category = ref('식료품') // 기본 카테고리를 '식료품'으로 설정
 const categories = ref(['식료품', '유흥', '쇼핑', '공과금', '생활용품', '의료비', '교통비', '통신비', '문화', '교육비', '외식 · 숙박', '기타'])
-// const totalSaved = ref({}) // 기본값 설정
-// const currentSavings = ref({}) // 기본값 설정
-// const totalSavings = ref({}) // 기본값 설정
 const userSpending = ref(0)
 const couldsaving = ref(0)
 const averageSpending = ref(0)
-const diffAmount = computed(() =>  userSpending.value - averageSpending.value)
+const diffAmount = computed(() => userSpending.value - averageSpending.value)
 const possibleSaveAmount = ref([]); // 빈 배열로 초기화
 const saveAmount = ref([]); // 빈 배열로 초기화
+
+// 통화 포맷 함수
+const formatCurrency = (amount) => {
+  if (amount >= 100000) {
+    return `${(amount / 10000).toFixed(0)}만원`;
+  } else {
+    return `${amount.toLocaleString()}원`;
+  }
+};
+
 
 const wordMapping2 = {
 '식료품': '식료품 · 비주류음료',
@@ -116,30 +144,43 @@ let savingChart = null
 
 // 이전/다음 달 버튼 클릭 시
 const previousMonth = () => {
-if (currentMonthIndex.value > 0) currentMonthIndex.value -= 1
-fetchComparisonData() // 월 변경 시 데이터 가져오기
+  const { year: updatedYear, month: updatedMonth } = monthStore.decreaseMonth();
+  curMonth.value = updatedMonth;
+  curYear.value = updatedYear;
+
+  fetchComparisonData();   // 데이터를 다시 가져오기
+  fetchCouldSaving();
+  fetchSimulationData();
 }
+
 const nextMonth = () => {
-if (currentMonthIndex.value < 11) currentMonthIndex.value += 1
-fetchComparisonData() // 월 변경 시 데이터 가져오기
-}
+  const { year: updatedYear, month: updatedMonth } = monthStore.increaseMonth();
+  curMonth.value = updatedMonth;
+  curYear.value = updatedYear;
+
+  fetchComparisonData();   // 데이터를 다시 가져오기
+  fetchCouldSaving();
+  fetchSimulationData();
+};
 
 // 카테고리 변경 시 데이터 가져오기
 watch(category, () => {
 fetchComparisonData();
 });
 
-watch(currentMonthIndex, () => {
-fetchComparisonData()
-fetchCouldSaving()
-fetchSimulationData()
-})
+// 월과 연도 변경 시 데이터 업데이트
+watch([curMonth, curYear], () => {
+  fetchCouldSaving()
+  fetchSimulationData()
+  fetchComparisonData();
+});
 
 // 소비 비교 데이터를 API에서 가져와 차트에 반영
 const fetchComparisonData = async () => {
-const cntYear = 2024; // 고정된 연도 값
-const cntMonth = currentMonthIndex.value + 1; // currentMonthIndex는 0부터 시작하므로 1을 더함
-try {
+  const cntYear = curYear.value;
+  const cntMonth = curMonth.value;
+
+
   const tempCategory = mapColumnToKeyword2(category.value); // category의 매핑된 값을 가져옴
   const encodedCategory = encodeURIComponent(tempCategory); // 카테고리를 URL 인코딩
   const response = await axiosInstance.get(`/outcome/compare/${cntYear}/${cntMonth}/${encodedCategory}`);
@@ -150,58 +191,53 @@ try {
   console.log(userSpending.value, averageSpending.value);
   
   createComparisonChart(); // 데이터를 받아온 후 차트 생성
-} catch (error) {
-  console.error('Error fetching comparison data:', error);
-}
+};
+
+// 이번달 아낄 수 있었던 비용
+const fetchCouldSaving = async () => {
+  const cntYear = curYear.value;
+  const cntMonth = curMonth.value;
+
+  const response = await axiosInstance.get(`/outcome/review/sum/${cntYear}/${cntMonth}`);
+  const data = response.data.response.data;
+  couldsaving.value = Math.abs(data.possibleSaveAmount); // 음수값을 절대값으로 변환
+  console.log(couldsaving.value);
+
 };
 
 // 6개월 절약 시뮬레이션 데이터 가져오기
-const fetchCouldSaving = async () => {
-const cntYear = 2024; // 고정된 연도 값
-const cntMonth = currentMonthIndex.value + 1; // currentMonthIndex는 0부터 시작하므로 1을 더함
-try {
-  const response = await axiosInstance.get(`/outcome/review/sum/${cntYear}/${cntMonth}`);
-  const data = response.data.response.data;
-  couldsaving.value = data.possibleSaveAmount;
-} catch (error) {
-  console.error('Error fetching couldSave data:', error);
-}
-};
-
 const fetchSimulationData = async () => {
-  const cntYear = 2024; // 고정된 연도 값
-  const cntMonth = 10; // 10월로 설정
-  try {
+  const cntYear = curYear.value;
+  const cntMonth = curMonth.value;
+
     const response = await axiosInstance.get(`/outcome/simulation/${cntYear}/${cntMonth}`);
     const data = response.data.response.data;
+console.log(data);
 
-    console.log(data);
-
-    // 데이터 처리
     possibleSaveAmount.value = data.possibleSaveAmount.map(amount => Math.abs(amount));
     saveAmount.value = data.saveAmount.map(amount => Math.abs(amount));
 
-    // DOM 업데이트가 완료된 후 차트 생성
     nextTick(() => {
       const canvasElement = document.getElementById('savingChart');
       if (canvasElement) {
+        const ctx = canvasElement.getContext('2d');
+        if(ctx) {
         createSavingChart(data.months, saveAmount.value, possibleSaveAmount.value);
       } else {
         console.error('Cannot find canvas element for savingChart');
       }
-    });
-  } catch (error) {
-    console.error('Error fetching simulation data:', error);
-  }
+    }
+  })
 };
+  
 
 
 
 // 막대 그래프 생성
 const createComparisonChart = () => {
-  const ctx1 = document.getElementById('myChart').getContext('2d')
+  const ctx1 = document.getElementById('myChart').getContext('2d');
 
-  if (myChart) myChart.destroy() // 이전 차트 삭제
+  if (myChart) myChart.destroy(); // 이전 차트 삭제
 
   // 카테고리 비교 차트
   myChart = new Chart(ctx1, {
@@ -221,13 +257,29 @@ const createComparisonChart = () => {
     },
     options: {
       responsive: true,
+      layout: {
+        padding: {
+          top: 20, // 그래프 상단에 패딩 추가
+        },
+      },
       scales: {
         y: {
+          grid: {
+            display: false, // y축 배경선 숨기기
+          },
           beginAtZero: true,
           ticks: {
             callback: function (value) {
-              return value.toLocaleString() + '원' // y축에 '원' 추가
+              return value.toLocaleString() + '원'; // y축에 '원' 추가
             },
+          },
+        },
+        x: {
+          grid: {
+            display: false, // x축 배경선 숨기기
+          },
+          ticks: {
+            color: '#767676', // x축 라벨 색상
           },
         },
       },
@@ -238,16 +290,44 @@ const createComparisonChart = () => {
         tooltip: {
           callbacks: {
             label: function (tooltipItem) {
-              return tooltipItem.raw.toLocaleString() + '원' // 툴팁에 '원' 추가
+              return tooltipItem.raw.toLocaleString() + '원'; // 툴팁에 '원' 추가
             },
           },
         },
       },
     },
-  })
-}
-// 절약 시뮬레이션 차트 생성 함수
-const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
+    plugins: [
+      {
+        id: 'barLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales: { x, y } } = chart;
+
+          ctx.save();
+          ctx.font = '12px Pretendard';
+          ctx.fillStyle = '#767676';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+
+          data.datasets.forEach((dataset, i) => {
+            chart.getDatasetMeta(i).data.forEach((bar, index) => {
+              const value = dataset.data[index];
+              const formattedValue = value >= 100000 
+                ? `${Math.floor(value / 10000)}만원` // Use Math.floor() to truncate instead of rounding
+                : `${value.toLocaleString()}원`;
+
+              ctx.fillText(formattedValue, bar.x, bar.y - 5);
+            });
+          });
+
+          ctx.restore();
+        },
+      },
+    ],
+  });
+};
+
+
+  const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
   const ctx2 = document.getElementById('savingChart')?.getContext('2d');
   
   if (!ctx2) {
@@ -257,6 +337,9 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
 
   if (savingChart) savingChart.destroy(); // 기존 차트가 있으면 삭제
 
+
+  console.log(saveAmount, possibleSaveAmount);
+
   savingChart = new Chart(ctx2, {
     type: 'line',
     data: {
@@ -264,14 +347,14 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
       datasets: [
         {
           label: '절약했을 때 저축',
-          data: possibleSaveAmount,
+          data: saveAmount,
           borderColor: '#FF6384',
           fill: false,
           borderWidth: 2,
         },
         {
           label: '평소 저축',
-          data: saveAmount,
+          data: possibleSaveAmount,
           borderColor: '#D3D3D3',
           fill: false,
           borderWidth: 2,
@@ -292,7 +375,7 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
       },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'bottom', // 범례를 아래로 이동
         },
         tooltip: {
           callbacks: {
@@ -306,16 +389,54 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
   });
 };
 
+
+
 // 페이지 로드 시 데이터 가져오기
 onMounted(() => {
   fetchComparisonData(); // 초기 로드 시 데이터 가져오기
   fetchCouldSaving();     // 절약 가능 금액 데이터 가져오기
   fetchSimulationData();  // 시뮬레이션 데이터 가져오기
+
+  curMonth.value = monthStore.month;
+  curYear.value = monthStore.year;
 });
+
 </script>
 
 <style scoped>
+
 * {
+  font-family: pretendard;
+  color: #19181D;
+  font-size: 20px;
+  max-width: 1704px;
+}
+
+.container {
+ margin: 80px;
+}
+
+.total-asset {
+  margin-top: 40px;
+  display: flex;
+  height: 107px;
+  padding: 10px 10px 10px 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  max-width: 1704px;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  height: 150px;
+  border: 1px solid #f8f8f8;
+}
+
+.asset-title {
+  color: var(--black-default, #19181D);
+  text-align: center;
+  font-family: Pretendard;
   font-size: 20px;
   font-style: normal;
   font-weight: 400;
@@ -361,7 +482,7 @@ onMounted(() => {
   border-radius: 20px;
   background: #FAFAFB;
   display: flex;
-  height: 107px;
+  height: 500px;
   padding: 10px 10px 10px 10px;
   flex-direction: column;
   justify-content: center;
