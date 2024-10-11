@@ -31,10 +31,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - name: Set up Nodejs
+        uses: actions/setup-node@4
         with:
-          node-version: ''
+          node-version: '20.16.0'
           cache: 'npm'
       
       - name: Install dependencies
@@ -42,6 +42,8 @@ jobs:
      
       - name: Build
         run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
