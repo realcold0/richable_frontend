@@ -215,55 +215,45 @@ const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
 
 const fetchData = async () => {
   try {
-
-    const [
-      finAssetRes,
-      totalAssetRes,
-      finAssetTotalRes,
-      changedFinRes,
-      changedSpotRes,
-      electronicSpotRes,
-      otherSpotRes,
-      carSpotRes,
-      // luxSpotRes,
-      brandSpotRes,
-      returnIncomeRes,
-      returnBondRes,
-      returnCoinRes,
-      returnStockRes
-    ]  
-    = await Promise.all([
-      instance.get('/finance/fin/sum'),   // 절대 경로 대신 상대 경로 사용
-      instance.get('/finance/total/sum'), 
-      instance.get('/finance/fin'),       
+    const results = await Promise.allSettled([
+      instance.get('/finance/fin/sum'),
+      instance.get('/finance/total/sum'),
+      instance.get('/finance/fin'),
       instance.get('/finance/changed/fin'),
       instance.get('/finance/changed/spot'),
       instance.get('/finance/spot/elec/sum'),
       instance.get('/finance/spot/etc/sum'),
       instance.get('/finance/spot/car/sum'),
-      // instance.get('/finance/spot/luxury/sum'),
+      instance.get('/finance/spot/luxury/sum'),
       instance.get('/finance/spot/brand/sum'),
       instance.get('/finance/return/income'),
       instance.get('/finance/return/bond'),
       instance.get('/finance/return/coin'),
       instance.get('/finance/return/stock')
-    ]);   
+    ]);
 
     // 데이터 저장
-    finAsset.value = finAssetRes?.data?.response?.data?.amount || 0;  // finAsset 값 설정
-    totalAsset.value = totalAssetRes?.data?.response?.data?.amount || 0;  // totalAsset 값 설정
-    finAssetTotal.value = finAssetTotalRes.data.response.data; // 값이 없을 경우 빈 배열을 할당
-    changedFin.value = changedFinRes.data.response.data;
-    changedSpot.value = changedSpotRes.data.response.data;
-    electronicSpot.value = electronicSpotRes?.data?.response?.data || {};
-    otherSpot.value = otherSpotRes?.data?.response?.data || {};
-    carSpot.value = carSpotRes?.data?.response?.data || {};
-    brandSpot.value = brandSpotRes?.data?.response?.data || {};
-    // luxSpot.value = luxSpotRes?.data?.response?.data || {};
-    returnIncome.value = returnIncomeRes.data.response.data;
-    returnCoin.value = returnCoinRes.data.response.data;
-    returnStock.value = returnStockRes.data.response.data;
-    returnBond.value = returnBondRes.data.response.data;
+    finAsset.value = results[0].status === 'fulfilled' ? results[0].value?.data?.response?.data?.amount || 0 : 0;
+    totalAsset.value = results[1].status === 'fulfilled' ? results[1].value?.data?.response?.data?.amount || 0 : 0;
+    finAssetTotal.value = results[2].status === 'fulfilled' ? results[2].value.data.response.data : [];
+    changedFin.value = results[3].status === 'fulfilled' ? results[3].value?.data?.response?.data || {} : {};
+    changedSpot.value = results[4].status === 'fulfilled' ? results[4].value?.data?.response?.data || {} : {};
+    electronicSpot.value = results[5].status === 'fulfilled' ? results[5].value?.data?.response?.data || {} : {};
+    otherSpot.value = results[6].status === 'fulfilled' ? results[6].value?.data?.response?.data || {} : {};
+    carSpot.value = results[7].status === 'fulfilled' ? results[7].value?.data?.response?.data || {} : {};
+    luxSpot.value = results[8].status === 'fulfilled' ? results[8].value?.data?.response?.data || {} : {};
+    brandSpot.value = results[9].status === 'fulfilled' ? results[9].value?.data?.response?.data || {} : {};
+    returnIncome.value = results[10].status === 'fulfilled' ? results[10].value.data.response.data : [];
+    returnCoin.value = results[11].status === 'fulfilled' ? results[11].value.data.response.data : [];
+    returnStock.value = results[12].status === 'fulfilled' ? results[12].value.data.response.data : [];
+    returnBond.value = results[13].status === 'fulfilled' ? results[13].value.data.response.data : [];
+
+    // Log failed requests
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        console.error(`API 호출 실패: ${index} - ${result.reason}`);
+      }
+    });
 
     console.log(finAsset.value);
     console.log(totalAsset.value);
@@ -276,7 +266,13 @@ const fetchData = async () => {
 
     // 차트 렌더링
     renderChart(pieChart, 'doughnut', displayedAssetList.value.map(item => item.prodCategory), displayedAssetList.value.map(item => item.amount));
-    renderBarChart(displayedSixMonth.value.map(item => mapMonthToLabel(item.month)), displayedSixMonth.value.map(item => item.balance));
+
+    // Defensive check before mapping
+    if (Array.isArray(displayedSixMonth.value)) {
+      renderBarChart(displayedSixMonth.value.map(item => mapMonthToLabel(item.month)), displayedSixMonth.value.map(item => item.balance));
+    } else {
+      console.error('displayedSixMonth.value는 배열이 아닙니다:', displayedSixMonth.value);
+    }
 
     processSums(returnBond.value, returnCoin.value, returnStock.value, returnIncome.value);
 
@@ -285,13 +281,18 @@ const fetchData = async () => {
     const incomeLabels = returnIncome.value.map(item => item.month);
     const stockLabels = returnStock.value.map(item => mapMonthToLabel(item.month));
 
-    renderAllLineCharts(bondLabels, returnBond.value.map(item => item.earningRate), coinLabels, returnCoin.value.map(item => item.earningRate), incomeLabels, returnIncome.value.map(item => item.balance), stockLabels, returnStock.value.map(item => item.earningRate));
-
+    renderAllLineCharts(
+      bondLabels, returnBond.value.map(item => item.earningRate),
+      coinLabels, returnCoin.value.map(item => item.earningRate),
+      incomeLabels, returnIncome.value.map(item => item.balance),
+      stockLabels, returnStock.value.map(item => item.earningRate)
+    );
 
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);
   }
 };
+
 
 // 자산 변화 계산
 const calculateAssetDifference = () => {
