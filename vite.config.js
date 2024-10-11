@@ -9,7 +9,7 @@ dotenv.config()
 const apiBaseUrl = process.env.VITE_API_BASE_URL
 // Vite 설정
 export default defineConfig({
-  base: '/richable_frontend/',
+  base: '/',
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
