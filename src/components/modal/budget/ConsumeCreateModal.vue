@@ -54,6 +54,22 @@
           </div>
         </div>
 
+        <!-- 계좌 선택 -->
+        <div class="mb-3" style="display: flex">
+          <label
+            for="selectAccount"
+            class="form-label"
+            style="font-weight: bold; width: 70px; padding-top: 8px"
+            >계좌</label
+          >
+          <select class="form-select" id="selectAccount" v-model="selectedAccount">
+            <option value="" disabled>계좌를 선택하세요</option>
+            <option v-for="account in accounts" :key="account.index" :value="account.accountNum">
+              {{ account.orgCode }} - {{ account.accountNum }} - {{ account.prodName }}
+            </option>
+          </select>
+        </div>
+
         <div class="modal-footer d-flex justify-content-between">
           <button type="button" class="btn" data-bs-dismiss="modal"
             style="background-color: white; border: 1px solid #020202; color: #020202; font-weight: bold; margin-right: 12px; width: 62px;">
@@ -69,19 +85,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose } from 'vue';
-import { Modal } from 'bootstrap';
-import axios from 'axios';
+import { ref, onMounted, defineExpose } from 'vue'
+import { Modal } from 'bootstrap'
+import axios from 'axios'
+import axiosInstance from '@/AxiosInstance'
 
 // 모달 초기화 변수
 const modal = ref(null);
 let modalInstance = null;
 
 // 소비 등록을 위한 데이터 바인딩 변수
-const expenseCategory = ref('');        // 소비 유형      
-const expenseAmount = ref('');      // 소비 가격
-const expenseDescript = ref('');     // 소비 내용
-const expenseMemo = ref('');        // 소비 메모
+const expenseCategory = ref('') // 소비 유형
+const expenseAmount = ref('') // 소비 가격
+const expenseDescript = ref('') // 소비 내용
+const expenseMemo = ref('') // 소비 메모
+const expenseDate = ref('')
+const accounts = ref([])
+const selectedAccount = ref(0)
 
 // 모달 열기 함수
 const show = () => {
@@ -92,7 +112,19 @@ const show = () => {
     });
     modalInstance.show();
   } else if (modalInstance) {
-    modalInstance.show();
+    modalInstance.show()
+  }
+}
+const fetchAccounts = async () => {
+  try {
+    const response = await axiosInstance.get('/asset/account/list')
+    if (response.data.success) {
+      accounts.value = response.data.response.data.account
+    } else {
+      console.error('계좌 목록 조회 실패:', response.data)
+    }
+  } catch (error) {
+    console.error('계좌 목록 조회 실패:', error.response ? error.response.data : error)
   }
 };
 
@@ -104,6 +136,7 @@ onMounted(() => {
       keyboard: true
     });
   }
+  fetchAccounts()
 });
 const registerExpense = async () => {
   try {
@@ -111,11 +144,15 @@ const registerExpense = async () => {
       expCategory: expenseCategory.value,              
       amount: parseInt(expenseAmount.value),           
       descript: expenseDescript.value,                 
-      memo: expenseMemo.value,                         
+      memo: expenseMemo.value,
+      date : expenseDate.value,
+      accountNum: selectedAccount.value
     };
 
-    const response = await axios.post('http://localhost:8080/outcome/add', expenseData);
+    console.log(expenseData);
 
+    const response = await axiosInstance.post('/outcome/add', expenseData);
+    console.log(response.data);
     if (response.data.success) {
       console.log("소비 등록 성공:", response.data.response.data);
       if (modalInstance) {
@@ -124,7 +161,6 @@ const registerExpense = async () => {
     } else {
       console.error("소비 등록 실패:", response.data);
     }
-
   } catch (error) {
     console.error("소비 등록 실패:", error.response ? error.response.data : error);
   }

@@ -411,7 +411,7 @@ const submitAgreement = async () => {
   const userId = route.params.id
 
   try {
-    const response = await axios.post(`http://localhost:8080/member/terms/${userId}`, {
+    const response = await axios.post(`http://localhost:8080/member/agree/${userId}`, {
       info: agreeServiceTerms.value,
       finance: agreePrivacyPolicy.value
     })

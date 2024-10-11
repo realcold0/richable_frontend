@@ -1,17 +1,50 @@
 <script setup>
 import { RouterView, useRoute } from 'vue-router'
+import { computed } from 'vue';
 
-const route = useRoute()
+const route = useRoute();
+
+// 라우트 이름에 따라 제목을 매핑하는 객체
+const titleMapping = {
+  home: '홈',
+  about: '소개',
+  signIn: '로그인',
+  signUp: '회원가입',
+  findpassword: '비밀번호 찾기',
+  findid: '아이디 찾기',
+  findid1: '아이디 찾기',
+  findpassword: '비밀번호 찾기',
+  findpassword2:'비밀번호 찾기',
+  term : '약관동의',
+  assetAnalysis: '자산 분석',
+  assetComparison: '또래 자산 비교',
+  assetManagement: '자산 관리',
+  budgetList: '소득/소비 관리',
+  consumeAnalysis: '소비 분석',
+  compareConsume : '평균 소비 비교',
+  myPage : '마이페이지',
+  investAdvisor: '투자 상품 추천',
+  topReturn :'수익률 상위 자산',
+  goalList : '목표',
+  knowhowList : '리치노하우',
+  knowhowDetail : '리치노하우',
+  knowhowWrite : '리치노하우',
+  knowhowUpdate : '리치노하우'
+};
+
+// 현재 라우트에 따라 제목을 동적으로 가져오는 computed 속성
+const pageTitle = computed(() => {
+  return titleMapping[route.name] || '기본 제목'; // 기본 제목 설정
+});
 </script>
 
 <template>
   <div class="main-template">
-    <!-- 구분을 위해 임시로 blue로 설정 -->
     <SideBar />
 
     <div class="page-view">
-      <!-- topbar의 text는 path 별로 달라지게 해야 함 -->
-      <div class="topbar"><span style="margin-left: 12px">자산 현황</span></div>
+      <!-- topbar의 text는 path 별로 달라지게 설정 -->
+      <div class="topbar"><span style="margin-left: 12px">{{ pageTitle }}</span></div>
       <RouterView />
     </div>
 
@@ -34,7 +67,6 @@ const route = useRoute()
   </div>
 </template>
 
-<script></script>
 <style scoped>
 .main-template {
   min-height: 100vh; /* 화면 전체 높이를 차지 */

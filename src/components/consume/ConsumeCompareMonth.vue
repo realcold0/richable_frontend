@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
 
-        <div>
+        <div style="width: 1000px;">
             <div class="text-left category-comparison">
                 <div class="main-title">전달 소비 누계 비교</div>
             </div>
@@ -178,16 +178,15 @@ watch(() => month.month, () => {
 
 <style scoped>
 * {
-    max-width: 1704px;
     font-family: 'Pretendard', sans-serif;
-}
-.wrapper {
-    max-width: 864px;
-    margin: 0 auto;
-    padding: 30px;
     font-size: 18px;
-}
-
+  }
+  
+  .wrapper {
+    width:1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
 /* 설명 문구 스타일 */
 .consumeCompareTitle {
     margin-top: 8px;
@@ -213,23 +212,29 @@ watch(() => month.month, () => {
     font-weight: 500;
 }
 
-/* 그래프 영역 스타일 */
 .graphWrapper {
     margin-top: 8px;
     padding: 20px;
     background-color: #ffffff;
     border-radius: 15px;
     border: 1px solid #e0e0e0;
+    display: flex; /* Flexbox 사용 */
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
 }
 
 .graph {
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* 부모 요소 기준으로 너비 설정 */
     height: 300px;
 }
 
 canvas {
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: 100%; /* 전체 너비로 설정 */
+    height: 100%; /* 부모 높이로 설정 */
 }
 
 .sub-title{

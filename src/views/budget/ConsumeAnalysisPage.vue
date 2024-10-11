@@ -13,14 +13,11 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue'
 
 <style scoped>
 .pageWrapper {
-  margin: 80px 0;
+  margin: 80px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   display: flex;
 }
 
-.ConsumeCategorySum {
-  margin: 64px 0;
-}
 </style>
