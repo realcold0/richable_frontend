@@ -1,0 +1,42 @@
+name: CICD BY Github Pages
+
+on:
+    push:
+        branches: [ "master" ]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+
+        
+jobs:
+    build:
+        runs-on: ubuntu-lastest
+    
+        steps:
+            - name: Checkout
+              uses: actions/checkout@4
+
+            - name: Set up Nodejs
+              uses: actions/setup-node@4
+              with:
+                node-version: '20.16.0'
+            
+            - name: Install Dependencies
+              run: npm install
+
+            - name: Build Project
+              run : npm run build
+
+            - name: Deploy   
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                github_token: ${{ secrets.ACCESS_TOKEN_GIT }}
+                publish_dir: ./dist
+            
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v1
+        
+
+
