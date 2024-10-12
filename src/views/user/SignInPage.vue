@@ -42,10 +42,9 @@
       <span class="mx-2"> | </span>
       <router-link to="/user/findpassword" class="join-link">비밀번호 찾기</router-link>
     </div>
-    <div class="or-divider">또는</div>
+    <div class="or-divider">또는</div> 
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
       <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
     </div>
 
@@ -116,7 +115,7 @@ const handleNaverCallback = async () => {
         if (redirectUrl) {
           window.location.href = redirectUrl // 전체 페이지 리로드
         } else {
-          router.push({ name: 'home' })
+          router.push({ name: 'assetAnalysis' })
         }
       } else {
         throw new Error('Invalid response format')
@@ -146,7 +145,7 @@ const login = async () => {
       // 로그인 성공 시 처리
       alert('Login successful!');
       localStorage.setItem('authToken', token);
-      router.push({ name: 'home' });
+      router.push({ name: 'assetAnalysis' });
     } else {
       throw new Error('Invalid response format');
     }
