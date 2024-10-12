@@ -58,29 +58,31 @@
     </div>
 
     <!-- 스크롤 가능한 추천 상품 리스트 -->
-    <div v-else class="scroll-wrapper">
-      <button @click="scrollLeft">
-        <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-left']" />
-      </button>
-      <div class="scroll-container" ref="scrollContainer">
-        <div class="scroll-item" v-for="(product, index) in recommendedProducts" :key="index">
-          <div class="custom-card">
-            <div class="card-body">
-              <p :class="getRiskClass(product.prodCategroy)">위험도 {{ getRiskLevel(product.prodCategroy) }}</p>
-              <div class="product-name mb-2 text-muted">{{ product.name }}</div>
-              <div style="display: flex; justify-content: space-between;">
-                <p class="product-price">{{ product.price.toLocaleString() }}원</p>
-                <p class="unit-price text-muted">단위당 가격</p>
-              </div>
+<div v-else class="scroll-wrapper">
+  <button @click="scrollLeft">
+    <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-left']" />
+  </button>
+  <div class="scroll-container" ref="scrollContainer">
+    <div class="scroll-item" v-for="(product, index) in recommendedProducts" :key="index">
+        <div class="custom-card">
+          <a style="text-decoration: none;"href="http://data.krx.co.kr/contents/MMC/ISIF/isif/MMCISIF009.cmd?tabIndex=0&isuCd=KR103502G891&isuSrtCd=KR103502G891&isuTp=BND&isuTpDtl=KTS&prodId=" target="_blank" rel="noopener noreferrer">
+          <div class="card-body">
+            <p :class="getRiskClass(product.prodCategroy)">위험도 {{ getRiskLevel(product.prodCategroy) }}</p>
+            <div class="product-name mb-2 text-muted">{{ product.name }}</div>
+            <div style="display: flex; justify-content: space-between;">
+              <p class="product-price">{{ product.price.toLocaleString() }}원</p>
+              <p class="unit-price text-muted">단위당 가격</p>
             </div>
           </div>
+        </a>
         </div>
-      </div>
-      <button @click="scrollRight">
-        <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-right']" />
-      </button>
     </div>
   </div>
+  <button @click="scrollRight">
+    <font-awesome-icon style="color: #fff;" :icon="['fas', 'chevron-right']" />
+  </button>
+</div>
+</div>
 </template>
 
 <script setup>

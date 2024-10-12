@@ -348,14 +348,14 @@ const createComparisonChart = () => {
       datasets: [
         {
           label: '절약했을 때 저축',
-          data: saveAmount,
+          data: possibleSaveAmount,
           borderColor: '#FF6384',
           fill: false,
           borderWidth: 2,
         },
         {
           label: '평소 저축',
-          data: possibleSaveAmount,
+          data:  saveAmount,
           borderColor: '#D3D3D3',
           fill: false,
           borderWidth: 2,
@@ -480,7 +480,7 @@ onMounted(() => {
   width: 100%;
   height: auto;
   padding: 20px; /* 패딩으로 차트 여백 확보 */
-  background: #FAFAFB;
+  background: #FFF;
 }
 
 
