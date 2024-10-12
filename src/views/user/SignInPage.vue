@@ -56,13 +56,14 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
 const id = ref('')
 const password = ref('')
 const showPassword = ref(true)
+const route = useRoute()
 const router = useRouter()
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -73,10 +74,8 @@ const togglePassword = () => {
 
 const naverLogin = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/naverlogin`)
-    console.log('Naver login response:', response.data)
+    const response = await axios.get(`${BASE_URL}/member/naverlogin`)
     if (response.data.success && response.data.response?.data?.redirectUrl) {
-      localStorage.setItem('naverState', response.data.response.data.state)
       window.location.href = response.data.response.data.redirectUrl
     } else {
       console.error('Invalid response format:', response.data)
@@ -88,44 +87,29 @@ const naverLogin = async () => {
   }
 }
 
-const handleNaverCallback = async () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
+const handleNaverCallback = async (code, state) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/member/naverCallback`, {
+      params: { code, state }
+    })
 
-  if (code && state) {
-    try {
-      const savedState = localStorage.getItem('naverState')
-      if (state !== savedState) {
-        throw new Error('Invalid state')
-      }
+    // 리다이렉트된 URL에서 토큰 추출
+    const token = new URLSearchParams(window.location.search).get('token')
 
-      const response = await axios.get(`${BASE_URL}/naverCallback`, { params: { code, state } })
-      if (response.data.success && response.data.response?.data?.token) {
-        const { token, userInfo } = response.data.response.data
-        console.log('Naver login success:', token)
-        alert('네이버 로그인 성공!')
-        sessionStorage.setItem('authToken', token)
-        localStorage.removeItem('naverState') // 사용 후 state 제거
-        // 인증 헤더 설정
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    if (token) {
+      // 토큰 저장
+      localStorage.setItem('authToken', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-        localStorage.removeItem('naverState') // 사용 후 state 제거
-
-        // 리다이렉트 URL로 이동
-        if (redirectUrl) {
-          window.location.href = redirectUrl // 전체 페이지 리로드
-        } else {
-          router.push({ name: 'home' })
-        }
-      } else {
-        throw new Error('Invalid response format')
-      }
-    } catch (error) {
-      console.error('Naver login callback failed:', error)
-      alert(`네이버 로그인 처리 중 오류: ${error.response?.data?.error || error.message}`)
-      router.push({ name: 'login' }) // 로그인 페이지로 리다이렉트
+      // 홈 페이지로 리다이렉트
+      router.push({ name: 'home' })
+    } else {
+      throw new Error('Token not found in redirect URL')
     }
+  } catch (error) {
+    console.error('Naver login callback failed:', error)
+    alert(`네이버 로그인 처리 중 오류: ${error.message}`)
+    router.push({ name: 'login' })
   }
 }
 
@@ -155,12 +139,22 @@ const login = async () => {
     alert('Login failed. Please check your credentials.')
   }
 }
+
+watch(
+  () => route.query,
+  (query) => {
+    const { code, state } = query
+    if (code && state) {
+      handleNaverCallback(code, state)
+    }
+  },
+  { immediate: true }
+)
+
 onMounted(() => {
-  handleNaverCallback()
-  // 페이지 로드 시 저장된 토큰이 있다면 axios 헤더에 설정
-  const token = localStorage.getItem('authToken')
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  const { code, state } = route.query
+  if (code && state) {
+    handleNaverCallback(code, state)
   }
 })
 </script>
