@@ -33,18 +33,18 @@
                 <canvas ref="pieChart"></canvas>
               </div>
             </div>
-            <div class="asset-analysis-table-wrapper">
+            <div style="width: 350px;" class="asset-analysis-table-wrapper">
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>총 상품자산</th>
-                    <th>{{ formatCurrency(displayAsset) }}원</th>
+                    <th style="text-align: center;">총 상품자산</th>
+                    <th style="text-align: center;">{{ formatCurrency(displayAsset) }}원</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(asset, index) in paginatedAssets" :key="index" @click="toggleDetails(asset)" class="clickable-row">
-                    <td>{{ asset.prodCategory }}</td>
-                    <td>{{ formatCurrency(asset.amount) }}원</td>
+                    <td style="text-align: center;">{{ asset.prodCategory }}</td>
+                    <td style="text-align: center;" >{{ formatCurrency(asset.amount) }}원</td>
                   </tr>
                 </tbody>
               </table>
@@ -134,6 +134,7 @@ const electronicSpot = ref({});
 const otherSpot = ref({});
 const carSpot = ref({});
 const brandSpot = ref({});
+const luxSpot = ref({});
 const paginatedAssets = ref([]);
 const changedFin = ref([]);
 const changedSpot = ref([]);
@@ -202,8 +203,12 @@ const highestAsset = computed(() => {
 
 // 금액 포맷 함수
 const formatCurrency = (amount) => {
+  if (amount == null || isNaN(amount)) {
+    return '0'; // 금액이 없거나 유효하지 않을 때 기본값으로 '0' 반환
+  }
   return amount.toLocaleString('ko-KR');
 };
+
 
 const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
   // month가 1인 값을 찾아서 합계에 저장
@@ -215,54 +220,51 @@ const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
 
 const fetchData = async () => {
   try {
-    const results = await Promise.allSettled([
-      instance.get('/finance/fin/sum'),
-      instance.get('/finance/total/sum'),
-      instance.get('/finance/fin'),
-      instance.get('/finance/changed/fin'),
-      instance.get('/finance/changed/spot'),
-      instance.get('/finance/spot/elec/sum'),
-      instance.get('/finance/spot/etc/sum'),
-      instance.get('/finance/spot/car/sum'),
-      instance.get('/finance/spot/luxury/sum'),
-      instance.get('/finance/spot/brand/sum'),
-      instance.get('/finance/return/income'),
-      instance.get('/finance/return/bond'),
-      instance.get('/finance/return/coin'),
-      instance.get('/finance/return/stock')
+    const [finSum, totalSum, fin, changedFinData, changedSpotData, elecSpotData, etcSpotData, carSpotData, luxSpotData, brandSpotData, incomeReturnData, bondReturnData, coinReturnData, stockReturnData] = await Promise.all([
+      instance.get('/finance/fin/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/total/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/fin').catch(err => ({ error: true, err })),
+      instance.get('/finance/changed/fin').catch(err => ({ error: true, err })),
+      instance.get('/finance/changed/spot').catch(err => ({ error: true, err })),
+      instance.get('/finance/spot/elec/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/spot/etc/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/spot/car/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/spot/luxury/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/spot/brand/sum').catch(err => ({ error: true, err })),
+      instance.get('/finance/return/income').catch(err => ({ error: true, err })),
+      instance.get('/finance/return/bond').catch(err => ({ error: true, err })),
+      instance.get('/finance/return/coin').catch(err => ({ error: true, err })),
+      instance.get('/finance/return/stock').catch(err => ({ error: true, err })),
     ]);
 
     // 데이터 저장
-    finAsset.value = results[0].status === 'fulfilled' ? results[0].value?.data?.response?.data?.amount || 0 : 0;
-    totalAsset.value = results[1].status === 'fulfilled' ? results[1].value?.data?.response?.data?.amount || 0 : 0;
-    finAssetTotal.value = results[2].status === 'fulfilled' ? results[2].value.data.response.data : [];
-    changedFin.value = results[3].status === 'fulfilled' ? results[3].value?.data?.response?.data || {} : {};
-    changedSpot.value = results[4].status === 'fulfilled' ? results[4].value?.data?.response?.data || {} : {};
-    electronicSpot.value = results[5].status === 'fulfilled' ? results[5].value?.data?.response?.data || {} : {};
-    otherSpot.value = results[6].status === 'fulfilled' ? results[6].value?.data?.response?.data || {} : {};
-    carSpot.value = results[7].status === 'fulfilled' ? results[7].value?.data?.response?.data || {} : {};
-    luxSpot.value = results[8].status === 'fulfilled' ? results[8].value?.data?.response?.data || {} : {};
-    brandSpot.value = results[9].status === 'fulfilled' ? results[9].value?.data?.response?.data || {} : {};
-    returnIncome.value = results[10].status === 'fulfilled' ? results[10].value.data.response.data : [];
-    returnCoin.value = results[11].status === 'fulfilled' ? results[11].value.data.response.data : [];
-    returnStock.value = results[12].status === 'fulfilled' ? results[12].value.data.response.data : [];
-    returnBond.value = results[13].status === 'fulfilled' ? results[13].value.data.response.data : [];
+    finAsset.value = finSum?.error ? 0 : finSum?.data?.response?.data?.amount || 0;
+    totalAsset.value = totalSum?.error ? 0 : totalSum?.data?.response?.data?.amount || 0;
+    finAssetTotal.value = fin?.error ? [] : fin?.data?.response?.data || [];
+    changedFin.value = changedFinData?.error ? {} : changedFinData?.data?.response?.data || {};
+    changedSpot.value = changedSpotData?.error ? {} : changedSpotData?.data?.response?.data || {};
 
-    // Log failed requests
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        console.error(`API 호출 실패: ${index} - ${result.reason}`);
-      }
-    });
+    // 자산 카테고리별 데이터가 없을 때 기본값 설정
+    electronicSpot.value = elecSpotData?.error ? {"prodCategory": "전자기기", "amount": 0} : elecSpotData?.data?.response?.data || {"prodCategory": "전자기기", "amount": 0};
+    otherSpot.value = etcSpotData?.error ? {"prodCategory": "기타", "amount": 0} : etcSpotData?.data?.response?.data || {"prodCategory": "기타", "amount": 0};
+    carSpot.value = carSpotData?.error ? {"prodCategory": "자동차", "amount": 0} : carSpotData?.data?.response?.data || {"prodCategory": "자동차", "amount": 0};
+    luxSpot.value = luxSpotData?.error ? {"prodCategory": "명품", "amount": 0} : luxSpotData?.data?.response?.data || {"prodCategory": "명품", "amount": 0};
+    brandSpot.value = brandSpotData?.error ? {"prodCategory": "브랜드", "amount": 0} : brandSpotData?.data?.response?.data || {"prodCategory": "브랜드", "amount": 0};
 
-    console.log(finAsset.value);
-    console.log(totalAsset.value);
+    // 기타 데이터 처리
+    returnIncome.value = incomeReturnData?.error ? [] : incomeReturnData?.data?.response?.data || [];
+    returnCoin.value = coinReturnData?.error ? [] : coinReturnData?.data?.response?.data || [];
+    returnStock.value = stockReturnData?.error ? [] : stockReturnData?.data?.response?.data || [];
+    returnBond.value = bondReturnData?.error ? [] : bondReturnData?.data?.response?.data || [];
+
 
     // 자산 변화 계산 함수 호출
     calculateAssetDifference();
 
     // 페이지네이션을 위한 자산 목록 슬라이스
     paginatedAssets.value = displayedAssetList.value.slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
+
+    // await nextTick();
 
     // 차트 렌더링
     renderChart(pieChart, 'doughnut', displayedAssetList.value.map(item => item.prodCategory), displayedAssetList.value.map(item => item.amount));
@@ -292,6 +294,7 @@ const fetchData = async () => {
     console.error('API 호출 중 오류 발생:', error);
   }
 };
+
 
 
 // 자산 변화 계산
@@ -330,7 +333,8 @@ const displayedAssetList = computed(() => {
         ...(electronicSpot.value ? [electronicSpot.value] : []), 
         ...(otherSpot.value ? [otherSpot.value] : []),
         ...(brandSpot.value ? [brandSpot.value] : []),
-        ...(carSpot.value ? [carSpot.value] : [])
+        ...(carSpot.value ? [carSpot.value] : []),
+        ...(luxSpot.value ? [luxSpot.value]:[])
       ]
     : Array.isArray(finAssetTotal.value) ? finAssetTotal.value : [];
 
@@ -349,7 +353,7 @@ const displayedAssetList = computed(() => {
 
 
 const renderAllLineCharts = async (bondLabels, bondData, coinLabels, coinData, incomeLabels, incomeData, stockLabels, stockData) => {
-  await nextTick();
+  // await nextTick();
   renderLineChart(lineChart1, lineChartInstance1, coinLabels, coinData);
   renderLineChart(lineChart2, lineChartInstance2, bondLabels, bondData);
   renderLineChart(lineChart3, lineChartInstance3, incomeLabels, incomeData, true);  // 소득 수익률 차트는 원 단위로 표시
@@ -375,7 +379,7 @@ const mapMonthToLabel = (month) => {
 
 // 차트 렌더링 함수
 const renderBarChart = async (labels, data) => {
-  await nextTick();
+  // await nextTick();
   if (!barChart.value) return;
 
   if (barChartInstance) barChartInstance.destroy();
@@ -409,8 +413,9 @@ const renderBarChart = async (labels, data) => {
 
 
 
+// 차트 렌더링 함수 (0원인 항목을 제외한 데이터만 렌더링)
 const renderChart = async (chartRef, chartType, labels, data) => {
-  await nextTick();
+  // await nextTick();
   if (!chartRef.value) return;
 
   // 데이터가 비어 있거나 잘못된 경우 확인
@@ -419,6 +424,10 @@ const renderChart = async (chartRef, chartType, labels, data) => {
     return;
   }
 
+  // 0원인 데이터는 차트에서 제외
+  const filteredLabels = labels.filter((_, index) => data[index] > 0);
+  const filteredData = data.filter(value => value > 0);
+
   // 기존 차트가 있으면 파괴
   if (chartInstance) chartInstance.destroy();
 
@@ -426,9 +435,9 @@ const renderChart = async (chartRef, chartType, labels, data) => {
   chartInstance = new Chart(chartRef.value.getContext('2d'), {
     type: chartType,
     data: {
-      labels,
+      labels: filteredLabels, // 0원 항목 제외한 라벨
       datasets: [{
-        data,
+        data: filteredData,  // 0원 항목 제외한 데이터
         backgroundColor: ['#C30044', '#FF0062', '#DA0052', '#FFF2F6', '#FF99CC', '#FF6699']  // 파이 차트 색상
       }]
     },
@@ -599,6 +608,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 1318px;
 }
 
 .asset-analysis-nav {
@@ -638,7 +648,7 @@ onMounted(() => {
   align-items: center;
   margin-top: 40px;
   width: 1000px;
-  height : 400px;
+  height : 500px;
 }
 
 .asset-analysis-content-container2{
@@ -647,7 +657,7 @@ onMounted(() => {
   align-items: center;
   margin-top: 40px;
   width: 1000px;
-  height : 412px;
+  height : 500px;
   flex-direction: column;
    justify-content: center
 
@@ -707,7 +717,7 @@ onMounted(() => {
 }
 
 .graph-container {
-  width: 400px;
+  width: 500px;
   height: 350px;
   font-family: pretendard;
 
@@ -766,6 +776,7 @@ onMounted(() => {
 .graph-container2{
   display: flex;
   flex-direction: column;
+  width: 450px;
 }
 
 @media (max-width: 768px) {
