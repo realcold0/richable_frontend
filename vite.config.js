@@ -22,6 +22,8 @@ export default defineConfig({
         target: apiBaseUrl,  // 정의된 변수 사용
         changeOrigin: true, // 필요시 추가
         secure: false, // 필요시 추가
+        rewrite: (path) => path.replace(/^\/api/, '')  // '/api'를 서버로 보내기 전에 제거
+
       },
     },
   },
