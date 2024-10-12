@@ -11,7 +11,7 @@
         <div class="img" :style="{ backgroundImage: 'url(' + richImage + ')' }"></div>
       </div>
 
-      <button id="start-btn">시작하기</button>
+      <button id="start-btn" @click="goToSignIn">시작하기</button>
     </div>
 
     <div class="mid">
@@ -45,7 +45,7 @@
             나의 모든 자산을 확인하세요.
           </p>
         </div>
-        <div class="image-content"></div>
+        <div class="image-content-asset"></div>
       </div>
     </div>
 
@@ -63,7 +63,7 @@
             줄여야 될 소비를 볼 수 있어요.
           </p>
         </div>
-        <div class="image-content"></div>
+        <div class="image-content-consume"></div>
       </div>
     </div>
 
@@ -74,7 +74,7 @@
           <h2 class="title">투자</h2>
 
           <p class="description">
-            나의 투자현황을 <br />
+            나의 투자유형을 <br />
             확인해보세요.
           </p>
           <p class="description-sub">
@@ -82,7 +82,7 @@
             투자유형에 맞는 투자상품을 추천받아요.
           </p>
         </div>
-        <div class="image-content"></div>
+        <div class="image-content-invest"></div>
       </div>
     </div>
 
@@ -97,7 +97,7 @@
             이를 관리해요.
           </p>
         </div>
-        <div class="image-content"></div>
+        <div class="image-content-goal"></div>
       </div>
     </div>
 
@@ -117,7 +117,7 @@
             자산 관리 노하우를 들어봐요!
           </p>
         </div>
-        <div class="image-content"></div>
+        <div class="image-content-community"></div>
       </div>
     </div>
   </div>
@@ -126,8 +126,10 @@
 <script setup>
 import { ref } from 'vue'
 import richImage from '@/assets/images/rich.png'
+import {useRouter} from 'vue-router'
 
 const activeIndex = ref(0)
+const router = useRouter()
 
 function setActive(index, sectionId) {
   activeIndex.value = index
@@ -136,6 +138,11 @@ function setActive(index, sectionId) {
     section.scrollIntoView({ behavior: 'smooth' })
   }
 }
+
+function goToSignIn() {
+  router.push({ path: '/user/signin'})
+}
+
 </script>
 
 <style scoped>
@@ -298,6 +305,61 @@ html {
 }
 
 .image-content {
+  flex: 1;
+  text-align: right;
+  background-image: url('../assets/images/laptop-rich.png');
+  background-size: cover;
+  height: 350px;
+  width: 585px;
+  box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
+  border-radius: 20px;
+}
+
+.image-content-asset {
+  flex: 1;
+  text-align: right;
+  background-image: url('../assets/images/laptop-rich.png');
+  background-size: cover;
+  height: 350px;
+  width: 585px;
+  box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
+  border-radius: 20px;
+}
+
+.image-content-consume {
+  flex: 1;
+  text-align: right;
+  background-image: url('../assets/images/laptop-rich.png');
+  background-size: cover;
+  height: 350px;
+  width: 585px;
+  box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
+  border-radius: 20px;
+}
+
+.image-content-invest {
+  flex: 1;
+  text-align: right;
+  background-image: url('../assets/images/laptop-rich.png');
+  background-size: cover;
+  height: 350px;
+  width: 585px;
+  box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
+  border-radius: 20px;
+}
+
+.image-content-goal {
+  flex: 1;
+  text-align: right;
+  background-image: url('../assets/images/laptop-rich.png');
+  background-size: cover;
+  height: 350px;
+  width: 585px;
+  box-shadow: 0px 4px 8px rgba(25, 24, 29, 0.1);
+  border-radius: 20px;
+}
+
+.image-content-community {
   flex: 1;
   text-align: right;
   background-image: url('../assets/images/laptop-rich.png');
