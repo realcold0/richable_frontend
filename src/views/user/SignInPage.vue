@@ -16,23 +16,25 @@
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
         <div class="password-input-wrapper position-relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="password"
-            class="form-control"
-            id="password"
-            placeholder="비밀번호를 입력해주세요"
-            required
-          />
-          <span
-            @click="togglePassword"
-            class="position-absolute top-50 end-0 translate-middle-y pe-2"
-            style="cursor: pointer"
-            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
-          >
-            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-          </span>
-        </div>
+    <input
+      :type="showPassword ? 'text' : 'password'"
+      v-model="password"
+      class="form-control"
+      id="password"
+      placeholder="비밀번호를 입력해주세요"
+      required
+    />
+    <span
+      @click="togglePassword"
+      class="position-absolute top-50 end-0 translate-middle-y pe-2"
+      style="cursor: pointer"
+      :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+    >
+      <font-awesome-icon 
+        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" 
+      />
+    </span>
+  </div>
       </div>
       <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>
@@ -42,9 +44,10 @@
       <span class="mx-2"> | </span>
       <router-link to="/user/findpassword" class="join-link">비밀번호 찾기</router-link>
     </div>
-    <div class="or-divider">또는</div> 
+    <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
+      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
       <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
     </div>
 
@@ -115,7 +118,7 @@ const handleNaverCallback = async () => {
         if (redirectUrl) {
           window.location.href = redirectUrl // 전체 페이지 리로드
         } else {
-          router.push({ name: 'assetAnalysis' })
+          router.push({ name: 'home' })
         }
       } else {
         throw new Error('Invalid response format')
@@ -145,7 +148,7 @@ const login = async () => {
       // 로그인 성공 시 처리
       alert('Login successful!');
       localStorage.setItem('authToken', token);
-      router.push({ name: 'assetAnalysis' });
+      router.push({ name: 'home' });
     } else {
       throw new Error('Invalid response format');
     }
