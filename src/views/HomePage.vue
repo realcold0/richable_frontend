@@ -127,6 +127,7 @@
 import { ref } from 'vue'
 import richImage from '@/assets/images/rich.png'
 import {useRouter} from 'vue-router'
+import axiosInstance from '@/AxiosInstance';
 
 const activeIndex = ref(0)
 const router = useRouter()
@@ -139,8 +140,16 @@ function setActive(index, sectionId) {
   }
 }
 
-function goToSignIn() {
-  router.push({ path: '/user/signin'})
+async function goToSignIn() {
+  const token = localStorage.getItem('authToken'); // 또는 sessionStorage에서 토큰을 가져옴
+  console.log(token);
+  if (token) {
+    // 토큰이 있으면 자산 분석 페이지로 이동
+    router.push({ path: '/asset/analysis' });
+  } else {
+    // 토큰이 없으면 로그인 페이지로 이동
+    router.push({ path: '/user/signin' });
+  }
 }
 
 </script>
