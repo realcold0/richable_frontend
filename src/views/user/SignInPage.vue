@@ -135,24 +135,24 @@ const login = async () => {
     return
   }
   try {
-    const response = await axios.post(`${BASE_URL}/login`, {
+    const response = await axios.post(`${BASE_URL}/member/login`, {
       id: id.value,
       password: password.value
-    });
+    })
     // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
-      const token = response.data.response.data.token;
-      console.log('Token received:', token);
+      const token = response.data.response.data.token
+      console.log('Token received:', token)
       // 로그인 성공 시 처리
-      alert('Login successful!');
-      localStorage.setItem('authToken', token);
-      router.push({ name: 'home' });
+      alert('Login successful!')
+      localStorage.setItem('authToken', token)
+      router.push({ name: 'home' })
     } else {
-      throw new Error('Invalid response format');
+      throw new Error('Invalid response format')
     }
   } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login failed. Please check your credentials.');
+    console.error('Login failed:', error)
+    alert('Login failed. Please check your credentials.')
   }
 }
 onMounted(() => {
