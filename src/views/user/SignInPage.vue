@@ -16,23 +16,25 @@
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
         <div class="password-input-wrapper position-relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="password"
-            class="form-control"
-            id="password"
-            placeholder="비밀번호를 입력해주세요"
-            required
-          />
-          <span
-            @click="togglePassword"
-            class="position-absolute top-50 end-0 translate-middle-y pe-2"
-            style="cursor: pointer"
-            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
-          >
-            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-          </span>
-        </div>
+    <input
+      :type="showPassword ? 'text' : 'password'"
+      v-model="password"
+      class="form-control"
+      id="password"
+      placeholder="비밀번호를 입력해주세요"
+      required
+    />
+    <span
+      @click="togglePassword"
+      class="position-absolute top-50 end-0 translate-middle-y pe-2"
+      style="cursor: pointer"
+      :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+    >
+      <font-awesome-icon 
+        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" 
+      />
+    </span>
+  </div>
       </div>
       <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>

@@ -8,9 +8,9 @@
 
       <!-- 나의 단계 -->
       <div class="asset-level-container">
-        <div class="asset-level-title">김리치님은 <strong>씨앗 단계</strong>예요</div>
-        <div class="asset-level-sub">0원 ~ 1천만원 이하의 유저입니다.</div>
-        <div class="asset-level-img"></div>
+        <div class="asset-level-title">김리치님은 <strong>{{ assetLevel.level }} 단계</strong>예요</div>
+        <div class="asset-level-sub">{{ assetLevel.description }}</div>
+        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})` }"></div>
       </div>
 
       <!-- 자산 분석 섹션 -->
@@ -117,12 +117,8 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { Chart, PieController, ArcElement, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement } from 'chart.js';
-
 import instance from '@/AxiosInstance.js';
-// import instance from '@/axiosInstance'; 
 
-
-// Register Chart.js components
 Chart.register(PieController, ArcElement, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement);
 
 // 상태 관리
@@ -183,6 +179,38 @@ const categoryMapping = {
   luxury: '명품',
   etc: '기타'
 };
+
+// DisplayAsset 값에 따른 단계 계산
+const assetLevel = computed(() => {
+  const asset = displayAsset.value;
+
+  if (asset < 10000000) {
+    return {
+      level: '씨앗',
+      description: '0원 ~ 1천만원 이하의 유저입니다.',
+      imgUrl: new URL('@/assets/images/level-seed-rich.png', import.meta.url).href
+    };
+  } else if (asset >= 10000000 && asset < 50000000) {
+    return {
+      level: '새싹',
+      description: '1천만원 이상 ~ 5천만원 미만의 유저입니다.',
+      imgUrl: new URL('@/assets/images/level-sprout-rich.png', import.meta.url).href
+    };
+  } else if (asset >= 50000000 && asset < 100000000) {
+    return {
+      level: '나무',
+      description: '5천만원 이상 ~ 1억원 미만의 유저입니다.',
+      imgUrl: new URL('@/assets/images/level-tree-rich.png', import.meta.url).href
+    };
+  } else {
+    return {
+      level: '리치',
+      description: '1억원 이상의 재산가입니다.',
+      imgUrl: new URL('@/assets/images/level-leechy-rich.png', import.meta.url).href
+    };
+  }
+});
+
 
 // 가장 큰 자산 항목 계산
 const highestAsset = computed(() => {
