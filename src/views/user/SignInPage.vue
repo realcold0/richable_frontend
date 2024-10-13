@@ -1,7 +1,7 @@
 <template>
   <div id="singin" class="login-container">
     <img class="title" src="../../assets/images/navbar-full-rich.png" />
-    <form @submit.prevent="login">
+    <form @submit.prevent="login" method="post">
       <div class="mb-3 text-start">
         <label for="id" class="form-label">아이디</label>
         <input
@@ -140,6 +140,8 @@ const login = async () => {
       id: id.value,
       password: password.value
     });
+    console.log(`/api/member/login`);
+    
     // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
       const token = response.data.response.data.token;
