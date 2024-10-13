@@ -1,7 +1,7 @@
 <template>
   <div id="singin" class="login-container">
     <img class="title" src="../../assets/images/navbar-full-rich.png" />
-    <form @submit.prevent="login" method="post">
+    <form @submit.prevent="login" method="POST">
       <div class="mb-3 text-start">
         <label for="id" class="form-label">아이디</label>
         <input
@@ -60,6 +60,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import axiosinstance from '@/AxiosInstance';
 
 const id = ref('')
 const password = ref('')
@@ -136,11 +137,13 @@ const login = async () => {
     return
   }
   try {
-    const response = await axios.post(`/api/member/login`, {
+    console.log(`/api/member/login`);
+
+    const response = await axiosinstance.post(`/member/login` , {
       id: id.value,
       password: password.value
     });
-    console.log(`/api/member/login`);
+    
     
     // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
