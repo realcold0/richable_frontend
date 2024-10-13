@@ -217,7 +217,7 @@
   
   <style scoped>
   * {
-    max-width: 1440px;
+    max-width: 1980px;
     font-family: 'Pretendard', sans-serif;
     font-size: 18px;
   }

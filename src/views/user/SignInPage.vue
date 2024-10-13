@@ -1,7 +1,7 @@
 <template>
   <div id="singin" class="login-container">
     <img class="title" src="../../assets/images/navbar-full-rich.png" />
-    <form @submit.prevent="login" method="post">
+    <form @submit.prevent="login" method="POST">
       <div class="mb-3 text-start">
         <label for="id" class="form-label">아이디</label>
         <input
@@ -16,23 +16,25 @@
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
         <div class="password-input-wrapper position-relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="password"
-            class="form-control"
-            id="password"
-            placeholder="비밀번호를 입력해주세요"
-            required
-          />
-          <span
-            @click="togglePassword"
-            class="position-absolute top-50 end-0 translate-middle-y pe-2"
-            style="cursor: pointer"
-            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
-          >
-            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-          </span>
-        </div>
+    <input
+      :type="showPassword ? 'text' : 'password'"
+      v-model="password"
+      class="form-control"
+      id="password"
+      placeholder="비밀번호를 입력해주세요"
+      required
+    />
+    <span
+      @click="togglePassword"
+      class="position-absolute top-50 end-0 translate-middle-y pe-2"
+      style="cursor: pointer"
+      :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+    >
+      <font-awesome-icon 
+        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" 
+      />
+    </span>
+  </div>
       </div>
       <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>
@@ -58,6 +60,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import axiosinstance from '@/AxiosInstance';
 
 const id = ref('')
 const password = ref('')
@@ -134,11 +137,13 @@ const login = async () => {
     return
   }
   try {
-    const response = await axios.post(`/api/member/login`, {
+    console.log(`/api/member/login`);
+
+    const response = await axiosinstance.post(`/member/login` , {
       id: id.value,
       password: password.value
     });
-    console.log(`/api/member/login`);
+    
     
     // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
