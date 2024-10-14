@@ -2,7 +2,7 @@
   <div class="mypage-container">
     <div class="top-section d-flex justify-content-between">
       <section class="profile-section box">
-        <h5 class="bold-text text-left">나의 프로필1</h5>
+        <h5 class="bold-text text-left">나의 프로필</h5>
         <div class="profile">
           <img :src="profileImageUrl" alt="프로필 이미지" />
           <h2 class="mt-3">{{ userProfile.name }}</h2>
