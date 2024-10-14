@@ -34,6 +34,18 @@
               </div>
             </div>
             <div style="width: 350px;" class="asset-analysis-table-wrapper">
+              <div class="tooltip-box" @change="">
+              <button
+                class="tool-btn"
+                ref="tooltipButton"
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
+                :title="tooltipMessage"
+              >
+                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+              </button>
+            </div>
               <table class="table table-hover">
                 <thead>
                   <tr>
@@ -118,6 +130,7 @@
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { Chart, PieController, ArcElement, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement } from 'chart.js';
 import instance from '@/AxiosInstance.js';
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 Chart.register(PieController, ArcElement, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement);
 
@@ -152,6 +165,11 @@ const lineChart1 = ref(null);
 const lineChart2 = ref(null);
 const lineChart3 = ref(null);
 const lineChart4 = ref(null);
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.')
+
 
 let chartInstance = null;
 let barChartInstance = null;
@@ -551,6 +569,10 @@ const prevPage = () => {
 const resetCharts = () => {
   fetchData();
 };
+//툴팁 내용변경
+const resetTooltips = () => {
+
+};
 
 // 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(() => {
@@ -713,7 +735,11 @@ onMounted(() => {
   margin-left: 40px;
   width: 387px;
   padding: 20px 10px;
+}
 
+.asset-analysis-table-wrapper {
+  position: relative; /* 이 요소를 기준으로 툴팁 위치 설정 */
+  width: 350px;
 }
 
 .asset-analysis-table table {
@@ -805,6 +831,34 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   width: 450px;
+}
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  margin-top: 10px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
 }
 
 @media (max-width: 768px) {

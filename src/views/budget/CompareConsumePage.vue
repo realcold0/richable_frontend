@@ -78,6 +78,18 @@
         </div>
         <!-- 차트 -->
         <div class="chart-container">
+          <div class="tooltip-box">
+              <button
+                class="tool-btn"
+                ref="tooltipButton"
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
+                :title="tooltipMessage"
+              >
+                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+              </button>
+            </div>
           <canvas style="margin-top: 20px" id="myChart"></canvas>
         </div>
       </div>
@@ -112,20 +124,35 @@
             원 절약이 가능해요!
           </div>
         </div>
-
-        <!-- 절약 차트 -->
+                <!-- 절약 차트 -->
+<div class ="save-chart-container">
+        <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
+    <div class="tooltip-box">
+      <button
+        class="tool-btn"
+        ref="tooltipButton2"
+        type="button"
+        data-bs-toggle="tooltip"
+        data-bs-placement="left"
+        :title="tooltipMessage2"
+      >
+        <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+      </button>
+    </div>
         <canvas style="margin-top: 20px" id="savingChart"></canvas>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Chart, registerables } from 'chart.js'
+import { Chart, registerables, Tooltip } from 'chart.js'
 import { nextTick } from 'vue'
 import axiosInstance from '@/AxiosInstance'
 import { useMonthStore } from '@/stores/consume/curMonth.js'
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 // 차트.js 등록
 Chart.register(...registerables)
@@ -158,6 +185,11 @@ const averageSpending = ref(0)
 const diffAmount = computed(() => userSpending.value - averageSpending.value)
 const possibleSaveAmount = ref([]) // 빈 배열로 초기화
 const saveAmount = ref([]) // 빈 배열로 초기화
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('평균값은 KOSIS 산업별 가구당 월 [평균] 가계수지 입니다.')
+const tooltipMessage2 = ref('이번달에 아낀 소비를 6개월 뒤 까지 누적으로 합산합니다.')
 
 // 통화 포맷 함수
 const formatCurrency = (amount) => {
@@ -528,9 +560,11 @@ onMounted(() => {
   background-color: #f9f9f9;
   height: 150px;
   border: 1px solid #f8f8f8;
+  position:relative;
 }
 
 .chart-container {
+  position:relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -688,4 +722,40 @@ canvas {
   border-radius: 20px;
   border: 1px solid #e4ebf0;
 }
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  position: absolute;
+  right: 400px;
+  top: 0;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
+}
+
+.save-chart-container {
+  position: relative; /* 차트 컨테이너 기준으로 툴팁 위치 설정 */
+  width: 100%;
+  height: auto;
+  padding: 20px;
+  background: #fff;
+}
+
 </style>
