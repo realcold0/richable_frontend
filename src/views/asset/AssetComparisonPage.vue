@@ -17,8 +17,13 @@
         <div class="graph-container">
           <div class="graph-container-title">
             {{ userName }}님의 자산은 <br />
-            20대 평균보다 <strong style="color:#ff0062">{{ assetDifference > 0 ? assetDifference.toLocaleString() + '만원 많습니다.' : Math.abs(assetDifference).toLocaleString() + '만원 적습니다.' }}</strong>
-          </div>
+            20대 평균보다 
+<strong style="color:#ff0062">
+  {{ assetDifference > 0 
+    ? Math.floor(assetDifference).toLocaleString() + '만원 많습니다.' 
+    : Math.floor(Math.abs(assetDifference)).toLocaleString() + '만원 적습니다.' }}
+</strong>
+</div>
           <canvas id="barChart" class="chart-size"></canvas>
         </div>
 
@@ -32,29 +37,44 @@
       </div>
     </div>
 
-    <!-- 자산 비교 테이블 -->
-    <div class="compare-table">
-      <table>
-        <thead>
-          <tr>
-            <th>종목</th>
-            <th>나의 자산</th>
-            <th>평균 자산</th>
-            <th>비교</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in assetList" :key="index">
-            <td>{{ item.category }}</td>
-            <td>{{ item.myAsset ? item.myAsset.toLocaleString() : 0 }}원</td>
-            <td>{{ item.averageAsset ? item.averageAsset.toLocaleString() : 0 }}원</td>
-            <td>
-              {{ item.difference > 0 ? item.difference.toLocaleString() + '원이 더 적습니다.' : Math.abs(item.difference).toLocaleString() + '원이 더 많습니다.' }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- 자산 비교 테이블 -->
+<div class="compare-table">
+  <table>
+    <thead>
+      <tr>
+        <th>종목</th>
+        <th>나의 자산</th>
+        <th>평균 자산</th>
+        <th>비교</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item, index) in assetList" :key="index">
+        <td><strong>{{ item.category }}</strong></td>
+        <td>{{ item.myAsset ? Math.floor(item.myAsset / 10000).toLocaleString() : 0 }}만원</td>
+        <td>{{ item.averageAsset ? Math.floor(item.averageAsset / 10000).toLocaleString() : 0 }}만원</td>
+        <td>
+          <span v-if="item.difference > 0">
+            <strong style="color:#FF0062">
+              {{ Math.floor(item.difference / 10000).toLocaleString() }}만원 
+              <font-awesome-icon style="color:#FF0062" :icon="['fas', 'caret-up']" />
+            </strong>
+          </span>
+          <span v-else-if="item.difference < 0">
+            <strong style="color:#2768FF">
+              {{ Math.floor(Math.abs(item.difference / 10000)).toLocaleString() }}만원 
+              <font-awesome-icon style="color:#2768FF" :icon="['fas', 'caret-down']" />
+            </strong>
+          </span>
+          <span v-else style="color:#2768FF">
+            차이 없음
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 
     <!-- 로딩 및 오류 메시지 -->
     <div v-if="loading">로딩 중...</div>
@@ -66,11 +86,14 @@
 import { ref, onMounted } from 'vue';
 import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
 
 Chart.register(...registerables);
 
 // 사용자 이름
 const userName = "김리치";
+
 
 // 현재 자산 정보 및 자산 차이
 const currentAsset = ref(0);
@@ -131,6 +154,17 @@ const fetchPeerData = async () => {
 };
 
 
+// 카테고리 매핑 (영어 -> 한국어)
+const categoryMapping = {
+  bond: '채권',
+  deposit: '예금',
+  saving: '적금',
+  subscription: '청약',
+  withdrawal: '입출금',
+  stock: '주식',
+  cash: '현금',
+  coin: '코인'
+};
 
 // 금융 자산별 또래 자산 비교 데이터를 가져오는 함수
 const fetchPeerFinanceData = async () => {
@@ -142,10 +176,10 @@ const fetchPeerFinanceData = async () => {
 
     if (Array.isArray(financeData)) {
       assetList.value = financeData.map(item => ({
-        category: item.category,
+        category: categoryMapping[item.category] || item.category, // 카테고리 한국어 변환
         myAsset: item.bsAmount,
-        averageAsset: item.spotAvgAmount,
-        difference: item.bsAmount - item.spotAvgAmount
+        averageAsset: item.categoryAvgAmount,
+        difference: item.bsAmount - item.categoryAvgAmount // 비교값 계산
       }));
     } else {
       console.error("Expected an array but got: ", financeData);
@@ -183,122 +217,164 @@ const createCharts = () => {
   gradientRadarAvgAssets.addColorStop(0, '#4bc0c0');
   gradientRadarAvgAssets.addColorStop(1, '#80e1e1');
 
-  // 막대 차트
-  new Chart(barCtx, {
-    type: 'bar',
-    data: {
-      labels: ['20대 평균', '나의 자산'],
-      datasets: [
-        {
-          label: '자산 비교',
-          data: [peerAverageAsset.value, currentAsset.value],
-          backgroundColor: [gradientBar, 'rgba(255, 0, 98, 0.7)'],
-          borderColor: '#ff0062',
-          borderWidth: 2,
-          hoverBorderWidth: 3, // 호버 시 강조 효과
-          hoverBorderColor: '#ff4081', // 호버 시 색상
-          borderRadius: 20, // 막대 모서리 둥글게
+// 막대 차트
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['20대 평균', '나의 자산'],
+    datasets: [
+      {
+        label: '자산 비교',
+        data: [peerAverageAsset.value, currentAsset.value],
+        backgroundColor: ['#CCCCCC', '#FF0062'], // 첫 번째 바는 회색, 두 번째 바는 핑크색
+        borderColor: ['#CCCCCC', '#FF0062'], // 나의 자산 테두리 색상
+        borderWidth: 2, // 테두리 두께
+        hoverBorderWidth: 3, // 호버 시 강조 효과
+        hoverBorderColor: '#ff4081', // 호버 시 색상
+        borderRadius: 10, // 막대 모서리 둥글게 설정
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false, // 차트 비율 유지 안함 (화면에 맞게 조절)
+    scales: {
+      y: {
+        display: true,
+        beginAtZero: true, // y축 0부터 시작
+        grid: {
+          drawBorder: false, // y축 테두리 안 그림
+          color: 'rgba(200, 200, 200, 0.3)', // y축 그리드 라인 색상
+        },
+        ticks: {
+          font: {
+            size: 12, // y축 글자 크기
+          },
+          color: '#666', // y축 글자 색상
         }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          display: true,
-          beginAtZero: true,
-          grid: {
-            drawBorder: true,
-            color: 'rgba(200, 200, 200, 0.3)', // y축 그리드 라인 색상
-          },
-        },
-        x: {
-          grid: {
-            display: false,
-          },
-          ticks: {
-            color: '#666',
-            font: {
-              size: 16,
-              weight: 'bold',
-            },
-          },
-        },
       },
-      plugins: {
-        legend: {
-          display: false,
+      x: {
+        grid: {
+          display: false, // x축 그리드 숨김
         },
-        tooltip: {
-          backgroundColor: '#ff4081', // 툴팁 배경색
-          titleFont: {
-            size: 16,
-          },
-          bodyFont: {
-            size: 14,
+        ticks: {
+          color: '#666', // x축 글자 색상
+          font: {
+            size: 12, // x축 글자 크기
+            weight: 500, // x축 글자 굵게
           },
         },
       },
     },
-  });
+    plugins: {
+      legend: {
+        display: false, // 범례 숨김
+      },
+      tooltip: {
+        backgroundColor: '#ff4081', // 툴팁 배경색
+        titleFont: {
+          size: 12, // 툴팁 제목 글자 크기
+        },
+        bodyFont: {
+          size: 12, // 툴팁 내용 글자 크기
+        },
+      },
+    },
+  },
+});
+
 
   // 레이더 차트
-  new Chart(radarCtx, {
-    type: 'radar',
-    data: {
-      labels: categories,
-      datasets: [
-        {
-          label: '나의 자산',
-          data: myAssets,
-          backgroundColor: gradientRadarMyAssets,
-          borderColor: '#ff6384',
-          borderWidth: 2,
-          pointBackgroundColor: '#ff6384', // 포인트 색상
-          pointHoverRadius: 7, // 포인트 호버 반경
-          pointHoverBackgroundColor: '#ff0062', // 포인트 호버 색상
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: categories,
+    datasets: [
+      {
+        label: '평균 자산',
+        data: avgAssets,
+        backgroundColor: 'rgba(204, 204, 204, 0.55)',
+        borderColor: '#cccccc',
+        borderWidth: 2,
+        // pointBackgroundColor: '#ff6384', // 포인트 색상
+        // pointHoverRadius: 7, // 포인트 호버 반경
+        // pointHoverBackgroundColor: '#ff0062', // 포인트 호버 색상
+        pointBorderColor: '#fff', // 포인트 테두리 색상
+        // pointBorderWidth: 2, // 포인트 테두리 두께
+      },
+      {
+        label: '나의 자산',
+        data: myAssets,
+        backgroundColor: 'rgba(255, 84, 150, 0.55)',
+        borderColor: '#ff6384',
+        borderWidth: 2,
+        // pointBackgroundColor: '#ff6384', // 포인트 색상
+        // pointHoverRadius: 7, // 포인트 호버 반경
+        // pointHoverBackgroundColor: '#ff0062', // 포인트 호버 색상
+        pointBorderColor: '#fff', // 포인트 테두리 색상
+        // pointBorderWidth: 2, // 포인트 테두리 두께
+      }
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        beginAtZero: true,
+        min: 0,
+        max: Math.max(...myAssets, ...avgAssets),
+        ticks: {
+          stepSize: 1000,
+          font: {
+            size: 11,
+            family: "'Pretendard', sans-serif",
+          }
         },
-        {
-          label: '평균 자산',
-          data: avgAssets,
-          backgroundColor: gradientRadarAvgAssets,
-          borderColor: '#4bc0c0',
-          borderWidth: 2,
-          pointBackgroundColor: '#4bc0c0', // 포인트 색상
-          pointHoverRadius: 7, // 포인트 호버 반경
-          pointHoverBackgroundColor: '#2bc0c0', // 포인트 호버 색상
-        }
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        r: {
-          beginAtZero: true,
-          min: 0,
-          max: Math.max(...myAssets, ...avgAssets),
-          ticks: {
-            stepSize: 1000,
-            font: {
-              size: 11,
-            }
+        grid: {
+          color: '#ddd', // 그리드 색상
+        },
+        angleLines: {
+          color: '#bbb', // 각 라인의 색상
+        },
+        pointLabels: {
+          font: {
+            size: 14,
+            family: "'Pretendard', sans-serif",
           },
+          color: '#333', // 각 축 라벨 색상
         },
       },
-      plugins: {
-        legend: {
-          labels: {
-            font: {
-              size: 14,
-              family: "'Pretendard', sans-serif",
-            }
-          }
-        }
-      }
     },
-  });
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            size: 14,
+            family: "'Pretendard', sans-serif",
+          },
+          color: '#333', // 범례 라벨 색상
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // 툴팁 배경색
+        titleFont: {
+          size: 14,
+          family: "'Pretendard', sans-serif",
+        },
+        bodyFont: {
+          size: 12,
+          family: "'Pretendard', sans-serif",
+        },
+        bodyColor: '#fff', // 툴팁 내용 글자색
+        borderColor: '#333', // 툴팁 테두리 색상
+        borderWidth: 1, // 툴팁 테두리 두께
+      }
+    }
+  },
+});
+
 };
 
 // 데이터 가져오기 후 차트 생성 및 테이블 반영

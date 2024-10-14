@@ -10,20 +10,20 @@
           <!-- 분류 -->
           <div class="mb-3" style="display: flex; align-items: center;">
             <label for="incomeType" class="form-label" style="font-weight: bold; width: 70px; padding-top: 0;">분류</label>
-            <input type="text" class="form-control" readonly v-model="detail.type" />
+            <input type="text" class="form-control" readonly v-model="props.detail.type" />
           </div>
 
           <!-- 날짜 -->
           <div class="mb-3" style="display: flex; align-items: center;">
             <label for="incomeDate" class="form-label" style="font-weight: bold; width: 70px; padding-top: 0;">날짜</label>
-            <input type="text" class="form-control" readonly v-model="detail.incomeDate" />
+            <input type="text" class="form-control" readonly v-model="props.detail.incomeDate" />
           </div>
 
           <!-- 가격 -->
           <div class="mb-3" style="display: flex;">
             <label class="form-label" style="font-weight: bold; width: 70px;">가격</label>
             <div class="input-group" style="flex-grow: 1;">
-              <input type="text" class="form-control" readonly v-model="detail.price" />
+              <input type="text" class="form-control" readonly v-model="props.detail.price" />
               <span class="input-group-text">원</span>
             </div>
           </div>
@@ -31,13 +31,13 @@
           <!-- 내용 -->
           <div class="mb-3" style="display: flex;">
             <label class="form-label" style="font-weight: bold; width: 70px;">내용</label>
-            <input type="text" class="form-control" readonly v-model="detail.contents" />
+            <input type="text" class="form-control" readonly v-model="props.detail.contents" />
           </div>
 
           <!-- 메모 -->
           <div class="mb-3" style="display: flex;">
             <label class="form-label" style="font-weight: bold; width: 70px;">메모</label>
-            <input type="text" class="form-control" readonly v-model="detail.memo" />
+            <input type="text" class="form-control" readonly v-model="props.detail.memo" />
           </div>
         </div>
 
@@ -55,57 +55,22 @@
     </div>
   </div>
 
-  <!-- <IncomeUpdateModal ref="updateModal2" /> -->
 </template>
 
 <script setup>
 import { ref, defineExpose, defineProps, defineEmits } from 'vue';
 import { Modal } from 'bootstrap';
-import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue';
-import axiosInstance from '@/AxiosInstance';
 
 // Props로 전달된 detail 객체
 const props = defineProps({ detail: { type: Object, required: true } });
 const emit = defineEmits(['close']);
 
-const detail = ref({
-  type: '',
-  incomeDate: '',
-  price: 0,
-  contents: '',
-  memo: ''
-});
-
 const modal = ref(null);
 let modalInstance = null;
-const updateModal2 = ref(null);
 
-const isModalAVisible = true;
-
-
-// 소득 상세 조회 API 호출 함수
-const fetchIncomeDetail = async (incomeId) => {
-  try {
-
-    console.log("incomeId", incomeId);
-    if (!incomeId) {
-      console.log('유효하지 않은 인덱스 값:', incomeId);
-      return; // index가 유효하지 않을 경우 함수 종료
-    }
-    const response = await axiosInstance.get(`/income/detail/${index}`);
-    if (response.data.success) {
-      detail.value = response.data.response.data;
-    } else {
-      console.error('소득 상세 조회 실패:', response.data);
-    }
-  } catch (error) {
-    console.error('소득 상세 조회 중 오류 발생:', error);
-  }
-};
 
 // 모달 열기 함수
 const show = (incomeId) => {
-  fetchIncomeDetail(incomeId);  // 소득 상세 조회
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
       backdrop: 'static',
@@ -123,13 +88,8 @@ const editEntry = () => {
     modalInstance.hide();
   }
   emit('close');
-  // // IncomeUpdateModal 열기
-  // if (updateModal2.value && updateModal2.value.show) {
-  //   updateModal2.value.show(props.detail);
-  // } else {
-  //   console.log('IncomeUpdateModal이 로드되지 않음');
-  // }
 };
+
 defineExpose({ show });
 </script>
 

@@ -172,20 +172,18 @@
     <!-- 소비/소득 등록 모달 -->
     <IncomeCreateModal ref="createModal" @incomeRegistered="fetchIncomes"/>
     <IncomeDetailModal ref="detailModal" :detail="selectedDetail" @close="switchModalInput"/>
-    <IncomeUpdateModal ref="updateModal" @incomeUpdated="fetchIncomes" @incomeDeleted="incomeDeleted" />
+    <IncomeUpdateModal ref="updateModal" :detail="selectedDetail"  @incomeUpdated="IncomeUpdated" @incomeDeleted="incomeDeleted" />
 
   
     <ConsumeCreateModal ref="createModal2" @outcomeRegistered="fetchExpenses" />
-    <ConsumeDetailModal ref="detailModal2" :detail="selectedDetail2" @close="closeDetailModal2"/>
-    <ConsumeUpdateModal ref="updateModal2" @outcomeUpdated="fetchExpenses" @outcomeDeleted="fetchExpenses"/>
+    <ConsumeDetailModal ref="detailModal2" :detail="selectedDetail2" @close="switchModalConsume"/>
+    <ConsumeUpdateModal ref="updateModal2"  :detail="selectedDetail2"  @consumeUpdated="consumeUpdated" @consumeDeleted="consumeDeleted"/>
   </div>
 </template>
 
 <script setup>
 
 import { ref, computed, watch, onMounted } from 'vue';
-
-import axios from 'axios';
 import Pagination from '@/components/modal/pagenation/Pagenation.vue';
 import IncomeCreateModal from '@/components/modal/budget/IncomeCreateModal.vue'; 
 import IncomeDetailModal from '@/components/modal/budget/IncomeDetailModal.vue';
@@ -195,6 +193,7 @@ import ConsumeCreateModal from '@/components/modal/budget/ConsumeCreateModal.vue
 import ConsumeDetailModal from '@/components/modal/budget/ConsumeDetailModal.vue';
 import ConsumeUpdateModal from '@/components/modal/budget/ConsumeUpdateModal.vue';
 import axiosInstance from '@/AxiosInstance';
+
 
 
 // hoveredIndex 선언
@@ -209,6 +208,8 @@ const currentPage = ref(1);
 const itemsPerPage = ref(9);
 const totalExpenses = computed(() => expenses.value.length);
 const totalIncomes = computed(() => incomes.value.length);
+
+
 
 const sortOrder = ref('desc');  // 최신순(desc) 또는 오래된순(asc)을 저장할 변수
 const errorMessage = ref('');
@@ -239,6 +240,7 @@ const fetchExpenses = async () => {
 // 소득 데이터 불러오기
 const fetchIncomes = async () => {
   try {
+    console.log("fetch");
     const response = await axiosInstance.get('/income/all');
     if (Array.isArray(response.data.response.data)) {
       incomes.value = response.data.response.data;
@@ -256,44 +258,92 @@ const openEditModal = (income) => {
   const modalRef = ref(null);
   modalRef.value.show(income);  // 자식 컴포넌트에서 수정할 데이터 전달
 };
+//소득 수정
+const IncomeUpdated = async ()=>{
+  console.log("##################################################");
+  console.log( selectedDetail.value );
+  const response = await axiosInstance.put('/income/update',  selectedDetail.value );
+    if (response.data.success) {
+      console.log("소득 수정 성공:", response.data);
+      // incomes.value = response.data.response.data;
+      fetchIncomes();
+      //화면 다시 불러오기 
+    } else {
+      console.error("소득 수정 실패:", response.data);
+    }
+}
+// 소득 삭제
+const incomeDeleted = async ()=>{
+  console.log("##################################################");
+  console.log( selectedDetail.value.incomeId );
+  const incomeId =  selectedDetail.value.incomeId;
+  console.log(`/income/delete/${incomeId}`);
 
-// 탭 변경 시 데이터 로드
-// watch(selectedTab, (newTab) => {
-//   if (newTab === 'expense') {
-//     fetchExpenses();
-//   } else if (newTab === 'income') {
-//     fetchIncomes();
-//   }
-// });
-// onMounted(() => {
-//   const authToken = localStorage.getItem('authToken');
-//   if (!authToken) {
-//     console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
-//     window.location.href = '/login'; // 토큰이 없으면 로그인 페이지로 리다이렉트
-//   } else {
-//     fetchExpenses(); // 기본으로 소비 데이터를 먼저 로드
-//   }
-// });
+  const response = await axiosInstance.delete(`/income/delete/${incomeId}` );
+    if (response.data.success) {
+      console.log("소득 삭제 성공:", response.data);
+      
+      //화면 다시 불러오기 
+      fetchIncomes();
+    } else {
+      console.error("소득 삭제 실패:", response.data);
+    }
+}
 
+//소비 수정
+const consumeUpdated = async ()=>{
+  console.log("##################################################");
+  console.log( selectedDetail2.value );
+  const response = await axiosInstance.put('/outcome/update',  selectedDetail2.value );
+    if (response.data.success) {
+    
+      console.log("소득 수정 성공:", response.data);
+      fetchExpenses();
+      //화면 다시 불러오기 
+    } else {
+      console.error("소득 수정 실패:", response.data);
+    }
+}
 
+//소비 수정
+const consumeDeleted = async ()=>{
+  console.log("##################################################");
+  console.log( selectedDetail2.value );
+  const index = selectedDetail2.value.index;
+  const response = await axiosInstance.delete(`/outcome/delete/${index}`);
+    if (response.data.success) {
+      console.log("소득 삭제 성공:", response.data);
+      fetchExpenses();
+      //화면 다시 불러오기 
+    } else {
+      console.error("소득 수정 실패:", response.data);
+    }
+}
 
 // 모달 관련 상태
 const createModal = ref(null);
 const detailModal = ref(null);
+const updateModal = ref(null);
+
 const createModal2 = ref(null);
 const detailModal2 = ref(null);
+const updateModal2 = ref(null);
+
 const selectedDetail = ref({}); 
 const selectedDetail2 = ref({}); 
 
 // 소득 모달 열기
-const openCreateModal = () => createModal.value?.show();
 const openDetailModal = (detail) => {
-  selectedDetail.value = detail;
-  detailModal.value?.show();
+  if (detail && detail.incomeId) {
+    selectedDetail.value = { ...detail };  // 소득 데이터를 복사하여 selectedDetail에 저장
+    console.log('선택된 소득 데이터:', selectedDetail.value); // 데이터가 제대로 저장되었는지 확인
+    detailModal.value?.show();  // 모달 열기
+  } else {
+    console.error('유효하지 않은 소득 데이터:', detail);
+  }
 };
+const openUpdateModal = () => {
 
-const openUpdateModal = (update) => {
-  selectedDetail.value = update;
   updateModal.value?.show();
 };
 
@@ -308,26 +358,30 @@ function switchModalInput(){
   openUpdateModal();
 }
 
-
 // 소비 모달 열기
-const openCreateModal2 = () => { 
-  createModal2.value?.show();
-};
+const openCreateModal = () => createModal.value?.show();
+const openCreateModal2 = () => createModal2.value?.show();
 const openDetailModal2 = (detail) => {
   selectedDetail2.value = detail;
   detailModal2.value?.show();
 };
 
-// 모달 닫기
-const closeDetailModal = () => detailModal.value?.hide();
-const closeDetailModal2 = () => detailModal2.value?.hide();
-
-const incomeDeleted = (deletedIncomeId) => {
-  console.log('삭제된 소득 ID:', deletedIncomeId); 
-  incomes.value = incomes.value.filter(income => income.incomeId !== deletedIncomeId);
-  console.log('갱신된 소득 리스트:', incomes.value);
+const openUpdateModal2 = () => {
+  updateModal2.value?.show();
 };
 
+function switchModalConsume(){
+  openUpdateModal2();
+}
+// 모달 닫기
+// const closeDetailModal = () => detailModal.value?.hide();
+// const closeDetailModal2 = () => detailModal2.value?.hide();
+const outcomeUpdate = (updatedoutcome) => {
+  const index = outcome.value.findIndex(outcome => outcome.index === updatedoutcome.index); 
+  if (index !== -1) {
+    outcome.value.splice(index, 1, updatedoutcome); 
+  }
+};
 // 소비 필터링 및 정렬
 const filteredExpenses = computed(() => {
   let filtered = expenses.value;
@@ -389,7 +443,6 @@ watch(selectedTab, (newTab) => {
     fetchIncomes();
   }
 });
-
 
 // 초기 데이터 로드
 fetchExpenses(); 

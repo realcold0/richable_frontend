@@ -130,7 +130,7 @@
                 src="../assets/images/navbar-rich.png" 
                 alt="user"
                 style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #CCCCD6;" />
-                <span v-if="isSideBarActive"class="text sideToggle" style="margin-left: 8px; font-weight: 550;">{{ userprofile }}</span>
+                <span v-if="isSideBarActive"class="text sideToggle" style="margin-left: 8px; font-weight: 550;">rla</span>
             </router-link>
             </div>
 
