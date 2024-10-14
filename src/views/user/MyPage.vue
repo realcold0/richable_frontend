@@ -277,10 +277,10 @@ const apiKeys = ref({
 
 // 뱃지 관련 데이터 및 함수
 const badges = ref([
-  { id: 1, name: '사과러버 리치', imageUrl: '/images/badge-apple-rich.png', isSelected: false },
-  { id: 2, name: '부릉부릉 리치', imageUrl: '/images/badge-car-rich.png', isSelected: false },
-  { id: 3, name: '저금통 리치', imageUrl: '/images/badge-coin-box-rich.png', isSelected: false },
-  { id: 4, name: '럭셔리 리치', imageUrl: '/images/badge-luxury-rich.png', isSelected: false },
+  { id: 1, name: '사과러버 리치', imageUrl: 'src/asset/images/badge-apple-rich.png', isSelected: false },
+  { id: 2, name: '부릉부릉 리치', imageUrl: 'src/asset/images/badge-car-rich.png', isSelected: false },
+  { id: 3, name: '저금통 리치', imageUrl: 'src/asset/images/badge-coin-box-rich.png', isSelected: false },
+  { id: 4, name: '럭셔리 리치', imageUrl: 'src/asset/images/badge-luxury-rich.png', isSelected: false },
 ]);
 
 const selectedBadgeId = ref(null);
