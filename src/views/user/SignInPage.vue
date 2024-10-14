@@ -137,8 +137,7 @@ const login = async () => {
     return
   }
   try {
-    await axiosinstance.get('').then( (response) => console.log(response.data));
-    const response = await axiosinstance.post(`/member/login` , {
+    const response = await axios.post(`/api/member/login` , {
       id: id.value,
       password: password.value
     });

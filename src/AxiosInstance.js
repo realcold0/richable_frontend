@@ -3,7 +3,7 @@ import router from './router'; // Vue Router 가져오기
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // 환경 변수에서 API의 기본 URL 가져오기
+  baseURL: '/api', // 환경 변수에서 API의 기본 URL 가져오기
   headers: {
     Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`, // JWT 토큰 설정, 없으면 빈 문자열
   }
@@ -24,9 +24,9 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true; // 중복 요청 방지
       try {
         // 리프레시 토큰으로 액세스 토큰 재발급 요청
-        const response = await axiosInstance.post('/auth/refresh-token', {
-          refreshToken: localStorage.getItem('refreshToken'),
-        });
+        // const response = await axiosInstance.post('/auth/refresh-token', {
+        //   refreshToken: localStorage.getItem('refreshToken'),
+        // });
 
         // 새로운 액세스 토큰을 로컬 스토리지에 저장
         localStorage.setItem('authToken', response.data.accessToken);
