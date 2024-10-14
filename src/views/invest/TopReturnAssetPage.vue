@@ -316,4 +316,66 @@ td {
   line-height: 150%;
   letter-spacing: -0.48px;
 }
+/* 태블릿용 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .top-return-asset-page {
+    padding: 15px;
+  }
+
+  .filters {
+    justify-content: space-between;
+  }
+
+  .custom-card {
+    height: 180px;
+    width: 300px;
+    padding: 40px 15px;
+  }
+
+  .rank {
+    font-size: 36px;
+  }
+
+  .table th, .table td {
+    font-size: 16px;
+  }
+}
+
+/* 모바일용 */
+@media (max-width: 767px) {
+  .top-return-asset-page {
+    padding: 10px;
+  }
+
+  .filters {
+    justify-content: space-around;
+  }
+
+  .custom-card {
+    height: 150px;
+    width: 240px;
+    padding: 30px 10px;
+  }
+
+  .rank {
+    font-size: 28px;
+  }
+
+  .name {
+    font-size: 16px;
+  }
+
+  .type {
+    font-size: 14px;
+  }
+
+  .price, .return-rate {
+    font-size: 16px;
+  }
+
+  .table th, .table td {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
 </style>

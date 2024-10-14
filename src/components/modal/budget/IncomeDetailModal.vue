@@ -54,28 +54,46 @@
       </div>
     </div>
   </div>
-  <IncomeUpdateModal ref="updateModal2" />
+
+  <!-- <IncomeUpdateModal ref="updateModal2" /> -->
 </template>
 
 <script setup>
-import { ref, defineExpose, defineProps } from 'vue';
+import { ref, defineExpose, defineProps, defineEmits } from 'vue';
 import { Modal } from 'bootstrap';
 import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue';
 import axiosInstance from '@/AxiosInstance';
 
-
+// Props로 전달된 detail 객체
 const props = defineProps({ detail: { type: Object, required: true } });
+const emit = defineEmits(['close']);
+
+const detail = ref({
+  type: '',
+  incomeDate: '',
+  price: 0,
+  contents: '',
+  memo: ''
+});
 
 const modal = ref(null);
 let modalInstance = null;
 const updateModal2 = ref(null);
 
+const isModalAVisible = true;
+
+
 // 소득 상세 조회 API 호출 함수
-const fetchIncomeDetail = async (index) => {
+const fetchIncomeDetail = async (incomeId) => {
   try {
+
+    console.log("incomeId", incomeId);
+    if (!incomeId) {
+      console.log('유효하지 않은 인덱스 값:', incomeId);
+      return; // index가 유효하지 않을 경우 함수 종료
+    }
     const response = await axiosInstance.get(`/income/detail/${index}`);
     if (response.data.success) {
-      // props.detail 업데이트
       detail.value = response.data.response.data;
     } else {
       console.error('소득 상세 조회 실패:', response.data);
@@ -86,8 +104,8 @@ const fetchIncomeDetail = async (index) => {
 };
 
 // 모달 열기 함수
-const show = (index) => {
-  fetchIncomeDetail(index);  // 소득 상세 조회
+const show = (incomeId) => {
+  fetchIncomeDetail(incomeId);  // 소득 상세 조회
   if (!modalInstance && modal.value) {
     modalInstance = new Modal(modal.value, {
       backdrop: 'static',
@@ -104,15 +122,14 @@ const editEntry = () => {
   if (modalInstance) {
     modalInstance.hide();
   }
-
-  // IncomeUpdateModal 열기
-  if (updateModal2.value && updateModal2.value.show) {
-    updateModal2.value.show(props.detail);
-  } else {
-    console.log('IncomeUpdateModal이 로드되지 않음');
-  }
+  emit('close');
+  // // IncomeUpdateModal 열기
+  // if (updateModal2.value && updateModal2.value.show) {
+  //   updateModal2.value.show(props.detail);
+  // } else {
+  //   console.log('IncomeUpdateModal이 로드되지 않음');
+  // }
 };
-
 defineExpose({ show });
 </script>
 

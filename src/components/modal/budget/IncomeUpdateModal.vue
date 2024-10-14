@@ -1,11 +1,7 @@
 <template>
   <div>
     <!-- 소득 리스트 출력 -->
-    <ul>
-      <li v-for="income in incomeList" :key="income.incomeId">
-        {{ income.incomeDate }} - {{ income.type }} - {{ income.price }}원
-      </li>
-    </ul>
+  
 
     <!-- 수정 모달 -->
     <div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetLabel" aria-hidden="true" ref="modal">
@@ -103,7 +99,7 @@ import { Modal } from 'bootstrap';
 import axiosInstance from '@/AxiosInstance';
 
 // 이벤트 정의
-const emit = defineEmits(['incomeUpdated', 'incomeDeleted']);
+const emit = defineEmits(['incomeDeleted']);
 const incomeList = ref([]);
 
 const modal = ref(null);
@@ -165,8 +161,15 @@ const closeDeleteModal = () => {
 // 삭제 확인 후 실제 삭제 동작
 const confirmDelete = async () => {
   try {
+
+    emit('incomeDeleted', incomeId.value);  //부모 함수 호출하기
+
+    
     const response = await axiosInstance.delete(`/income/delete/${incomeId.value}`);
     if (response.data.success) {
+      console.log("$$$$$$$$$$$$$$$$$$$$$$$$", incomeId.value);
+     
+
       console.log("소득 삭제 성공:", response.data.response.data);
       if (modalInstance) {
         modalInstance.hide();
@@ -175,7 +178,7 @@ const confirmDelete = async () => {
         deleteModalInstance.hide();
       }
       isDeleteModalVisible.value = false;
-      emit('incomeDeleted', incomeId.value); // 삭제된 데이터의 ID 전달
+  
     } else {
       console.error("소득 삭제 실패:", response.data.message);
     }
