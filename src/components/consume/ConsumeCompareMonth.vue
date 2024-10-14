@@ -2,7 +2,22 @@
   <div class="wrapper">
     <div style="width: 1000px">
       <div class="text-left category-comparison">
-        <div class="main-title">전달 소비 누계 비교</div>
+        <div class="main-title">
+          전월 소비 누계 비교
+
+          <div class="tooltip-box">
+            <button
+              class="tool-btn"
+              ref="tooltipButton"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="left"
+              :title="tooltipMessage"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 설명 문구 부분 -->
@@ -33,12 +48,14 @@ import {
   PointElement,
   LineController,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  Tooltip
 } from 'chart.js'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import axiosinstance from '@/AxiosInstance'
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
-ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale)
+ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale, Tooltip)
 
 const month = useMonthStore()
 const lineChart = ref(null)
@@ -53,6 +70,11 @@ const currentDay = today.getDate()
 const days = Array.from({ length: 31 }, (_, i) => i + 1)
 
 const differenceMessage = ref('')
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('월의 시작일부터 오늘까지 소비의 누적 합입니다.')
+
 let totalDifference = 0
 
 const renderLineChart = async () => {
@@ -113,8 +135,8 @@ const renderLineChart = async () => {
             }
             return 0
           }),
-          pointHoverRadius: 10,  
-          pointHitRadius: 10,    
+          pointHoverRadius: 10,
+          pointHitRadius: 10,
           pointBackgroundColor: '#FF0062'
         },
         {
@@ -127,8 +149,8 @@ const renderLineChart = async () => {
           borderJoinStyle: 'round',
           tension: 0.4,
           pointRadius: 0,
-          pointHoverRadius: 10,  // hover 시 커지는 포인트 범위
-          pointHitRadius: 10,    // hover 인식 범위 확장
+          pointHoverRadius: 10, // hover 시 커지는 포인트 범위
+          pointHitRadius: 10, // hover 인식 범위 확장
           backgroundColor: function (context) {
             const chart = context.chart
             const { ctx, chartArea } = chart
@@ -156,14 +178,14 @@ const renderLineChart = async () => {
           }
         },
         tooltip: {
-        callbacks: {
-          // 툴팁에 표시될 라벨을 수정하는 부분
-          label: function (tooltipItem) {
-            const value = tooltipItem.raw.toLocaleString() + '원'
-            return `${tooltipItem.dataset.label}: ${value}`
+          callbacks: {
+            // 툴팁에 표시될 라벨을 수정하는 부분
+            label: function (tooltipItem) {
+              const value = tooltipItem.raw.toLocaleString() + '원'
+              return `${tooltipItem.dataset.label}: ${value}`
+            }
           }
         }
-      }
       },
       elements: {
         line: {
@@ -215,7 +237,7 @@ watch(
 }
 /* 설명 문구 스타일 */
 .consumeCompareTitle {
-  margin-top: 8px;
+  margin-top: 0; /* 추가: main-title과의 충분한 여백 확보 */
   flex-shrink: 0;
   border-radius: 20px;
   background: #fafafb;
@@ -274,7 +296,9 @@ canvas {
 }
 
 .main-title {
-  margin-top: 8xp;
+  position: relative;
+  margin-top: 0;
+  margin-bottom: 0;
   color: var(--3, #414158);
   font-feature-settings: 'dlig' on;
   font-family: Pretendard;
@@ -282,5 +306,31 @@ canvas {
   font-style: normal;
   font-weight: 700;
   line-height: 27px; /* 135% */
+}
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
 }
 </style>
