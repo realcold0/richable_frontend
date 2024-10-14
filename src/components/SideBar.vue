@@ -148,8 +148,8 @@
 </template>
 
 <script>
-import fullLogo from 'src/assets/images/navbar-full-rich.png'; // 전체 로고
-import collapsedLogo from 'src/assets/images/navbar-rich.png'; // 축소 로고
+import fullLogo from '@/assets/images/navbar-full-rich.png'; // 전체 로고
+import collapsedLogo from '@/assets/images/navbar-rich.png'; // 축소 로고
 export default {
   data() {
     return {
