@@ -9,8 +9,8 @@
         <img
           :src="
             isSideBarActive
-              ? '/src/assets/images/navbar-full-rich.png'
-              : '/src/assets/images/navbar-rich.png'
+              ? expandedLogo
+              : collapsedLogo
           "
           alt="로고"
         />
@@ -148,6 +148,8 @@
 </template>
 
 <script>
+import expandedLogo from '@/assets/images/navbar-full-rich.png';
+import collapsedLogo from '@/assets/images/navbar-rich.png';
 export default {
   data() {
     return {
