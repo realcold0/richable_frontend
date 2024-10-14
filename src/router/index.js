@@ -56,11 +56,6 @@ const routes = [
     component: () => import('../views/user/UserTermsPage.vue')
   },
   {
-    path: '/user/Board/',
-    name: 'board',
-    component: () => import('../views/user/Board.vue')
-  },
-  {
     path: '/user/mypage',
     name: 'myPage',
     component: () => import('../views/user/MyPage.vue')
