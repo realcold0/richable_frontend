@@ -53,7 +53,7 @@
         @click="openGoalDetailModal(goal)"
       >
         <p class="goal-index">{{ index + 1 }}. {{ goal.title }}</p>
-        <p class="goal-amount">{{ goal.totalAmount.toLocaleString() }}원 / {{ goal.gather.toLocaleString() }}원</p>
+        <p class="goal-amount">{{ goal.gather.toLocaleString() }}원 / {{ goal.totalAmount.toLocaleString() }}원</p>
         <div class="progress-bar">
           <div
             class="progress"
