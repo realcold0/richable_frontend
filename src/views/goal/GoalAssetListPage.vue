@@ -168,7 +168,7 @@ const addNewGoal = (newGoal) => {
     id: newId,
     title: newGoal.title,
     totalAmount: newGoal.totalAmount,
-    gather: 0 // 새로운 목표는 현재 모금액 0으로 시작
+    gather: 0
   })
   console.log('새로운 목표가 추가되었습니다!')
 }

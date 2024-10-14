@@ -13,7 +13,9 @@
     <div class="text-center total-asset">
       <div class="asset-title">
         {{
-          diffAmount > 0 ? '이번 달에 아낄 수 있었던 비용이에요 😢' : '이번달에 아낀 비용이에요 😲'
+          saveAmount.value - possibleSaveAmount.value > 0
+            ? '이번 달에 아낄 수 있었던 비용이에요 😢'
+            : '이번달에 아낀 비용이에요 😲'
         }}
       </div>
       <div class="asset-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
@@ -90,7 +92,12 @@
       <div v-if="possibleSaveAmount.length > 0">
         <div class="total-consume">
           <div class="consume-title">
-            이번 달 소비 중 줄일 수 있는 소비는
+            <!-- 이번 달 소비 중 줄일 수 있는 소비는 -->
+            {{
+          saveAmount.value - possibleSaveAmount.value > 0
+            ? '이번 달 소비 중 줄일 수 있는 소비는 😢'
+            : '이번달에 아낀 소비는 😲'
+        }}
             <span style="font-size: 18px; font-weight: 500; color: #ff0062">
               {{ Math.abs(couldsaving).toLocaleString() }}</span
             >
@@ -300,7 +307,10 @@ const createComparisonChart = () => {
       responsive: true,
       layout: {
         padding: {
-          top: 20 // 그래프 상단에 패딩 추가
+          top: 20,
+          bottom : 20,
+          left: 20,
+          right: 20
         }
       },
       scales: {
@@ -407,6 +417,14 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
     },
     options: {
       responsive: true,
+      layout: {
+        padding: {
+          top: 20,
+          bottom : 20,
+          left: 20,
+          right: 20
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
