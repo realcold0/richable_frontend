@@ -9,8 +9,8 @@
         <img
           :src="
             isSideBarActive
-              ? `${ fullLogoUrl }`
-              : `${ logoUrl }`
+              ? fullLogoUrl
+              : logoUrl
           "
           alt="로고"
         />
