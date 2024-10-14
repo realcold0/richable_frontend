@@ -175,8 +175,8 @@ const fetchPeerFinanceData = async () => {
     const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
+      console.log(financeData)
       assetList.value = financeData.map(item => ({
-        console.log(financeData)
         category: categoryMapping[item.category] || item.category, // 카테고리 한국어 변환
         myAsset: item.bsAmount,
         averageAsset: item.categoryAvgAmount,
