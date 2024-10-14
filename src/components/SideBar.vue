@@ -7,7 +7,11 @@
      <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
       <router-link to="/">
         <img
-          :src="isSideBarActive ? require('@/assets/images/navbar-full-rich.png') : require('@/assets/images/navbar-rich.png')"
+          :src="
+            isSideBarActive
+              ? fullLogoUrl
+              : logoUrl
+          "
           alt="로고"
         />
       </router-link>
@@ -149,6 +153,8 @@ import collapsedLogo from 'src/assets/images/navbar-rich.png'; // 축소 로고
 export default {
   data() {
     return {
+      fullLogoUrl : new URL('@/assets/images/navbar-full-rich.png', import.meta.url).href,
+      logoUrl : new URL('@/assets/images/navbar-rich.png', import.meta.url).href,
       isAssetMenuOpen: false,
       isIncomeMenuOpen: false,
       isInvestMenuOpen: false,
