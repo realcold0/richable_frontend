@@ -84,20 +84,16 @@ let allAssets = ref([])
 // 필터 클릭 시 실행되는 함수
 const filterAssets = async (filter) => {
   selectedFilter.value = filter;
-  let url = 'http://localhost:8080/invest/highreturn'; // 전체 조회
+  let url = '/invest/highreturn'; // 전체 조회
 
   if (filter === '주식') {
-    url = 'http://localhost:8080/invest/highreturn/stock';
+    url = '/invest/highreturn/stock';
   } else if (filter === '코인') {
-    url = 'http://localhost:8080/invest/highreturn/coin';
+    url = '/invest/highreturn/coin';
   }
 
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`  // JWT 토큰을 Authorization 헤더에 추가
-      }
-    });
+    const response = await axiosInstance.get(url);
     if (response.data.success) {
       allAssets.value = response.data.response.data.map(item => ({
         name: item.name,

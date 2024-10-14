@@ -54,15 +54,14 @@
       </div>
     </div>
   </div>
-
   <IncomeUpdateModal ref="updateModal2" />
 </template>
 
 <script setup>
 import { ref, defineExpose, defineProps } from 'vue';
 import { Modal } from 'bootstrap';
-import axios from 'axios';
 import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue';
+import axiosInstance from '@/AxiosInstance';
 
 
 const props = defineProps({ detail: { type: Object, required: true } });
@@ -74,10 +73,10 @@ const updateModal2 = ref(null);
 // 소득 상세 조회 API 호출 함수
 const fetchIncomeDetail = async (index) => {
   try {
-    const response = await axios.get(`http://localhost:8080/income/detail/${index}`);
+    const response = await axiosInstance.get(`/income/detail/${index}`);
     if (response.data.success) {
       // props.detail 업데이트
-      props.detail = response.data.response.data;
+      detail.value = response.data.response.data;
     } else {
       console.error('소득 상세 조회 실패:', response.data);
     }

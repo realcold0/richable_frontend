@@ -1,7 +1,7 @@
 <template>
   <div id="singin" class="login-container">
     <img class="title" src="../../assets/images/navbar-full-rich.png" />
-    <form @submit.prevent="login">
+    <form @submit.prevent="login" method="POST">
       <div class="mb-3 text-start">
         <label for="id" class="form-label">아이디</label>
         <input
@@ -16,23 +16,25 @@
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
         <div class="password-input-wrapper position-relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="password"
-            class="form-control"
-            id="password"
-            placeholder="비밀번호를 입력해주세요"
-            required
-          />
-          <span
-            @click="togglePassword"
-            class="position-absolute top-50 end-0 translate-middle-y pe-2"
-            style="cursor: pointer"
-            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
-          >
-            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-          </span>
-        </div>
+    <input
+      :type="showPassword ? 'text' : 'password'"
+      v-model="password"
+      class="form-control"
+      id="password"
+      placeholder="비밀번호를 입력해주세요"
+      required
+    />
+    <span
+      @click="togglePassword"
+      class="position-absolute top-50 end-0 translate-middle-y pe-2"
+      style="cursor: pointer"
+      :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+    >
+      <font-awesome-icon
+        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']"
+      />
+    </span>
+  </div>
       </div>
       <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>
@@ -45,7 +47,6 @@
     <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
-      <img src="https://via.placeholder.com/40?text=K" alt="Kakao" />
       <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
     </div>
 
@@ -59,6 +60,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import axiosinstance from '@/AxiosInstance';
 
 const id = ref('')
 const password = ref('')
@@ -66,7 +68,7 @@ const showPassword = ref(true)
 const route = useRoute()
 const router = useRouter()
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/member"
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value

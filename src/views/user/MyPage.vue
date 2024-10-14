@@ -218,6 +218,8 @@ const triggerFileUpload = () => {
   });
 };
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/member"
+
 // 사용자 ID를 userProfile에서 가져오는지 확인합니다.
 const deleteAccount = () => {
   const userId = userProfile.value.name;
@@ -228,7 +230,7 @@ const deleteAccount = () => {
   }
 
   axios
-    .delete(`http://localhost:8080/member/delete/${userId}`, {
+    .delete(`${BASE_URL}/delete/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(() => {
@@ -293,7 +295,7 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
-  axios.get('http://localhost:8080/member/info')
+  axios.get(`${BASE_URL}/delete/info`)
     .then((response) => {
       const responseData = response.data.response.data?.data || {};
       userProfile.value = {
