@@ -3,7 +3,7 @@ import router from './router'; // Vue Router 가져오기
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: '/api', // 환경 변수에서 API의 기본 URL 가져오기
+  baseURL: import.meta.env.VITE_API_BASE_URL, // 환경 변수에서 API의 기본 URL 가져오기
   headers: {
     Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`, // JWT 토큰 설정, 없으면 빈 문자열
   }
@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
         // });
 
         // 새로운 액세스 토큰을 로컬 스토리지에 저장
-        localStorage.setItem('authToken', response.data.accessToken);
+        localStorage.setItem('authToken', response.data.accessToken)
 
         // 새로운 토큰을 axiosInstance의 Authorization 헤더에 설정
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
@@ -39,8 +39,8 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         // 리프레시 토큰도 만료되었으면 로그인 페이지로 이동
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
+        // localStorage.removeItem('authToken');
+        // localStorage.removeItem('refreshToken');
 
 
         // 원래 요청 URL을 리디렉션 쿼리로 전달
