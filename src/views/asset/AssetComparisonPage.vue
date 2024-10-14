@@ -138,7 +138,6 @@ const fetchPeerData = async () => {
     console.log('Peer Data Response:', response.data); // 응답 확인
 
     if (response.data.success && response.data.response.data) {
-      console.log(financeData)
       peerAverageAsset.value = response.data.response.data.spotAvgAmount; // 평균 자산 설정
       assetDifference.value = (currentAsset.value - peerAverageAsset.value) / 10000; // 만원 단위로 차이 계산
       console.log('Peer Average Asset:', peerAverageAsset.value); // 평균 자산 값 확인
@@ -177,6 +176,7 @@ const fetchPeerFinanceData = async () => {
 
     if (Array.isArray(financeData)) {
       assetList.value = financeData.map(item => ({
+        console.log(financeData)
         category: categoryMapping[item.category] || item.category, // 카테고리 한국어 변환
         myAsset: item.bsAmount,
         averageAsset: item.categoryAvgAmount,
