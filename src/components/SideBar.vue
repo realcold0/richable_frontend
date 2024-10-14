@@ -4,7 +4,7 @@
     @mouseleave="collapseSidebar"
     :class="{ active: isSideBarActive }"
   >
-    <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
+     <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
       <router-link to="/">
         <img
           :src="
@@ -16,7 +16,7 @@
         />
       </router-link>
     </div>
-
+    
     <div class="menu">
 
         <div  @mouseenter="toggleAssetMenu" @mouseleave="toggleAssetMenu" class="wrapButton">
@@ -148,6 +148,8 @@
 </template>
 
 <script>
+import fullLogo from 'src/assets/images/navbar-full-rich.png'; // 전체 로고
+import collapsedLogo from 'src/assets/images/navbar-rich.png'; // 축소 로고
 export default {
   data() {
     return {
