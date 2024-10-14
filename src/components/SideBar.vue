@@ -4,15 +4,15 @@
     @mouseleave="collapseSidebar"
     :class="{ active: isSideBarActive }"
   >
-    <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
+     <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
       <router-link to="/">
-         <img
-            :src="isSideBarActive ? fullLogo : collapsedLogo"
-            alt="로고"
-          />
+        <img
+          :src="isSideBarActive ? require('@/assets/images/navbar-full-rich.png') : require('@/assets/images/navbar-rich.png')"
+          alt="로고"
+        />
       </router-link>
     </div>
-
+    
     <div class="menu">
 
         <div  @mouseenter="toggleAssetMenu" @mouseleave="toggleAssetMenu" class="wrapButton">
