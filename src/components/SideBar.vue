@@ -6,10 +6,10 @@
   >
     <div :class="isSideBarActive ? 'expanded-logo' : 'collapsed-logo'">
       <router-link to="/">
-           <img
-          :src="isSideBarActive ? fullLogo : collapsedLogo"
-          alt="로고"
-        />
+         <img
+            :src="isSideBarActive ? fullLogo : collapsedLogo"
+            alt="로고"
+          />
       </router-link>
     </div>
 
@@ -144,8 +144,8 @@
 </template>
 
 <script>
-import fullLogo from '@/assets/images/navbar-full-rich.png'; // 전체 로고
-import collapsedLogo from '@/assets/images/navbar-rich.png'; // 축소 로고
+import fullLogo from 'src/assets/images/navbar-full-rich.png'; // 전체 로고
+import collapsedLogo from 'src/assets/images/navbar-rich.png'; // 축소 로고
 export default {
   data() {
     return {
