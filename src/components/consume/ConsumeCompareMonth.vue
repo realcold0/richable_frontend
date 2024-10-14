@@ -113,6 +113,8 @@ const renderLineChart = async () => {
             }
             return 0
           }),
+          pointHoverRadius: 10,  
+          pointHitRadius: 10,    
           pointBackgroundColor: '#FF0062'
         },
         {
@@ -125,6 +127,8 @@ const renderLineChart = async () => {
           borderJoinStyle: 'round',
           tension: 0.4,
           pointRadius: 0,
+          pointHoverRadius: 10,  // hover 시 커지는 포인트 범위
+          pointHitRadius: 10,    // hover 인식 범위 확장
           backgroundColor: function (context) {
             const chart = context.chart
             const { ctx, chartArea } = chart
@@ -150,7 +154,16 @@ const renderLineChart = async () => {
             boxWidth: 20,
             padding: 20
           }
+        },
+        tooltip: {
+        callbacks: {
+          // 툴팁에 표시될 라벨을 수정하는 부분
+          label: function (tooltipItem) {
+            const value = tooltipItem.raw.toLocaleString() + '원'
+            return `${tooltipItem.dataset.label}: ${value}`
+          }
         }
+      }
       },
       elements: {
         line: {
