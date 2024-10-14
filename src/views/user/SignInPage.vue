@@ -137,7 +137,6 @@ const login = async () => {
     return
   }
   try {
-    console.log(`/api/member/login`);
 
     const response = await axiosinstance.post(`/member/login` , {
       id: id.value,
