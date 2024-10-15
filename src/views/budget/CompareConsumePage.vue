@@ -13,7 +13,9 @@
     <div class="text-center total-asset">
       <div class="asset-title">
         {{
-          diffAmount > 0 ? '이번 달에 아낄 수 있었던 비용이에요 😢' : '이번달에 아낀 비용이에요 😲'
+          saveAmount.value - possibleSaveAmount.value > 0
+            ? '이번 달에 아낄 수 있었던 비용이에요 😢'
+            : '이번달에 아낀 비용이에요 😲'
         }}
       </div>
       <div class="asset-amount">{{ Math.abs(couldsaving).toLocaleString() }}원</div>
@@ -76,6 +78,18 @@
         </div>
         <!-- 차트 -->
         <div class="chart-container">
+          <div class="tooltip-box">
+            <button
+              class="tool-btn"
+              ref="tooltipButton"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="left"
+              :title="tooltipMessage"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
           <canvas style="margin-top: 20px" id="myChart"></canvas>
         </div>
       </div>
@@ -90,7 +104,12 @@
       <div v-if="possibleSaveAmount.length > 0">
         <div class="total-consume">
           <div class="consume-title">
-            이번 달 소비 중 줄일 수 있는 소비는
+            <!-- 이번 달 소비 중 줄일 수 있는 소비는 -->
+            {{
+              saveAmount.value - possibleSaveAmount.value > 0
+                ? '이번 달 소비 중 줄일 수 있는 소비는 😢'
+                : '이번달에 아낀 소비는 😲'
+            }}
             <span style="font-size: 18px; font-weight: 500; color: #ff0062">
               {{ Math.abs(couldsaving).toLocaleString() }}</span
             >
@@ -105,9 +124,23 @@
             원 절약이 가능해요!
           </div>
         </div>
-
         <!-- 절약 차트 -->
-        <canvas style="margin-top: 20px" id="savingChart"></canvas>
+        <div class="save-chart-container">
+          <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
+          <div class="tooltip-box">
+            <button
+              class="tool-btn"
+              ref="tooltipButton2"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="left"
+              :title="tooltipMessage2"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
+          <canvas style="margin-top: 20px" id="savingChart"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -115,10 +148,11 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Chart, registerables } from 'chart.js'
+import { Chart, registerables, Tooltip } from 'chart.js'
 import { nextTick } from 'vue'
 import axiosInstance from '@/AxiosInstance'
 import { useMonthStore } from '@/stores/consume/curMonth.js'
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 // 차트.js 등록
 Chart.register(...registerables)
@@ -141,7 +175,7 @@ const categories = ref([
   '통신비',
   '문화',
   '교육비',
-  '외식 · 숙박',
+  '외식',
   '비소비지출',
   '기타'
 ])
@@ -151,6 +185,11 @@ const averageSpending = ref(0)
 const diffAmount = computed(() => userSpending.value - averageSpending.value)
 const possibleSaveAmount = ref([]) // 빈 배열로 초기화
 const saveAmount = ref([]) // 빈 배열로 초기화
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('평균값은 KOSIS 산업별 가구당 월 [평균] 가계수지 입니다.')
+const tooltipMessage2 = ref('이번달에 아낀 소비를 6개월 뒤 까지 누적으로 합산합니다.')
 
 // 통화 포맷 함수
 const formatCurrency = (amount) => {
@@ -172,8 +211,8 @@ const wordMapping2 = {
   통신비: '통신',
   문화: '오락 · 문화',
   교육비: '교육',
-  '외식 · 숙박': '음식 · 숙박',
-  기타: '기타상품 · 서비스',
+  외식: '음식',
+  기타: '기타상품',
   비소비지출: '비소비지출'
 }
 
@@ -300,7 +339,10 @@ const createComparisonChart = () => {
       responsive: true,
       layout: {
         padding: {
-          top: 20 // 그래프 상단에 패딩 추가
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20
         }
       },
       scales: {
@@ -398,7 +440,7 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
         },
         {
           label: '평소 저축',
-          data:  saveAmount,
+          data: saveAmount,
           borderColor: '#D3D3D3',
           fill: false,
           borderWidth: 2
@@ -407,6 +449,14 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
     },
     options: {
       responsive: true,
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
@@ -510,16 +560,17 @@ onMounted(() => {
   background-color: #f9f9f9;
   height: 150px;
   border: 1px solid #f8f8f8;
+  position: relative;
 }
 
 .chart-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: auto;
-  padding: 20px; /* 패딩으로 차트 여백 확보 */
-  background: #FFF;
+  background: #fff;
 }
 
 .consume-title {
@@ -669,5 +720,39 @@ canvas {
   display: block;
   border-radius: 20px;
   border: 1px solid #e4ebf0;
+}
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  position: absolute;
+  bottom: 20px;
+  right: 410px;
+  top: 30px;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
+}
+
+.save-chart-container {
+  position: relative; /* 차트 컨테이너 기준으로 툴팁 위치 설정 */
+  width: 100%;
+  height: auto;
+  background: #fff;
 }
 </style>

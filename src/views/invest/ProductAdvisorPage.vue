@@ -12,6 +12,18 @@
     <!-- 도넛 차트 영역 -->
     <div class="d-flex justify-content-center align-items-center mb-5 chart-container1">
       <div class="chart-container2">
+        <div class="tooltip-box">
+              <button
+                class="tool-btn"
+                ref="tooltipButton"
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
+                :title="tooltipMessage"
+              >
+                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+              </button>
+            </div>
         <div class="donut-chart">
           <svg viewBox="0 0 36 36">
             <path
@@ -93,6 +105,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axiosInstance from '@/AxiosInstance';
+import { Chart, registerables, Tooltip } from 'chart.js'
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 const availableCash = ref(0); // 여유 자금
 const availablePercentage = ref(0); // 여유 자금 비율
@@ -286,6 +300,7 @@ const calculatePercentage = (cash) => {
 }
 
 .chart-container2 {
+  position:relative;
   width: 200px;
   height: 200px;
   position: relative;
@@ -474,6 +489,34 @@ button:hover {
   height: 50px;
   animation: spin 1s linear infinite;
 }
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  position: absolute;
+  right: -200px;
+  top: 0;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
+}
+
 
 @keyframes spin {
   0% {
