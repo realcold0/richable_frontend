@@ -72,10 +72,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+const setAuthToken = (key, value) => new Promise((resolve) => {
+  localStorage.setItem(key,value);
+  resolve();
+})
 
 const naverLogin = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/member/naverlogin`)
+    const response = await axiosinstance.get(`${BASE_URL}/member/naverlogin`)
     console.log('Naver login response:', response.data)
     if (response.data.success && response.data.response?.data?.redirectUrl) {
       localStorage.setItem('naverState', response.data.response.data.state)
@@ -108,8 +112,7 @@ const login = async () => {
       console.log('Token received:', token);
       // 로그인 성공 시 처리
       alert('Login successful!');
-      localStorage.setItem('authToken', token);
-      router.push({ name: 'assetAnalysis' });
+      await setAuthToken("authToken", token).then(() => router.push({ name: 'assetAnalysis' }));
     } else {
       throw new Error('Invalid response format');
     }

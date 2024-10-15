@@ -13,6 +13,12 @@
   const router = useRouter();
   const error = ref(null);
   
+  const setAuthToken = (key, value) => new Promise((resolve) => {
+  localStorage.setItem(key,value);
+  resolve();
+  })
+
+
   const handleNaverCallback = async () => {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -23,7 +29,7 @@
     if (token) {
       try {
         // JWT 토큰을 세션 스토리지에 저장
-        localStorage.setItem('authToken', token);
+        await setAuthToken('authToken', token);
         //sessionStorage.setItem('authToken', token);
   
         // Axios의 기본 인증 헤더 설정
