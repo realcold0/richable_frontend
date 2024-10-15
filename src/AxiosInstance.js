@@ -37,15 +37,7 @@ axiosInstance.interceptors.response.use(
     // 401 Unauthorized 에러 발생 시 처리
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // 중복 요청 방지
-<<<<<<< HEAD
-      
-      
-      // 원래 요청 URL을 리디렉션 쿼리로 전달
-      router.push({
-        path: '/user/signin',
-        query: { redirect: originalRequest.url } // 원래 요청한 경로를 쿼리로 전달
-      });
-=======
+
       try {
         // 리프레시 토큰으로 액세스 토큰 재발급 요청
         // const response = await axiosInstance.post('/auth/refresh-token', {
@@ -74,7 +66,7 @@ axiosInstance.interceptors.response.use(
 
         });
       }
->>>>>>> 696dd7a1c6a11b8759b0810067edc881bfc0a9c3
+
     }
     
     
