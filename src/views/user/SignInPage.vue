@@ -79,7 +79,7 @@ const setAuthToken = (key, value) => new Promise((resolve) => {
 
 const naverLogin = async () => {
   try {
-    const response = await axiosinstance.get(`${BASE_URL}/member/naverlogin`)
+    const response = await axiosinstance.get(`/member/naverlogin`)
     console.log('Naver login response:', response.data)
     if (response.data.success && response.data.response?.data?.redirectUrl) {
       localStorage.setItem('naverState', response.data.response.data.state)
