@@ -18,7 +18,7 @@
                 ref="tooltipButton"
                 type="button"
                 data-bs-toggle="tooltip"
-                data-bs-placement="left"
+                data-bs-placement="right"
                 :title="tooltipMessage"
               >
                 <font-awesome-icon icon="circle-question" style="font-size: 25px" />
@@ -103,9 +103,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axiosInstance from '@/AxiosInstance';
-import { Chart, registerables, Tooltip } from 'chart.js'
+import { Chart, registerables } from 'chart.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 const availableCash = ref(0); // 여유 자금
@@ -121,6 +121,11 @@ const scrollContainer = ref(null);
 const isDragging = ref(false);
 const startX = ref(0);
 const scrollLeft = ref(0);
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('여유자금은 보유 현금과 입출금 통장 금액의 합산입니다')
+
 
 // 마우스 드래그 시작 시 호출
 const startDragging = (e) => {
@@ -160,7 +165,13 @@ const getRiskClass = (category) => {
 
 onMounted(() => {
   const token = localStorage.getItem('authToken'); // JWT 토큰 가져오기
-
+  nextTick(() => {
+    // 첫 번째 툴팁 초기화
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+    }
+  });
   if (token) {
     // 전체 자산 가져오기
     axiosInstance.get('/finance/total/sum')
