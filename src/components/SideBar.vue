@@ -137,7 +137,6 @@
 </template>
 
 <script>
-<<<<<<< HEAD
 import { useAuthStore } from '@/stores/auth';
 import {watch} from 'vue';
 
@@ -146,15 +145,6 @@ export default {
     return {
       fullLogoUrl: new URL('@/assets/images/navbar-full-rich.png', import.meta.url).href,
       logoUrl: new URL('@/assets/images/navbar-rich.png', import.meta.url).href,
-=======
-import fullLogo from 'src/assets/images/navbar-full-rich.png'; // 전체 로고
-import collapsedLogo from 'src/assets/images/navbar-rich.png'; // 축소 로고
-export default {
-  data() {
-    return {
-      fullLogoUrl : new URL('@/assets/images/navbar-full-rich.png', import.meta.url).href,
-      logoUrl : new URL('@/assets/images/navbar-rich.png', import.meta.url).href,
->>>>>>> 696dd7a1c6a11b8759b0810067edc881bfc0a9c3
       isAssetMenuOpen: false,
       isIncomeMenuOpen: false,
       isInvestMenuOpen: false,

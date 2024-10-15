@@ -67,11 +67,7 @@ const id = ref('')
 const password = ref('')
 const showPassword = ref(true)
 const router = useRouter()
-<<<<<<< HEAD
 const authStore = useAuthStore()
-=======
-
->>>>>>> 696dd7a1c6a11b8759b0810067edc881bfc0a9c3
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
