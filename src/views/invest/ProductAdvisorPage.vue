@@ -58,14 +58,14 @@
     <div v-else>
       <div class="cha-title">
         <div class="cha-title-sub">
-          "{{ nickname }}"님은 <p style="display: inline; color: #ff0062;">{{ tendency }}</p>이군요.
+          <strong>{{ nickname }}</strong>님은 <p style="display: inline; color: #ff0062;">{{ tendency }}</p>이군요.
         </div>
         <div class="cha-title-main">
           <template v-if="tendency === '공격형'">
-            {{ tendency }} 이므로 <span style="color: #ff0062;">채권/예금</span> 상품을 추천해드려요.
+             <span style="color: #ff0062;">채권/예금</span> 상품을 추천해드려요.
           </template>
           <template v-else-if="tendency === '안정형'">
-            {{ tendency }} 이므로 <span style="color: #ff0062;">주식/코인</span> 상품을 추천해드려요.
+            <span style="color: #ff0062;">주식/코인</span> 상품을 추천해드려요.
           </template>
           <template v-else>
             다양한 상품을 추천해드려요.
@@ -91,7 +91,7 @@
               <p :class="getRiskClass(product.prodCategroy)">위험도 {{ getRiskLevel(product.prodCategroy) }}</p>
               <div class="product-name mb-2 text-muted">{{ product.name }}</div>
               <div style="display: flex; justify-content: space-between;">
-                <p class="product-price">{{ product.price.toLocaleString() }}원</p>
+                <p class="product-price"><strong>{{ product.price.toLocaleString() }}원</strong></p>
                 <p class="unit-price text-muted">단위당 가격</p>
               </div>
             </div>

@@ -59,6 +59,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 import axiosinstance from '@/AxiosInstance';
 
@@ -66,12 +67,16 @@ const id = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const router = useRouter()
-
+const authStore = useAuthStore()
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+const setAuthToken = (key, value) => new Promise((resolve) => {
+  localStorage.setItem(key,value);
+  resolve();
+})
 const setAuthToken = (key, value) => new Promise((resolve) => {
   localStorage.setItem(key,value);
   resolve();
@@ -112,7 +117,10 @@ const login = async () => {
       console.log('Token received:', token);
       // 로그인 성공 시 처리
       alert('Login successful!');
-      await setAuthToken("authToken", token).then(() => router.push({ name: 'assetAnalysis' }));
+      await setAuthToken("authToken", token);
+      await authStore.fetchUserProfile();
+
+      router.push({ name: 'assetAnalysis' });
     } else {
       throw new Error('Invalid response format');
     }
