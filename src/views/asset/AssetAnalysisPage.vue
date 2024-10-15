@@ -412,7 +412,6 @@ const fetchData = async () => {
       incomeLabels, returnIncome.value.map(item => item.balalnceRate),
       stockLabels, returnStock.value.map(item => item.earningRate)
     );
-
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error)
   }

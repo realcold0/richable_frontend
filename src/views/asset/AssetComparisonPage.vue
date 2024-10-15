@@ -9,6 +9,18 @@
     <!-- 전체 자산 비교 -->
     <div class="asset-graph-container">
       <div class="asset-analysis-nav">
+        <div class="tooltip-box">
+              <button
+                class="tool-btn"
+                ref="tooltipButton"
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
+                :title="tooltipMessage"
+              >
+                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+              </button>
+            </div>
         <div class="asset-title">전체 자산 비교</div>
       </div>
 
@@ -84,9 +96,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, Tooltip } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 
 Chart.register(...registerables);
@@ -106,6 +119,11 @@ const assetList = ref([]);
 // 로딩 상태 및 오류 메시지
 const loading = ref(false);
 const errorMessage = ref('');
+
+const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipMessage = ref('평균값은 KOSIS 산업별 가구당 월 [평균] 가계수지 입니다.')
+
 
 const fetchFinancialAssetsSum = async () => {
   loading.value = true;
@@ -175,6 +193,7 @@ const fetchPeerFinanceData = async () => {
     const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
+      console.log(financeData)
       assetList.value = financeData.map(item => ({
         category: categoryMapping[item.category] || item.category, // 카테고리 한국어 변환
         myAsset: item.bsAmount,
@@ -427,6 +446,7 @@ onMounted(async () => {
 }
 
 .asset-analysis-nav {
+  position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -500,5 +520,32 @@ th {
 td {
   font-size: 16px;
   color: #555;
+}
+
+.tooltip-inner {
+  white-space: nowrap !important;
+}
+
+.tooltip-box {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.tooltip-box button {
+  border: none; /* 테두리 제거 */
+  background: none; /* 배경 제거 */
+  padding: 0; /* 여백 제거 */
+  cursor: pointer; /* 클릭 가능한 마우스 커서 */
+  outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+}
+
+
+.tooltip-inner {
+  font-family: 'Pretendard';
+  max-width: 400px !important;
+  white-space: normal !important;
+  font-size: 12px;
 }
 </style>

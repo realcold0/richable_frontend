@@ -52,6 +52,18 @@
             <label for="expenseMemo" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">메모</label>
             <input type="text" class="form-control" id="expenseMemo" v-model="expenseMemo">
           </div>
+
+          <!-- 계좌 선택 -->
+          <div class="mb-3 form-group" style="display: flex;">
+            <label for="selectAccount" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">계좌</label>
+            <select class="form-select" id="selectAccount" v-model="selectedAccount" style="flex-grow: 1;">
+              <option value="" disabled>계좌를 선택하세요</option>
+              <option v-for="account in accounts" :key="account.index" :value="account.accountNum">
+                {{ account.orgCode }} - {{ account.accountNum }} - {{ account.prodName }}
+              </option>
+            </select>
+          </div>
+
         </div>
 
         <div class="modal-footer d-flex justify-content-between">
@@ -69,21 +81,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose } from 'vue';
-import { Modal } from 'bootstrap';
-import axios from 'axios';
-import axiosInstance from '@/AxiosInstance.js'
+import { ref, onMounted, defineExpose, defineEmits } from 'vue'
+import { Modal } from 'bootstrap'
+import axiosInstance from '@/AxiosInstance'
 
 // 모달 초기화 변수
 const modal = ref(null);
 let modalInstance = null;
 
 // 소비 등록을 위한 데이터 바인딩 변수
-const expenseCategory = ref('');        // 소비 유형      
-const expenseAmount = ref('');      // 소비 가격
-const expenseDescript = ref('');     // 소비 내용
-const expenseMemo = ref('');        // 소비 메모
-const expenseDate = ref('');
+const expenseCategory = ref('') // 소비 유형
+const expenseAmount = ref('') // 소비 가격
+const expenseDescript = ref('') // 소비 내용
+const expenseMemo = ref('') // 소비 메모
+const expenseDate = ref('') // 소비 날짜
+const accounts = ref([]) // 계좌 목록
+const selectedAccount = ref(0) // 선택한 계좌
 
 // 모달 열기 함수
 const show = () => {
@@ -94,7 +107,21 @@ const show = () => {
     });
     modalInstance.show();
   } else if (modalInstance) {
-    modalInstance.show();
+    modalInstance.show()
+  }
+}
+
+// 계좌 목록 불러오기
+const fetchAccounts = async () => {
+  try {
+    const response = await axiosInstance.get('/asset/account/list')
+    if (response.data.success) {
+      accounts.value = response.data.response.data.account
+    } else {
+      console.error('계좌 목록 조회 실패:', response.data)
+    }
+  } catch (error) {
+    console.error('계좌 목록 조회 실패:', error.response ? error.response.data : error)
   }
 };
 
@@ -106,15 +133,17 @@ onMounted(() => {
       keyboard: true
     });
   }
+  fetchAccounts()
 });
 const registerExpense = async () => {
   try {
     const expenseData = {
-      expCategory: expenseCategory.value,              
-      amount: parseInt(expenseAmount.value),           
-      descript: expenseDescript.value,                 
-      memo: expenseMemo.value,             
-      date : expenseDate.value            
+      expCategory: expenseCategory.value,
+      amount: parseInt(expenseAmount.value),
+      descript: expenseDescript.value,
+      memo: expenseMemo.value,
+      date: expenseDate.value,
+      accountNum: selectedAccount.value
     };
 
     console.log(expenseData);
@@ -126,10 +155,11 @@ const registerExpense = async () => {
       if (modalInstance) {
         modalInstance.hide();
       }
+      emit('outcomeRegistered');
+      console.log('outcomeRegistered');
     } else {
       console.error("소비 등록 실패:", response.data);
     }
-
   } catch (error) {
     console.error("소비 등록 실패:", error.response ? error.response.data : error);
   }
