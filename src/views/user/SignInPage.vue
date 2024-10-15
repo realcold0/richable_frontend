@@ -64,7 +64,7 @@ import axiosinstance from '@/AxiosInstance';
 
 const id = ref('')
 const password = ref('')
-const showPassword = ref(true)
+const showPassword = ref(false)
 const router = useRouter()
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

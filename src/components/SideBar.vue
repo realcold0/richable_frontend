@@ -217,11 +217,15 @@ export default {
       this.isLoggedIn = !!token;
     },
     logout() {
-      // 로그아웃 시 localStorage에서 토큰 삭제 후 로그인 페이지로 리디렉션
-      localStorage.removeItem('authToken');
-      alert('로그아웃 되었습니다.');
+      // 로그아웃 시 localStorage 및 sessionStorage에서 모든 세션 정보 삭제
+      localStorage.removeItem('authToken');  // localStorage에서 authToken 삭제
+      sessionStorage.clear();  // sessionStorage 전체 삭제
+      
+      // 상태 초기화 및 리디렉션
       this.isLoggedIn = false;
       this.$router.push('/user/signin');
+      
+      alert('로그아웃 되었습니다.');
     }
   },
   mounted(){
