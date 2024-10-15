@@ -507,8 +507,8 @@ button:hover {
 
 .tooltip-box {
   position: absolute;
-  right: -200px;
-  top: 0;
+  right: -570px;
+  top: -80px;
   z-index: 10;
 }
 

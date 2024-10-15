@@ -457,7 +457,7 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .graph-container-title {
@@ -535,7 +535,7 @@ td {
 .tooltip-box {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 30;
   z-index: 10;
 }
 
