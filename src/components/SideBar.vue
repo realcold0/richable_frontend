@@ -9,8 +9,8 @@
         <img
           :src="
             isSideBarActive
-              ? fullLogo
-              : collapsedLogo
+              ? fullLogoUrl
+              : logoUrl
           "
           alt="로고"
         />
