@@ -170,6 +170,7 @@
   
       categories.value = responseData.categorys || [];
       totalSum.value = responseData.sum || 0;
+      console.log(`total sum : ${totalSum.value}`);
   
       processCategories();
     } catch (error) {
