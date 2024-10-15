@@ -151,6 +151,18 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useBadgeStore } from '@/stores/mypage/badge.js';
 import UserAllBadgesModal from '@/components/modal/user/UserAllBadgesModal.vue';
 
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+  return JSON.parse(jsonPayload);
+}
+
 const badgeStore = useBadgeStore();
 const badges = computed(() => badgeStore.badges);
 
@@ -160,8 +172,20 @@ const openBadgeModal = () => {
   badgeModal.show();
 };
 
+
+
+
 // JWT 토큰을 localStorage에서 가져오기
 const token = localStorage.getItem('authToken');
+
+let nickname = null;
+
+if (token) {
+  const decodedToken = parseJwt(token); // 토큰에서 닉네임 추출
+  nickname = decodedToken.nickname;
+} else {
+  console.error('토큰이 없습니다.');
+}
 
 // 프로필 및 API 키 관리용 변수
 const userProfile = ref({
@@ -292,7 +316,11 @@ const selectedBadgeId = ref(null);
 
 const selectedBadge = computed(() => badges.value.length > 0 ? badges.value.find(badge => badge.id === selectedBadgeId.value) : null);
 
-const selectBadge = (badge) => selectedBadgeId.value = badge.id;
+const selectBadge = (badge) => {
+  selectedBadgeId.value = badge.id;
+  // 선택한 배지 정보를 localStorage에 저장
+  localStorage.setItem('selectedBadge', JSON.stringify(badge));
+};
 
 const toggleBadgeSelection = (badge) => {
   if (!badge.isSelected) selectedBadgeId.value = null;
@@ -300,6 +328,19 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
+
+  // localStorage에 저장된 배지 정보를 불러옴
+  const storedBadge = localStorage.getItem('selectedBadge');
+  if (storedBadge) {
+    const badge = JSON.parse(storedBadge);
+    selectedBadgeId.value = badge.id; // 저장된 배지 ID 설정
+  }
+  if (nickname) {
+    badgeStore.fetchBadges(nickname); // nickname을 전달해서 fetchBadges 호출
+  } else {
+    console.error('Nickname is not defined.');
+  }
+  
   axios.get(`${BASE_URL}/info`)
     .then((response) => {
       const responseData = response.data.response.data?.data || {};
@@ -325,7 +366,7 @@ onMounted(() => {
           bankApiKey: 'API 키 없음',
           stockApiKey: 'API 키 없음',
           cryptoApiKey: 'API 키 없음',
-          consentStatus: '동의 안함',
+          consentStatus: '동의 안함'
         };
       }
     })
