@@ -112,7 +112,7 @@
 
         <div class="graph-container-wrapper">
           <div class="graph-container">
-            <div class="graph-title">저축량</div>
+            <div class="graph-title">저축률</div>
             <div class="graph-sum">{{returnIncomeSum}}%</div>
             <canvas class="graph" ref="lineChart3"></canvas>
           </div>
