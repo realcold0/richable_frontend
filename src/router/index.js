@@ -26,9 +26,9 @@ const routes = [
     component: () => import('../views/user/SignUpPage.vue')
   },
   {
-    path: '/auth/naver',
-    name: 'naverAuth',
-    component: () => import('../views/user/SignInPage.vue')
+    path: '/auth/naver/callback',
+    name: 'NaverAuthCallback',
+    component: () => import('../views/user/NaverAuthCallback.vue')
   },
   {
     path: '/user/findpassword',
