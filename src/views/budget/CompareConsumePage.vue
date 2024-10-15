@@ -78,6 +78,8 @@
         </div>
         <!-- 차트 -->
         <div class="chart-container">
+          
+          <canvas style="margin-top: 20px" id="myChart"></canvas>
           <div class="tooltip-box">
             <button
               class="tool-btn"
@@ -89,7 +91,6 @@
               <font-awesome-icon icon="circle-question" style="font-size: 25px" />
             </button>
           </div>
-          <canvas style="margin-top: 20px" id="myChart"></canvas>
         </div>
       </div>
     </div>
@@ -123,22 +124,25 @@
             원 절약이 가능해요!
           </div>
         </div>
+
         <!-- 절약 차트 -->
+        <div class="graph-container">
         <div class="save-chart-container">
           <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
-          <div class="tooltip-box">
-            <button
-              class="tool-btn"
-              ref="tooltipButton2"
-              type="button"
-              data-bs-toggle="tooltip"
-              data-bs-placement="right"
-            >
-              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
-            </button>
-          </div>
           <canvas style="margin-top: 20px" id="savingChart"></canvas>
         </div>
+        <div class="tooltip-box">
+          <button
+            class="tool-btn"
+            ref="tooltipButton2"
+            type="button"
+            data-bs-toggle="tooltip"
+            data-bs-placement="right"
+          >
+            <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+          </button>
+      </div>
+    </div>
       </div>
     </div>
   </div>
@@ -592,7 +596,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: auto;
+  height: 432px;
   background: #fff;
 }
 
@@ -620,7 +624,7 @@ onMounted(() => {
   width: 100%; /* 캔버스 너비를 부모 요소에 맞춤 */
   max-width: 800px; /* 캔버스 최대 너비 설정 */
   height: auto; /* 높이는 자동으로 설정 */
-  margin: 0 auto; /* 중앙 정렬 */
+  margin: 0; /* 중앙 정렬 */
   display: block; /* block 요소로 설정 */
   border-radius: 20px;
   border: 1px solid #e4ebf0;
@@ -734,26 +738,13 @@ onMounted(() => {
   font-size: 18px;
 }
 
-/* 차트 스타일 */
-canvas {
-  max-width: 100%;
-  width: 800px;
-  height: 400px;
-  margin: 0 auto;
-  display: block;
-  border-radius: 20px;
-  border: 1px solid #e4ebf0;
-}
 
 .tooltip-inner {
   white-space: nowrap !important;
 }
 
 .tooltip-box {
-  position: absolute;
-  bottom: 20px;
-  right: 410px;
-  top: 30px;
+  position: relative;
   z-index: 10;
 }
 
@@ -774,8 +765,18 @@ canvas {
 
 .save-chart-container {
   position: relative; /* 차트 컨테이너 기준으로 툴팁 위치 설정 */
-  width: 100%;
-  height: auto;
+  height: 440px;
   background: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
+
+.save-chart-container #savingChart {
+  width: 100%; 
+  max-width: 800px;
+  height: auto; 
+  border-radius: 20px;
+  border: 1px solid #e4ebf0;
+  }
 </style>
