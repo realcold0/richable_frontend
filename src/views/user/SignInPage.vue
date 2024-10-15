@@ -65,7 +65,7 @@ import axiosinstance from '@/AxiosInstance';
 
 const id = ref('')
 const password = ref('')
-const showPassword = ref(true)
+const showPassword = ref(false)
 const router = useRouter()
 const authStore = useAuthStore()
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -73,6 +73,10 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+const setAuthToken = (key, value) => new Promise((resolve) => {
+  localStorage.setItem(key,value);
+  resolve();
+})
 const setAuthToken = (key, value) => new Promise((resolve) => {
   localStorage.setItem(key,value);
   resolve();
