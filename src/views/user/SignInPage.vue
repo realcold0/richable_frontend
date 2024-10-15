@@ -77,10 +77,6 @@ const setAuthToken = (key, value) => new Promise((resolve) => {
   localStorage.setItem(key,value);
   resolve();
 })
-const setAuthToken = (key, value) => new Promise((resolve) => {
-  localStorage.setItem(key,value);
-  resolve();
-})
 
 const naverLogin = async () => {
   try {
