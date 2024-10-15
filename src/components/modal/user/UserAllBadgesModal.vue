@@ -26,15 +26,41 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import axiosInstance from '@/AxiosInstance';
+import { useBadgeStore } from '@/stores/mypage/badge.js';
 
-// 뱃지 데이터 저장 변수
+
+// JWT 디코딩 함수 추가
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+  return JSON.parse(jsonPayload);
+}
+
 const badges = ref([]);
+const badgeStore = useBadgeStore();
+
+const token = localStorage.getItem('authToken');
+let nickname = null;
+
+if (token) {
+  const decodedToken = parseJwt(token); // JWT 토큰에서 닉네임 추출
+  nickname = decodedToken.nickname;
+} else {
+  console.error('토큰이 없습니다.');
+}
 
 // API 호출 후 데이터 가져오기
 const fetchBadges = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/member/badge/all/multiearlyer');
+    // nickname을 포함한 API 요청
+    const response = await axiosInstance.get(`/member/badge/all/${nickname}`);
     badges.value = response.data.response.data;
   } catch (error) {
     console.error('Error fetching badges:', error);
@@ -43,9 +69,14 @@ const fetchBadges = async () => {
 
 // 컴포넌트가 마운트되면 API 호출
 onMounted(() => {
-  fetchBadges();
+  if (nickname) {
+    fetchBadges();
+  } else {
+    console.error('Nickname is not defined.');
+  }
 });
 </script>
+
 
 <style scoped>
 .badge-item {
