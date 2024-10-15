@@ -77,19 +77,20 @@
           </div>
         </div>
         <!-- 차트 -->
-        <div class="chart-container">
-          
-          <canvas style="margin-top: 20px" id="myChart"></canvas>
-          <div class="tooltip-box">
-            <button
-              class="tool-btn"
-              ref="tooltipButton"
-              type="button"
-              data-bs-toggle="tooltip"
-              data-bs-placement="right"
-            >
-              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
-            </button>
+        <div class="graph-container">
+          <div class="chart-container">
+            <canvas style="margin-top: 20px" id="myChart"></canvas>
+            <div class="tooltip-box">
+              <button
+                class="tool-btn"
+                ref="tooltipButton"
+                type="button"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
+              >
+                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -126,23 +127,23 @@
         </div>
 
         <!-- 절약 차트 -->
-        <div class="graph-container">
-        <div class="save-chart-container">
-          <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
-          <canvas style="margin-top: 20px" id="savingChart"></canvas>
+        <div class="graph-container2">
+          <div class="save-chart-container">
+            <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
+            <canvas style="margin-top: 20px" id="savingChart"></canvas>
+          </div>
+          <div class="tooltip-box2">
+            <button
+              class="tool-btn"
+              ref="tooltipButton2"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="right"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
         </div>
-        <div class="tooltip-box">
-          <button
-            class="tool-btn"
-            ref="tooltipButton2"
-            type="button"
-            data-bs-toggle="tooltip"
-            data-bs-placement="right"
-          >
-            <font-awesome-icon icon="circle-question" style="font-size: 25px" />
-          </button>
-      </div>
-    </div>
       </div>
     </div>
   </div>
@@ -157,7 +158,7 @@ import { useMonthStore } from '@/stores/consume/curMonth.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
 // 차트.js 등록
-Chart.register(...registerables);
+Chart.register(...registerables)
 
 // pinia store 사용
 // 달별 네비게이션
@@ -195,14 +196,16 @@ const tooltipInstance2 = ref(null) // 툴팁 인스턴스
 const tooltipMessage = ref('평균값은 KOSIS 산업별 가구당 월 [평균] 가계수지 입니다.')
 const tooltipMessage2 = ref('이번달에 아낀 소비를 6개월 뒤 까지 누적으로 합산합니다.')
 
-
-watch(() => tooltipButton2.value, (newVal) => {
-  if (newVal) {
-    newVal.setAttribute('title', tooltipMessage2.value);
-    tooltipInstance2.value = new BootstrapTooltip(newVal);
-    console.log('Tooltip 2 initialized');
+watch(
+  () => tooltipButton2.value,
+  (newVal) => {
+    if (newVal) {
+      newVal.setAttribute('title', tooltipMessage2.value)
+      tooltipInstance2.value = new BootstrapTooltip(newVal)
+      console.log('Tooltip 2 initialized')
+    }
   }
-});
+)
 
 // 통화 포맷 함수
 const formatCurrency = (amount) => {
@@ -501,17 +504,17 @@ onMounted(() => {
   nextTick(() => {
     // 첫 번째 툴팁 초기화
     if (tooltipButton.value) {
-      tooltipButton.value.setAttribute('title', tooltipMessage.value);
-      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+      tooltipButton.value.setAttribute('title', tooltipMessage.value)
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value)
     }
 
     // 두 번째 툴팁 초기화
     if (tooltipButton2.value) {
-      tooltipButton2.value.setAttribute('title', tooltipMessage2.value);
-      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value);
+      tooltipButton2.value.setAttribute('title', tooltipMessage2.value)
+      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value)
     }
-  });
-  
+  })
+
   fetchComparisonData() // 초기 로드 시 데이터 가져오기
   fetchCouldSaving() // 절약 가능 금액 데이터 가져오기
   fetchSimulationData() // 시뮬레이션 데이터 가져오기
@@ -591,7 +594,6 @@ onMounted(() => {
 }
 
 .chart-container {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -738,22 +740,24 @@ onMounted(() => {
   font-size: 18px;
 }
 
-
-.tooltip-inner {
-  white-space: nowrap !important;
-}
-
-.tooltip-box {
-  position: relative;
+.tooltip-box,
+.tooltip-box2 {
+  position: absolute;
+  top: 10px; /* 그래프 상단에 맞추기 위한 값 */
+  right: 10px; /* 그래프 우측에 맞추기 위한 값 */
   z-index: 10;
+  display: flex;
+  justify-content: flex-end; /* 우측 정렬 */
+  align-items: flex-start; /* 상단 정렬 */
 }
 
-.tooltip-box button {
+.tool-btn {
   border: none; /* 테두리 제거 */
   background: none; /* 배경 제거 */
   padding: 0; /* 여백 제거 */
   cursor: pointer; /* 클릭 가능한 마우스 커서 */
   outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
+  box-shadow: none; /* 사각형 제거 */
 }
 
 .tooltip-inner {
@@ -763,20 +767,30 @@ onMounted(() => {
   font-size: 12px;
 }
 
-.save-chart-container {
-  position: relative; /* 차트 컨테이너 기준으로 툴팁 위치 설정 */
-  height: 440px;
+.graph-container,
+.graph-container2 {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 432px;
   background: #fff;
+}
+
+.save-chart-container {
+  width: 100%; /* 너비를 부모 요소에 맞춤 */
+  max-width: 800px; /* 최대 너비를 설정 */
+  height: 100%; /* 높이를 자동으로 설정 */
   display: flex;
   flex-direction: row;
   justify-content: center;
 }
 
 .save-chart-container #savingChart {
-  width: 100%; 
-  max-width: 800px;
-  height: auto; 
+  width: 100%; /* 차트가 부모 요소의 너비에 맞게 조절됨 */
+  height: 100%; /* 높이도 자동 조절 */
   border-radius: 20px;
   border: 1px solid #e4ebf0;
-  }
+}
 </style>
