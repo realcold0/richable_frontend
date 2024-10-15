@@ -15,9 +15,9 @@
                 ref="tooltipButton"
                 type="button"
                 data-bs-toggle="tooltip"
-                data-bs-placement="left"
+                data-bs-placement="right"
                 :title="tooltipMessage"
-              >
+                >
                 <font-awesome-icon icon="circle-question" style="font-size: 25px" />
               </button>
             </div>
@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Chart, registerables, Tooltip } from 'chart.js';
+import { ref, onMounted,nextTick } from 'vue';
+import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
@@ -405,6 +405,13 @@ onMounted(async () => {
   await fetchPeerData();
   await fetchPeerFinanceData();
   createCharts(); // 차트 생성을 데이터 fetch 후에 실행
+  nextTick(() => {
+    // 첫 번째 툴팁 초기화
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+    }
+  });
 });
 </script>
 
@@ -526,7 +533,7 @@ td {
 }
 
 .tooltip-inner {
-  white-space: nowrap !important;
+  white-space: nowrap;
 }
 
 .tooltip-box {
@@ -547,8 +554,8 @@ td {
 
 .tooltip-inner {
   font-family: 'Pretendard';
-  max-width: 400px !important;
-  white-space: normal !important;
+  max-width: 400px ;
+  white-space: normal ;
   font-size: 12px;
 }
 </style>
