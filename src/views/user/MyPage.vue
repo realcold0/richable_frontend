@@ -291,7 +291,7 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
-  axios.get(`${BASE_URL}/delete/info`)
+  axios.get(`${BASE_URL}/info`)
     .then((response) => {
       const responseData = response.data.response.data?.data || {};
       userProfile.value = {

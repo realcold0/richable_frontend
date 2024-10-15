@@ -59,6 +59,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 import axiosinstance from '@/AxiosInstance';
 
@@ -66,16 +67,20 @@ const id = ref('')
 const password = ref('')
 const showPassword = ref(true)
 const router = useRouter()
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/member"
+const authStore = useAuthStore()
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+const setAuthToken = (key, value) => new Promise((resolve) => {
+  localStorage.setItem(key,value);
+  resolve();
+})
 
 const naverLogin = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/naverlogin`)
+    const response = await axiosinstance.get(`/member/naverlogin`)
     console.log('Naver login response:', response.data)
     if (response.data.success && response.data.response?.data?.redirectUrl) {
       localStorage.setItem('naverState', response.data.response.data.state)
@@ -90,54 +95,13 @@ const naverLogin = async () => {
   }
 }
 
-const handleNaverCallback = async () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
-
-  if (code && state) {
-    try {
-      const savedState = localStorage.getItem('naverState')
-      if (state !== savedState) {
-        throw new Error('Invalid state')
-      }
-
-      const response = await axios.get(`${BASE_URL}/naverCallback`, { params: { code, state } })
-      if (response.data.success && response.data.response?.data?.token) {
-        const { token, userInfo } = response.data.response.data
-        console.log('Naver login success:', token)
-        alert('네이버 로그인 성공!')
-        sessionStorage.setItem('authToken', token)
-        localStorage.removeItem('naverState') // 사용 후 state 제거
-        // 인증 헤더 설정
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-        localStorage.removeItem('naverState') // 사용 후 state 제거
-
-        // 리다이렉트 URL로 이동
-        if (redirectUrl) {
-          window.location.href = redirectUrl // 전체 페이지 리로드
-        } else {
-          router.push({ name: 'assetAnalysis' })
-        }
-      } else {
-        throw new Error('Invalid response format')
-      }
-    } catch (error) {
-      console.error('Naver login callback failed:', error)
-      alert(`네이버 로그인 처리 중 오류: ${error.response?.data?.error || error.message}`)
-      router.push({ name: 'login' }) // 로그인 페이지로 리다이렉트
-    }
-  }
-}
-
 const login = async () => {
   if (!id.value || !password.value) {
     alert('아이디와 비밀번호를 모두 입력해주세요')
     return
   }
   try {
-    const response = await axios.post(`/api/member/login` , {
+    const response = await axiosinstance.post(`/member/login` , {
       id: id.value,
       password: password.value
     });
@@ -149,7 +113,9 @@ const login = async () => {
       console.log('Token received:', token);
       // 로그인 성공 시 처리
       alert('Login successful!');
-      localStorage.setItem('authToken', token);
+      await setAuthToken("authToken", token);
+      await authStore.fetchUserProfile();
+
       router.push({ name: 'assetAnalysis' });
     } else {
       throw new Error('Invalid response format');
@@ -160,7 +126,6 @@ const login = async () => {
   }
 }
 onMounted(() => {
-  handleNaverCallback()
   // 페이지 로드 시 저장된 토큰이 있다면 axios 헤더에 설정
   const token = localStorage.getItem('authToken')
   if (token) {
