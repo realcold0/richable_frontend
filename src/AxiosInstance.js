@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
         // });
 
         // 새로운 액세스 토큰을 로컬 스토리지에 저장
-        localStorage.setItem('authToken', response.data.accessToken);
+        localStorage.setItem('authToken', response.data.accessToken)
 
         // 새로운 토큰을 axiosInstance의 Authorization 헤더에 설정
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;

@@ -28,11 +28,6 @@
             <span class="ms-3">{{ apiKeys.cryptoApiKey }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('crypto')">➡️</button>
           </li>
-          <li class="d-flex align-items-center">
-            <span>동의여부</span>
-            <span class="ms-3">{{ apiKeys.consentStatus }}</span>
-            <button class="btn btn-link ms-auto" @click="openApiKeyInput('consent')">➡️</button>
-          </li>
         </ul>
 
         <div v-if="showApiKeyInput" class="mt-3">
@@ -146,6 +141,7 @@ import noprofileImage from '@/assets/images/noprofile1.png'; // 이미지 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 
 // JWT 토큰을 localStorage에서 가져오기
 const token = localStorage.getItem('authToken');
@@ -295,7 +291,7 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
-  axios.get(`${BASE_URL}/delete/info`)
+  axios.get(`${BASE_URL}/info`)
     .then((response) => {
       const responseData = response.data.response.data?.data || {};
       userProfile.value = {
@@ -329,6 +325,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 기본 스타일 (웹) */
 .mypage-container {
   padding: 20px;
   max-width: 1400px;
@@ -447,4 +444,113 @@ a.text-end {
 .bold-text {
   font-weight: bold;
 }
+
+/* 태블릿 환경 */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .mypage-container {
+    padding: 15px;
+    max-width: 800px;
+  }
+
+  .top-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .box {
+    padding: 30px;
+  }
+
+  .profile img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .badge-title {
+    font-size: 18px;
+  }
+
+  .badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .representative-badge {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .badge-item {
+    width: 120px;
+  }
+
+  .badge-image {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* 모바일 환경 */
+@media (max-width: 767px) {
+  .mypage-container {
+    padding: 10px;
+    max-width: 100%;
+  }
+
+  .top-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .box {
+    padding: 20px;
+    border-radius: 5px;
+  }
+
+  .profile img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile h2 {
+    font-size: 18px;
+  }
+
+  .badge-title {
+    font-size: 16px;
+  }
+
+  .badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .representative-badge {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .badge-item {
+    width: 100px;
+  }
+
+  .badge-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .modal-body .profile-image img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+
+  .btn {
+    font-size: 14px;
+  }
+}
 </style>
+

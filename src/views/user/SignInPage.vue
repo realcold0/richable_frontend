@@ -67,7 +67,7 @@ const password = ref('')
 const showPassword = ref(true)
 const router = useRouter()
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -137,7 +137,6 @@ const login = async () => {
     return
   }
   try {
-    // await axiosinstance.get('').then( (response) => console.log(response.data));
     const response = await axiosinstance.post(`/member/login` , {
       id: id.value,
       password: password.value
