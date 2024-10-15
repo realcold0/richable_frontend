@@ -146,7 +146,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 import Datepicker from 'vue3-datepicker'
 
 const router = useRouter()
@@ -181,7 +181,7 @@ const checkId = async () => {
     return alert('사용자 ID를 입력하세요.')
   }
   try {
-    const { data } = await axios.get(`${BASE_URL}/checkDupl/${member.id}`)
+    const { data } = await axiosinstance.get(`/member/checkDupl/${member.id}`)
     disableSubmit.value = data.success
     checkError.value = data.success ? '이미 사용중인 ID입니다.' : '사용가능한 ID입니다.'
   } catch (error) {
@@ -215,7 +215,7 @@ const join = async () => {
   // console.log('Sending member data:', memberToSend); // 디버깅을 위해 추가
 
   try {
-    const { data } = await axios.post(`${BASE_URL}/register`, memberToSend)
+    const { data } = await axiosinstance.post(`/register`, memberToSend)
     console.log('Signup successful:', data)
     router.push({ name: 'terms', params: { id: member.id } })
   } catch (error) {
