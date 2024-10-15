@@ -79,17 +79,17 @@
         <!-- 차트 -->
         <div class="chart-container">
           <div class="tooltip-box">
-              <button
-                class="tool-btn"
-                ref="tooltipButton"
-                type="button"
-                data-bs-toggle="tooltip"
-                data-bs-placement="left"
-                :title="tooltipMessage"
-              >
-                <font-awesome-icon icon="circle-question" style="font-size: 25px" />
-              </button>
-            </div>
+            <button
+              class="tool-btn"
+              ref="tooltipButton"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="left"
+              :title="tooltipMessage"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
           <canvas style="margin-top: 20px" id="myChart"></canvas>
         </div>
       </div>
@@ -106,10 +106,10 @@
           <div class="consume-title">
             <!-- 이번 달 소비 중 줄일 수 있는 소비는 -->
             {{
-          saveAmount.value - possibleSaveAmount.value > 0
-            ? '이번 달 소비 중 줄일 수 있는 소비는 😢'
-            : '이번달에 아낀 소비는 😲'
-        }}
+              saveAmount.value - possibleSaveAmount.value > 0
+                ? '이번 달 소비 중 줄일 수 있는 소비는 😢'
+                : '이번달에 아낀 소비는 😲'
+            }}
             <span style="font-size: 18px; font-weight: 500; color: #ff0062">
               {{ Math.abs(couldsaving).toLocaleString() }}</span
             >
@@ -124,25 +124,25 @@
             원 절약이 가능해요!
           </div>
         </div>
-                <!-- 절약 차트 -->
-<div class ="save-chart-container">
-        <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
-    <div class="tooltip-box">
-      <button
-        class="tool-btn"
-        ref="tooltipButton2"
-        type="button"
-        data-bs-toggle="tooltip"
-        data-bs-placement="left"
-        :title="tooltipMessage2"
-      >
-        <font-awesome-icon icon="circle-question" style="font-size: 25px" />
-      </button>
-    </div>
-        <canvas style="margin-top: 20px" id="savingChart"></canvas>
+        <!-- 절약 차트 -->
+        <div class="save-chart-container">
+          <!-- 두 번째 차트 우상단에 툴팁 버튼 -->
+          <div class="tooltip-box">
+            <button
+              class="tool-btn"
+              ref="tooltipButton2"
+              type="button"
+              data-bs-toggle="tooltip"
+              data-bs-placement="left"
+              :title="tooltipMessage2"
+            >
+              <font-awesome-icon icon="circle-question" style="font-size: 25px" />
+            </button>
+          </div>
+          <canvas style="margin-top: 20px" id="savingChart"></canvas>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -340,7 +340,7 @@ const createComparisonChart = () => {
       layout: {
         padding: {
           top: 20,
-          bottom : 20,
+          bottom: 20,
           left: 20,
           right: 20
         }
@@ -440,7 +440,7 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
         },
         {
           label: '평소 저축',
-          data:  saveAmount,
+          data: saveAmount,
           borderColor: '#D3D3D3',
           fill: false,
           borderWidth: 2
@@ -452,7 +452,7 @@ const createSavingChart = (months, saveAmount, possibleSaveAmount) => {
       layout: {
         padding: {
           top: 20,
-          bottom : 20,
+          bottom: 20,
           left: 20,
           right: 20
         }
@@ -560,18 +560,17 @@ onMounted(() => {
   background-color: #f9f9f9;
   height: 150px;
   border: 1px solid #f8f8f8;
-  position:relative;
+  position: relative;
 }
 
 .chart-container {
-  position:relative;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: auto;
-  padding: 20px; /* 패딩으로 차트 여백 확보 */
-  background: #FFF;
+  background: #fff;
 }
 
 .consume-title {
@@ -729,8 +728,9 @@ canvas {
 
 .tooltip-box {
   position: absolute;
-  right: 400px;
-  top: 0;
+  bottom: 20px;
+  right: 410px;
+  top: 30px;
   z-index: 10;
 }
 
@@ -741,7 +741,6 @@ canvas {
   cursor: pointer; /* 클릭 가능한 마우스 커서 */
   outline: none; /* 버튼 선택 시 나타나는 윤곽선 제거 */
 }
-
 
 .tooltip-inner {
   font-family: 'Pretendard';
@@ -754,8 +753,6 @@ canvas {
   position: relative; /* 차트 컨테이너 기준으로 툴팁 위치 설정 */
   width: 100%;
   height: auto;
-  padding: 20px;
   background: #fff;
 }
-
 </style>
