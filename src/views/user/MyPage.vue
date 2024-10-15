@@ -1,6 +1,7 @@
 <template>
   <div class="mypage-container">
     <div class="top-section d-flex justify-content-between">
+      <!-- 프로필 섹션 -->
       <section class="profile-section box">
         <h5 class="bold-text text-left">나의 프로필</h5>
         <div class="profile">
@@ -10,6 +11,7 @@
         </div>
       </section>
 
+      <!-- API 관리 섹션 -->
       <section class="api-management box text-left">
         <h4 class="bold-text">API 관리</h4><br>
         <ul class="list-unstyled">
@@ -30,6 +32,7 @@
           </li>
         </ul>
 
+        <!-- API 키 입력 -->
         <div v-if="showApiKeyInput" class="mt-3">
           <input type="text" class="form-control mb-2" :placeholder="currentApiKeyLabel + ' API 키 입력'" v-model="newApiKey" />
           <button class="btn btn-primary" @click="saveApiKey">저장</button>
@@ -37,9 +40,11 @@
       </section>
     </div>
 
+    <!-- 뱃지 섹션 -->
     <section class="badge-section box mt-5">
       <div class="d-flex justify-content-between align-items-center">
         <h1 class="badge-title bold-text">나의 뱃지</h1>
+        <!-- 전체보기 클릭 시 모달 오픈 -->
         <a href="#" class="text-end" @click.prevent="openBadgeModal" style="color: #FF0062;">전체보기</a>
       </div>
 
@@ -71,6 +76,9 @@
       </div>
     </section>
 
+    <!-- UserAllBadgesModal 모달 삽입 -->
+    <UserAllBadgesModal ref="badgeModal" />
+
     <!-- 회원 탈퇴 확인 모달 -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -90,7 +98,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
@@ -141,7 +148,17 @@ import noprofileImage from '@/assets/images/noprofile1.png'; // 이미지 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { useBadgeStore } from '@/stores/mypage/badge.js';
+import UserAllBadgesModal from '@/components/modal/user/UserAllBadgesModal.vue';
 
+const badgeStore = useBadgeStore();
+const badges = computed(() => badgeStore.badges);
+
+// 모달 관리
+const openBadgeModal = () => {
+  const badgeModal = new bootstrap.Modal(document.getElementById('badgeModal'));
+  badgeModal.show();
+};
 
 // JWT 토큰을 localStorage에서 가져오기
 const token = localStorage.getItem('authToken');
@@ -271,17 +288,9 @@ const apiKeys = ref({
   consentStatus: '',
 });
 
-// 뱃지 관련 데이터 및 함수
-const badges = ref([
-  { id: 1, name: '사과러버 리치', imageUrl: '/images/badge-apple-rich.png', isSelected: false },
-  { id: 2, name: '부릉부릉 리치', imageUrl: '/images/badge-car-rich.png', isSelected: false },
-  { id: 3, name: '저금통 리치', imageUrl: '/images/badge-coin-box-rich.png', isSelected: false },
-  { id: 4, name: '럭셔리 리치', imageUrl: '/images/badge-luxury-rich.png', isSelected: false },
-]);
-
 const selectedBadgeId = ref(null);
 
-const selectedBadge = computed(() => badges.value.find(badge => badge.id === selectedBadgeId.value));
+const selectedBadge = computed(() => badges.value.length > 0 ? badges.value.find(badge => badge.id === selectedBadgeId.value) : null);
 
 const selectBadge = (badge) => selectedBadgeId.value = badge.id;
 
@@ -321,8 +330,10 @@ onMounted(() => {
       }
     })
     .catch((error) => console.error('프로필 정보와 API 키를 가져오는 중 오류 발생:', error));
+    badgeStore.fetchBadges();
 });
 </script>
+
 
 <style scoped>
 /* 기본 스타일 (웹) */
