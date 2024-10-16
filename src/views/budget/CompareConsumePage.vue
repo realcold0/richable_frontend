@@ -533,7 +533,7 @@ onMounted(() => {
 }
 
 .container {
-  margin: 80px;
+  padding: 5em;
 }
 
 .total-asset {
