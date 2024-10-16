@@ -27,7 +27,7 @@
       <!-- 목표 자산이 있을 때 자산 현황 표시 -->
       <div v-else class="progress-bar-container" @click="openAssetGoalDetailModal">
         <p class="goal-description">
-          김리치님의 목표 자산 현황<br />
+          {{ auth.userProfile.data.nickname }}님의 목표 자산 현황<br />
           <strong>{{ assetGoal.title }} : {{ assetGoal.totalAmount.toLocaleString() }}원</strong
           >까지 <strong>{{ assetGoal.remaindate }}</strong
           >일 남았습니다 💪
@@ -131,6 +131,9 @@ import AssetGoalDetailModal from '../../components/modal/goal/AssetGoalDetailMod
 import AssetGoalCreateModal from '../../components/modal/goal/AssetGoalCreateModal.vue'
 import Instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore();
 
 const tooltipButton1 = ref(null) // 툴팁 버튼
 const tooltipButton2 = ref(null) // 툴팁 버튼
@@ -339,6 +342,7 @@ const fetchGoals = async () => {
 
 // 페이지 로드 시 목표 데이터를 가져옴
 onMounted(async () => {
+  auth.fetchUserProfile();
   try {
     await fetchAssetGoal()
     await fetchGoals()

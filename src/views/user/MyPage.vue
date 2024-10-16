@@ -5,8 +5,8 @@
       <section class="profile-section box">
         <h5 class="bold-text text-left">나의 프로필</h5>
         <div class="profile">
-          <img :src="profileImageUrl" alt="프로필 이미지" />
-          <h2 class="mt-3">{{ userProfile.name }}</h2>
+          <img :src=auth.userProfile.data.img alt="프로필 이미지" />
+          <h2 class="mt-3">{{ auth.userProfile.data.nickname }}</h2>
           <button class="btn btn-danger mt-3" @click="openProfileModal" style="background-color: #FF0062; border-color: #FF0062;">프로필 수정</button>
         </div>
       </section>
@@ -17,17 +17,17 @@
         <ul class="list-unstyled">
           <li class="d-flex align-items-center">
             <span>은행 api key</span>
-            <span class="ms-3">{{ apiKeys.bankApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.bank }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('bank')">➡️</button>
           </li>
           <li class="d-flex align-items-center">
             <span>증권 api key</span>
-            <span class="ms-3">{{ apiKeys.stockApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.stock.app }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('stock')">➡️</button>
           </li>
           <li class="d-flex align-items-center">
             <span>암호화폐 api key</span>
-            <span class="ms-3">{{ apiKeys.cryptoApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.coin.app }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('crypto')">➡️</button>
           </li>
         </ul>
@@ -150,6 +150,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useBadgeStore } from '@/stores/mypage/badge.js';
 import UserAllBadgesModal from '@/components/modal/user/UserAllBadgesModal.vue';
+import { useAuthStore } from '@/stores/auth';
 
 function parseJwt(token) {
   const base64Url = token.split('.')[1];
@@ -164,6 +165,7 @@ function parseJwt(token) {
 }
 
 const badgeStore = useBadgeStore();
+const auth = useAuthStore();
 const badges = computed(() => badgeStore.badges);
 
 // 모달 관리
@@ -328,7 +330,7 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
-
+  auth.fetchUserProfile();
   // localStorage에 저장된 배지 정보를 불러옴
   const storedBadge = localStorage.getItem('selectedBadge');
   if (storedBadge) {

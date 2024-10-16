@@ -11,18 +11,19 @@
           <div class="mb-3" style="display: flex;">
             <label for="expenseType" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">유형</label>
             <select class="form-select" id="expenseType" v-model="expenseCategory">
-              <option value="식료품">식료품</option>
-              <option value="유흥">유흥</option>
-              <option value="쇼핑">쇼핑</option>
-              <option value="공과금">공과금</option>
-              <option value="생활용품">생활용품</option>
-              <option value="의료비">의료비</option>
-              <option value="교통비">교통비</option>
-              <option value="통신비">통신비</option>
-              <option value="문화">문화</option>
-              <option value="교육비">교육비</option>
-              <option value="외식 · 숙박">외식 · 숙박</option>
-              <option value="기타">기타</option>
+              <option value="식료품 · 비주류음료">식료품 · 비주류음료</option>
+              <option value="주류 · 담배">주류 · 담배</option>
+          <option value="의류 · 신발">의류 · 신발</option>
+           <option value="주거 · 수도 · 광열">주거 · 수도 · 광열</option>
+          <option value="가정용품 · 가사서비스">가정용품 · 가사서비스</option>
+          <option value="보건">보건</option>
+          <option value="교통">교통</option>
+         <option value="통신">통신</option>
+          <option value="오락 · 문화">오락 · 문화</option>
+          <option value="교육">교육</option>
+        <option value="음식">음식</option>
+        <option value="기타상품">기타상품</option>
+        <option value="비소비지출">비소비지출</option>
             </select>
           </div>
 

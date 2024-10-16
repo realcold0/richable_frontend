@@ -35,13 +35,13 @@
     <div class="tab-content">
       <div class="tab-page" v-if="selectedTab === 'tab1'">
         <div class="total-asset">
-          <div class="asset-title">김리치님의 총 금융 자산 현황 😎</div>
+          <div class="asset-title">{{ auth.userProfile.data.nickname }}님의 총 금융 자산 현황 😎</div>
           <div class="asset-amount">{{ financeTotalAmount.toLocaleString() }} 원</div>
         </div>
         <div class="asset-list">
           <div class="list-title">
             금융 자산 목록
-            <!-- <font-awesome-icon icon="square-plus" style="color: #c30044" @click="openCreateModal" /> -->
+            <font-awesome-icon icon="square-plus" style="color: #c30044" @click="openCreateModal" />
           </div>
 
           <div class="list-box">
@@ -153,7 +153,7 @@
 
       <div class="tab-page" v-if="selectedTab === 'tab2'">
         <div class="total-asset">
-          <div class="asset-title">김리치님의 총 현물 자산 현황 😎</div>
+          <div class="asset-title">{{ auth.userProfile.data.nickname }}님의 총 현물 자산 현황 😎</div>
           <div class="asset-amount">{{ spotTotalAmount.toLocaleString() }} 원</div>
         </div>
         <div class="asset-list">
@@ -212,7 +212,8 @@
         </div>
       </div>
     </div>
-    <AssetCreateModal ref="createModal" />
+    <AssetCreateModal ref="createModal" 
+      @refresh-data="refreshData" />
     <AssetUpdateModal ref="editModal" />
     <TangibleAssetCreateModal ref="createModal2" @create-asset="handleCreateAsset" />
     <TangibleAssetUpdateModal
@@ -226,14 +227,21 @@
       :bond-data-list="bondDataList"
       :coin-data-list="coinDataList"
       :stock-data-list="stockDataList"
+      @refresh-data="refreshData"  
       ref="checkModal"
     />
+      
+    <AssetUpdateModal
+      ref="updateModal"
+      @update-asset="handleAssetUpdate"
+      @delete-asset="handleAssetDelete"
+    />
+
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref, watch, nextTick, computed } from 'vue'
-import axios from 'axios'
 import axiosInstance from '@/AxiosInstance'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -242,6 +250,7 @@ import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue'
 import AssetCheckModal from '../../components/modal/asset/AssetCheckModal.vue'
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue'
 import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue'
+import { useAuthStore } from '@/stores/auth'
 
 // Chart.js에 필요한 컴포넌트(컨트롤러, 요소, 플러그인) 등록
 Chart.register(PieController, ArcElement, Tooltip, Legend)
@@ -258,40 +267,11 @@ const itemsPerPage = 4
 
 // 자산 데이터
 const selectedAssetType = ref('bank')
-const bankDataList = ref([
-  { orgCode: '국민은행', accountNum: 93800123456, prodCategory: '예금', balanceAmt: 1000000 },
-  { orgCode: '신한은행', accountNum: 12345678910, prodCategory: '적금', balanceAmt: 1500000 },
-  { orgCode: '하나은행', accountNum: 56789012345, prodCategory: '예금', balanceAmt: 2000000 }
-])
-
-const bondDataList = ref([
-  { name: '국고채권 01500-5003(20-2)', cnt: 2, price: 7000 },
-  { name: '국고채권 01200-4003(18-3)', cnt: 3, price: 8500 },
-  { name: '국고채권 01300-5003(19-2)', cnt: 5, price: 9200 }
-])
-
-const coinDataList = ref([
-  { currency: 'BTC', balance: 0.5, avgBuyPrice: 45000000 },
-  { currency: 'ETH', balance: 2.0, avgBuyPrice: 1500000 },
-  { currency: 'XRP', balance: 5000.0, avgBuyPrice: 1000 }
-])
-
-const stockDataList = ref([
-  { prdtName: '삼성전자', hldgQty: 10, avgBuyPrice: 80000 },
-  { prdtName: 'LG화학', hldgQty: 5, avgBuyPrice: 750000 },
-  { prdtName: '카카오', hldgQty: 15, avgBuyPrice: 110000 }
-])
-
-const tangibleAssets = ref([
-  { index: 1, category: '전자기기', name: '아이폰', price: 1200000 },
-  { index: 2, category: '명품', name: '구찌 가방', price: 3000000 },
-  { index: 3, category: '브랜드', name: '나이키 신발', price: 200000 },
-  { index: 4, category: '기타', name: '기타 자산', price: 500000 },
-  { index: 5, category: '전자기기', name: '맥북', price: 2000000 },
-  { index: 6, category: '명품', name: '프라다 가방', price: 3500000 },
-  { index: 7, category: '브랜드', name: '아디다스 신발', price: 150000 },
-  { index: 8, category: '기타', name: '기타 자산 2', price: 600000 }
-])
+const bankDataList = ref([])
+const bondDataList = ref([])
+const coinDataList = ref([])
+const stockDataList = ref([])
+const tangibleAssets = ref([])
 
 // 2. 계산된 속성 정의
 const latestAssets = computed(() => tangibleAssets.value.slice().reverse()) // 최신순 정렬
@@ -303,6 +283,8 @@ const paginatedAssets = computed(() => {
 
   return latestAssets.value.slice(start, end)
 })
+
+const auth = useAuthStore();
 
 // 총 슬라이드 개수 계산
 const maxSlide = computed(() => Math.ceil(tangibleAssets.value.length / itemsPerPage))
@@ -444,6 +426,7 @@ watch(selectedTab, (newTab) => {
   else if (newTab === 'tab2') renderPieChart2()
 })
 
+
 // 모달 처리
 const createModal = ref(null)
 const editModal = ref(null)
@@ -485,7 +468,6 @@ const handleUpdateAsset = async (updatedAsset) => {
   }
 };
 
-
 // 자산 삭제 처리
 const handleDeleteAsset = async (deletedAsset) => {
   tangibleAssets.value = tangibleAssets.value.filter((asset) => asset.index !== deletedAsset.index);
@@ -494,26 +476,68 @@ const handleDeleteAsset = async (deletedAsset) => {
   await renderPieChart2();
 }
 
-// 금융 자산 총합
+const handleAssetUpdate = async (assetType, updatedAsset) => {
+  let targetList;
+  if (assetType === 'bank') {
+    targetList = bankDataList;
+  } else if (assetType === 'bond') {
+    targetList = bondDataList;
+  } else if (assetType === 'coin') {
+    targetList = coinDataList;
+  } else if (assetType === 'stock') {
+    targetList = stockDataList;
+  }
+
+  // 여기서 ref.value로 접근해야 함
+  const index = targetList.value.findIndex(asset => asset.index === updatedAsset.index);
+  if (index !== -1) {
+    targetList.value[index] = { ...updatedAsset };
+    console.log(`자산 ${assetType}이(가) 업데이트되었습니다.`);
+  } else {
+    console.warn(`해당 자산을 찾을 수 없습니다: ${updatedAsset.index}`);
+  }
+
+  await getFinanceList();
+  await fetchFinanceAmount();
+  await fetchFinanceAssetList();
+  await renderPieChart();
+};
+
+const handleAssetDelete = async (assetType, assetIndex) => {
+  let targetList;
+  if (assetType === 'bank') {
+    targetList = bankDataList;
+  } else if (assetType === 'bond') {
+    targetList = bondDataList;
+  } else if (assetType === 'coin') {
+    targetList = coinDataList;
+  } else if (assetType === 'stock') {
+    targetList = stockDataList;
+  }
+
+  // ref.value로 접근
+  targetList.value = targetList.value.filter(asset => asset.index !== assetIndex);
+  console.log(`${assetType} 자산이 삭제되었습니다.`);
+
+  await getFinanceList();
+  await fetchFinanceAmount();
+  await fetchFinanceAssetList();
+  await renderPieChart();
+};
+
+
+const refreshData = async () => {
+  console.log("데이터 새로고침 ");
+  await fetchFinanceAmount(); 
+  await getFinanceList();// 금융 자산 리스트 다시 불러오기
+  await fetchFinanceAssetList();
+  await renderPieChart();
+  console.log("데이터 새로고침 완료");
+}
+
+
 const financeTotalAmount = ref(0)
 
-// // 총 금융 자산 현황 연동
-// const fetchFinanceAssetList = async () => {
-//   try {
-//     const response = await axios.get('http://localhost:8080/finance/fin/sum', {
-//       headers: {
-//         Authorization: `Bearer ${localStorage.getItem("authToken")}`, // JWT 토큰을 Authorization 헤더에 추가
-//     }});
-
-//     console.log(response.data.response.data.data.amount);
-//     financeTotalAmount.value = response.data.response.data.data.amount;
-
-//   } catch (error) {
-//     console.error('금융 자산 합 조회 api 호출을 실패하였습니다. ', error);
-//   }
-// };
-
-// 총 금융 자산 현황 연동2
 const fetchFinanceAssetList = async () => {
   try {
     const response = await axiosInstance.get('/finance/fin/sum');
@@ -636,11 +660,12 @@ const fetchFinanceSpotList = async () => {
 }
 
 // 금융 자산별 목록 조회
-const getFinanceList = () => {
+const getFinanceList = async() => {
   fetchFinanceList('bank')
   fetchFinanceList('stock')
   fetchFinanceList('bond')
   fetchFinanceList('coin')
+  console.log("부르기")
 }
 
 // 현물 자산별 총합 조회
@@ -654,6 +679,7 @@ const getSpotList = async () => {
 
 // 5. 초기 설정
 onMounted(() => {
+  auth.fetchUserProfile();
   updateTooltipMessage()
   fetchFinanceAssetList() // 총 금융 자산 현황 조회
   fetchFinanceAmount() // 금융 자산별 합 조회

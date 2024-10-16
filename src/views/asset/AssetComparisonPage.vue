@@ -2,7 +2,7 @@
   <div class="content-container">
     <!-- 상단 자산 정보 -->
     <div class="total-asset">
-      <div class="asset-title">{{ userName }}님의 자산 현황 😎</div>
+      <div class="asset-title">{{ auth.userProfile.data.nickname }}님의 자산 현황 😎</div>
       <div class="asset-amount">{{ currentAsset ? currentAsset.toLocaleString() : 0 }}원</div>
     </div>
 
@@ -15,9 +15,9 @@
                 ref="tooltipButton"
                 type="button"
                 data-bs-toggle="tooltip"
-                data-bs-placement="left"
+                data-bs-placement="right"
                 :title="tooltipMessage"
-              >
+                >
                 <font-awesome-icon icon="circle-question" style="font-size: 25px" />
               </button>
             </div>
@@ -28,7 +28,7 @@
         <!-- 20대 평균 자산과 나의 자산 비교 (막대 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            {{ userName }}님의 자산은 <br />
+            {{ auth.userProfile.data.nickname }}님의 자산은 <br />
             20대 평균보다 
 <strong style="color:#ff0062">
   {{ assetDifference > 0 
@@ -42,7 +42,7 @@
         <!-- 카테고리별 자산 비교 (레이더 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            {{ userName }}님의 카테고리별 자산 비교
+            {{ auth.userProfile.data.nickname }}님의 카테고리별 자산 비교
           </div>
           <canvas id="radarChart" class="chart-size"></canvas>
         </div>
@@ -95,17 +95,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Chart, registerables, Tooltip } from 'chart.js';
+import { ref, onMounted,nextTick } from 'vue';
+import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth';
 
 
 Chart.register(...registerables);
 
 // 사용자 이름
-const userName = "김리치";
+const auth = useAuthStore();
 
 
 // 현재 자산 정보 및 자산 차이
@@ -401,10 +402,18 @@ new Chart(radarCtx, {
 
 // 데이터 가져오기 후 차트 생성 및 테이블 반영
 onMounted(async () => {
+  auth.fetchUserProfile();
   await fetchFinancialAssetsSum();
   await fetchPeerData();
   await fetchPeerFinanceData();
   createCharts(); // 차트 생성을 데이터 fetch 후에 실행
+  nextTick(() => {
+    // 첫 번째 툴팁 초기화
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+    }
+  });
 });
 </script>
 
@@ -454,7 +463,7 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .graph-container-title {
@@ -526,13 +535,13 @@ td {
 }
 
 .tooltip-inner {
-  white-space: nowrap !important;
+  white-space: nowrap;
 }
 
 .tooltip-box {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 30;
   z-index: 10;
 }
 
@@ -547,8 +556,8 @@ td {
 
 .tooltip-inner {
   font-family: 'Pretendard';
-  max-width: 400px !important;
-  white-space: normal !important;
+  max-width: 400px ;
+  white-space: normal ;
   font-size: 12px;
 }
 </style>
