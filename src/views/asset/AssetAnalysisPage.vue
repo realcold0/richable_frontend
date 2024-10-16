@@ -2,7 +2,7 @@
   <div>
     <div class="content-container">
       <div class="total-asset">
-        <div class="asset-title">{{ auth.userProfile.data.nickname }} 총 자산 현황 😎</div>
+        <div class="asset-title">{{ auth.userProfile.data.nickname}}님의 총 자산 현황 😎</div>
         <div class="asset-amount">{{ formatCurrency(displayAsset) }}원</div>
       </div>
 
@@ -12,7 +12,7 @@
           {{ auth.userProfile.data.nickname }}님은 <strong>{{ assetLevel.level }} 단계</strong>예요
         </div>
         <div class="asset-level-sub">{{ assetLevel.description }}</div>
-        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }"></div>
+        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', marginBottom: '36px' }"></div>
       </div>
 
       <!-- 자산 분석 섹션 -->
@@ -31,9 +31,9 @@
               <font-awesome-icon icon="circle-question" style="font-size: 25px" />
             </button>
           </div>
-          <div class="asset-analysis-btn">
+          <div  style="margin-top: 50px;"class="asset-analysis-btn">
             <!-- 체크박스 클릭 이벤트를 통해 값을 업데이트 -->
-            <input type="checkbox" v-model="includePhysicalAssets" @change="handleCheckboxChange" />
+            <input style="margin-bottom: 16px;" type="checkbox" v-model="includePhysicalAssets" @change="handleCheckboxChange" />
             <p>현물자산 포함</p>
           </div>
         </div>
@@ -88,7 +88,7 @@
           </div>
 
           <!-- 자산 변화 그래프 -->
-          <div class="text-center asset-analysis-content-container2">
+          <div class="text-center asset-analysis-content-container2" style="margin-top: 60px;">
             <p>
               총자산이 지난달보다 <br />
               <strong>{{ assetDifferenceMessage }}</strong>
@@ -158,7 +158,7 @@ import {
 } from 'chart.js'
 import instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth';
 
 Chart.register(
   PieController,
@@ -417,7 +417,7 @@ const fetchData = async () => {
 
     const bondLabels = returnBond.value.map((item) => mapMonthToLabel(item.month))
     const coinLabels = returnCoin.value.map((item) => mapMonthToLabel(item.month))
-    const incomeLabels = returnIncome.value.map((item) => item.month)
+    const incomeLabels = returnIncome.value.map((item) => mapMonthToLabel(item.month)).reverse();
     const stockLabels = returnStock.value.map((item) => mapMonthToLabel(item.month))
 
     renderAllLineCharts(
@@ -426,8 +426,6 @@ const fetchData = async () => {
       incomeLabels, returnIncome.value.map(item => item.balalnceRate),
       stockLabels, returnStock.value.map(item => item.earningRate)
     );
-
-    nickname.value = u
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error)
   }
@@ -505,9 +503,31 @@ const renderAllLineCharts = async (
   renderLineChart(lineChart4, lineChartInstance4, stockLabels, stockData)
 }
 
-// 데이터의 month를 이번 달 기준으로 계산하는 함수
 const mapMonthToLabel = (month) => {
-  const today = new Date()
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1; // 현재 월 (1월은 1, 2월은 2...)
+
+  // 문자열인 경우 (YYYY-MM 형식)
+  if (typeof month === 'string') {
+    const [year, monthString] = month.split("-");
+    const targetYear = parseInt(year, 10);
+    const targetMonth = parseInt(monthString, 10);
+
+    // 현재 연도와 비교
+    const currentYear = today.getFullYear();
+
+    if (currentYear === targetYear && targetMonth === currentMonth) {
+      return '이번달';
+    }else {
+      return `${targetMonth}월`;
+    }
+  }
+
+  // 숫자 형식인 경우 (1 ~ 12)
+  if (typeof month === 'number') {
+
+
+    const today = new Date()
   const currentMonth = today.getMonth() // 현재 월 (0부터 시작, 1월은 0)
 
   // 현재 달에서 month 값을 빼서 라벨을 결정
@@ -515,12 +535,23 @@ const mapMonthToLabel = (month) => {
   const targetMonth = calculatedMonth > 0 ? calculatedMonth : 12 + calculatedMonth
 
   // month가 1일 경우 "이번달", 2일 경우 "9월" 이런 식으로 처리
-  if (month === 1) {
+  if (month === 1 || month==="2024-10") {
     return '이번달'
   }
 
   return `${targetMonth}월` // 나머지 경우에 대한 월 반환
-}
+  }
+
+  return ''; // 해당되지 않을 경우 빈 문자열 반환
+};
+
+// 예시 데이터 사용
+const processAndDisplay = (data) => {
+  data.response.data.forEach((item) => {
+    const label = mapMonthToLabel(item.month);
+    console.log(`${label}: 소득 ${item.totalIncome}, 소비 ${item.totalOutcome}, 잔액 ${item.balance}, 잔액 비율 ${item.balalnceRate}%`);
+  });
+};
 
 // 차트 렌더링 함수
 const renderBarChart = async (labels, data) => {
@@ -617,7 +648,7 @@ const renderLineChart = (chartRef, chartInstance, labels, data, isCurrency = fal
       labels: reversedLabels, // 정렬된 라벨 사용
       datasets: [
         {
-          data: reversedData, // 정렬된 데이터 사용
+          data: data, // 정렬된 데이터 사용
           backgroundColor: 'rgba(250, 158, 190, 1)',
           borderColor: 'rgba(250, 158, 190, 1)',
           pointRadius: 3,
@@ -764,7 +795,7 @@ onMounted(() => {
 .asset-title,
 .asset-analysis-title,
 .asset-level-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 500;
   line-height: 150%;
   color: var(--black-default, #19181d);
