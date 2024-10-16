@@ -133,11 +133,6 @@ import Instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 import { useAuthStore } from '@/stores/auth'
 
-<<<<<<< HEAD
-
-=======
-const auth = useAuthStore();
->>>>>>> af7074298c88b383870d7cdf826d0708427916e4
 
 const tooltipButton1 = ref(null) // 툴팁 버튼
 const tooltipButton2 = ref(null) // 툴팁 버튼
