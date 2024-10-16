@@ -173,7 +173,6 @@ const formatDate = (date) => {
 // const currentYear = new Date().getFullYear()
 // const years = Array.from({ length: currentYear - 1900 + 1 }, (v, i) => currentYear - i)
 
-
 // Check id availability
 const checkId = async () => {
   if (!member.id) {
@@ -214,7 +213,7 @@ const join = async () => {
   // console.log('Sending member data:', memberToSend); // 디버깅을 위해 추가
 
   try {
-    const { data } = await axiosinstance.post(`/register`, memberToSend)
+    const { data } = await axiosinstance.post(`/member/register`, memberToSend)
     console.log('Signup successful:', data)
     router.push({ name: 'terms', params: { id: member.id } })
   } catch (error) {
