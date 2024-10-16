@@ -32,7 +32,7 @@ function parseJwt(token) {
     const fetchBadges = async () => {
       if (nickname) { // nickname이 있을 경우에만 API 호출
         try {
-          const response = await axiosInstance.get(`http://localhost:8080/member/badge/having/${nickname}`);
+          const response = await axiosInstance.get(`/member/badge/having/${nickname}`);
           badges.value = response.data.response.data.map(badge => ({
             id: badge.badgeNo,
             name: badge.name,
