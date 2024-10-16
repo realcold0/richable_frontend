@@ -2,7 +2,7 @@
   <div>
     <div class="content-container">
       <div class="total-asset">
-        <div class="asset-title">{{ auth.userProfile.data.nickname }} 총 자산 현황 😎</div>
+        <div class="asset-title">{{ auth.userProfile.data.nickname}}님의 총 자산 현황 😎</div>
         <div class="asset-amount">{{ formatCurrency(displayAsset) }}원</div>
       </div>
 
@@ -158,7 +158,7 @@ import {
 } from 'chart.js'
 import instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth';
 
 Chart.register(
   PieController,

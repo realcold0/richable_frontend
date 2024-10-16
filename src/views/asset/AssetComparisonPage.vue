@@ -2,7 +2,7 @@
   <div class="content-container">
     <!-- 상단 자산 정보 -->
     <div class="total-asset">
-      <div class="asset-title">{{ userName }}님의 자산 현황 😎</div>
+      <div class="asset-title">{{ auth.userProfile.data.nickname }}님의 자산 현황 😎</div>
       <div class="asset-amount">{{ currentAsset ? currentAsset.toLocaleString() : 0 }}원</div>
     </div>
 
@@ -28,7 +28,7 @@
         <!-- 20대 평균 자산과 나의 자산 비교 (막대 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            {{ userName }}님의 자산은 <br />
+            {{ auth.userProfile.data.nickname }}님의 자산은 <br />
             20대 평균보다 
 <strong style="color:#ff0062">
   {{ assetDifference > 0 
@@ -42,7 +42,7 @@
         <!-- 카테고리별 자산 비교 (레이더 차트) -->
         <div class="graph-container">
           <div class="graph-container-title">
-            {{ userName }}님의 카테고리별 자산 비교
+            {{ auth.userProfile.data.nickname }}님의 카테고리별 자산 비교
           </div>
           <canvas id="radarChart" class="chart-size"></canvas>
         </div>
@@ -100,12 +100,13 @@ import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth';
 
 
 Chart.register(...registerables);
 
 // 사용자 이름
-const userName = "김리치";
+const auth = useAuthStore();
 
 
 // 현재 자산 정보 및 자산 차이
@@ -401,6 +402,7 @@ new Chart(radarCtx, {
 
 // 데이터 가져오기 후 차트 생성 및 테이블 반영
 onMounted(async () => {
+  auth.fetchUserProfile();
   await fetchFinancialAssetsSum();
   await fetchPeerData();
   await fetchPeerFinanceData();
