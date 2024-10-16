@@ -371,7 +371,7 @@ html {
 .image-content-community {
   flex: 1;
   text-align: right;
-  background-image: url('../assets/images/laptop-community .png');
+  background-image: url('../assets/images/laptop-community.png');
   background-size: cover;
   height: 350px;
   width: 585px;
