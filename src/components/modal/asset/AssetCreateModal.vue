@@ -14,7 +14,6 @@
               <option value="stock">주식</option>
               <option value="bond">채권</option>
               <option value="coin">코인</option>
-              <option value="cash">현금</option>
             </select>
           </div>
 

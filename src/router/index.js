@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import HomeView from '../views/HomeView.vue'
 import HomePage from '@/views/HomePage.vue'
+import NotFoundPage from '@/views/NotFoundPage.vue'
 
 const routes = [
   {
@@ -147,6 +148,13 @@ const routes = [
     name: 'knowhowUpdate',
     component: () => import('../views/knowhow/KnowHowUpdatePage.vue'),
     meta: { requiresAuth: true }
+  },
+  // 404 페이지 라우트
+  {
+    path: '/:pathMatch(.*)*', // 모든 일치하지 않는 경로
+    name: 'NotFound',
+    component: NotFoundPage
+
   }
 ]
 

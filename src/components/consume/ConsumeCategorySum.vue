@@ -121,7 +121,7 @@
       selectedCategory.value = category;
       filteredItems.value = categories.value.slice(4);
     } else {
-      router.push({ path: '/budget/list'});
+      router.push({ path: '/budget/list', query: { category: category.category}});
     }
     showDetailModal.value = true;
   };
