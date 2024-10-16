@@ -253,14 +253,24 @@ const previousMonth = () => {
 }
 
 const nextMonth = () => {
-  const { year: updatedYear, month: updatedMonth } = monthStore.increaseMonth()
-  curMonth.value = updatedMonth
-  curYear.value = updatedYear
+  const today = new Date(); // 현재 날짜를 가져옴
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1; // 월은 0부터 시작하므로 +1
 
-  fetchComparisonData() // 데이터를 다시 가져오기
-  fetchCouldSaving()
-  fetchSimulationData()
-}
+  // 현재 년도와 월을 기준으로 다음 달이 현재보다 크지 않도록 제한
+  if (
+    curYear.value < currentYear ||
+    (curYear.value === currentYear && curMonth.value < currentMonth)
+  ) {
+    const { year: updatedYear, month: updatedMonth } = monthStore.increaseMonth();
+    curMonth.value = updatedMonth;
+    curYear.value = updatedYear;
+
+    fetchComparisonData(); // 데이터를 다시 가져오기
+    fetchCouldSaving();
+    fetchSimulationData();
+  }
+};
 
 // 카테고리 변경 시 데이터 가져오기
 watch(category, () => {
