@@ -2,17 +2,17 @@
   <div>
     <div class="content-container">
       <div class="total-asset">
-        <div class="asset-title">김리치님의 총 자산 현황 😎</div>
+        <div class="asset-title">{{ auth.userProfile.data.nickname}}님의 총 자산 현황 😎</div>
         <div class="asset-amount">{{ formatCurrency(displayAsset) }}원</div>
       </div>
 
       <!-- 나의 단계 -->
       <div class="asset-level-container">
         <div class="asset-level-title">
-          김리치님은 <strong>{{ assetLevel.level }} 단계</strong>예요
+          {{ auth.userProfile.data.nickname }}님은 <strong>{{ assetLevel.level }} 단계</strong>예요
         </div>
         <div class="asset-level-sub">{{ assetLevel.description }}</div>
-        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }"></div>
+        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', marginBottom: '36px' }"></div>
       </div>
 
       <!-- 자산 분석 섹션 -->
@@ -31,9 +31,9 @@
               <font-awesome-icon icon="circle-question" style="font-size: 25px" />
             </button>
           </div>
-          <div class="asset-analysis-btn">
+          <div  style="margin-top: 50px;"class="asset-analysis-btn">
             <!-- 체크박스 클릭 이벤트를 통해 값을 업데이트 -->
-            <input type="checkbox" v-model="includePhysicalAssets" @change="resetCharts" />
+            <input style="margin-bottom: 16px;" type="checkbox" v-model="includePhysicalAssets" @change="handleCheckboxChange" />
             <p>현물자산 포함</p>
           </div>
         </div>
@@ -88,7 +88,7 @@
           </div>
 
           <!-- 자산 변화 그래프 -->
-          <div class="text-center asset-analysis-content-container2">
+          <div class="text-center asset-analysis-content-container2" style="margin-top: 60px;">
             <p>
               총자산이 지난달보다 <br />
               <strong>{{ assetDifferenceMessage }}</strong>
@@ -112,7 +112,7 @@
 
         <div class="graph-container-wrapper">
           <div class="graph-container">
-            <div class="graph-title">저축량</div>
+            <div class="graph-title">저축률</div>
             <div class="graph-sum">{{returnIncomeSum}}%</div>
             <canvas class="graph" ref="lineChart3"></canvas>
           </div>
@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import {
   Chart,
   PieController,
@@ -158,6 +158,7 @@ import {
 } from 'chart.js'
 import instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth';
 
 Chart.register(
   PieController,
@@ -206,9 +207,13 @@ const lineChart3 = ref(null)
 const lineChart4 = ref(null)
 
 const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipButton2 = ref(null) // 툴팁 버튼
 const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipInstance2 = ref(null) // 툴팁 인스턴스
 const tooltipMessage = ref('예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.')
 const tooltipMessage2 = ref('금융자산과 등록해주신 현물을 합산한 값 입니다.')
+
+const auth = useAuthStore();
 
 let chartInstance = null
 let barChartInstance = null
@@ -216,6 +221,15 @@ let lineChartInstance1 = null
 let lineChartInstance2 = null
 let lineChartInstance3 = null
 let lineChartInstance4 = null
+
+watch(() => tooltipButton2.value, (newVal) => {
+  if (newVal) {
+    newVal.setAttribute('title', tooltipMessage2.value);
+    tooltipInstance2.value = new BootstrapTooltip(newVal);
+    resetTooltips();
+    console.log('Tooltip 2 initialized');
+  }
+});
 
 const displayAsset = computed(() =>
   includePhysicalAssets.value ? totalAsset.value : finAsset.value
@@ -403,7 +417,7 @@ const fetchData = async () => {
 
     const bondLabels = returnBond.value.map((item) => mapMonthToLabel(item.month))
     const coinLabels = returnCoin.value.map((item) => mapMonthToLabel(item.month))
-    const incomeLabels = returnIncome.value.map((item) => item.month)
+    const incomeLabels = returnIncome.value.map((item) => mapMonthToLabel(item.month)).reverse();
     const stockLabels = returnStock.value.map((item) => mapMonthToLabel(item.month))
 
     renderAllLineCharts(
@@ -489,9 +503,31 @@ const renderAllLineCharts = async (
   renderLineChart(lineChart4, lineChartInstance4, stockLabels, stockData)
 }
 
-// 데이터의 month를 이번 달 기준으로 계산하는 함수
 const mapMonthToLabel = (month) => {
-  const today = new Date()
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1; // 현재 월 (1월은 1, 2월은 2...)
+
+  // 문자열인 경우 (YYYY-MM 형식)
+  if (typeof month === 'string') {
+    const [year, monthString] = month.split("-");
+    const targetYear = parseInt(year, 10);
+    const targetMonth = parseInt(monthString, 10);
+
+    // 현재 연도와 비교
+    const currentYear = today.getFullYear();
+
+    if (currentYear === targetYear && targetMonth === currentMonth) {
+      return '이번달';
+    }else {
+      return `${targetMonth}월`;
+    }
+  }
+
+  // 숫자 형식인 경우 (1 ~ 12)
+  if (typeof month === 'number') {
+
+
+    const today = new Date()
   const currentMonth = today.getMonth() // 현재 월 (0부터 시작, 1월은 0)
 
   // 현재 달에서 month 값을 빼서 라벨을 결정
@@ -499,12 +535,23 @@ const mapMonthToLabel = (month) => {
   const targetMonth = calculatedMonth > 0 ? calculatedMonth : 12 + calculatedMonth
 
   // month가 1일 경우 "이번달", 2일 경우 "9월" 이런 식으로 처리
-  if (month === 1) {
+  if (month === 1 || month==="2024-10") {
     return '이번달'
   }
 
   return `${targetMonth}월` // 나머지 경우에 대한 월 반환
-}
+  }
+
+  return ''; // 해당되지 않을 경우 빈 문자열 반환
+};
+
+// 예시 데이터 사용
+const processAndDisplay = (data) => {
+  data.response.data.forEach((item) => {
+    const label = mapMonthToLabel(item.month);
+    console.log(`${label}: 소득 ${item.totalIncome}, 소비 ${item.totalOutcome}, 잔액 ${item.balance}, 잔액 비율 ${item.balalnceRate}%`);
+  });
+};
 
 // 차트 렌더링 함수
 const renderBarChart = async (labels, data) => {
@@ -601,7 +648,7 @@ const renderLineChart = (chartRef, chartInstance, labels, data, isCurrency = fal
       labels: reversedLabels, // 정렬된 라벨 사용
       datasets: [
         {
-          data: reversedData, // 정렬된 데이터 사용
+          data: data, // 정렬된 데이터 사용
           backgroundColor: 'rgba(250, 158, 190, 1)',
           borderColor: 'rgba(250, 158, 190, 1)',
           pointRadius: 3,
@@ -659,21 +706,63 @@ const prevPage = () => {
 
 // 차트 리셋
 const resetCharts = () => {
-  // 체크박스의 상태에 따라 툴팁 메시지 변경
-  if (includePhysicalAssets.value) {
-    tooltipMessage.value = tooltipMessage2.value
-  } else {
-    tooltipMessage.value = '예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.'
-  }
-
   // 데이터 재로딩
   fetchData()
 }
-//툴팁 내용변경
-const resetTooltips = () => {}
+// 체크박스 변경 시 툴팁 메시지 업데이트 및 차트 리셋
+const handleCheckboxChange = () => {
+  if (includePhysicalAssets.value) {
+    tooltipMessage.value = tooltipMessage2.value; // 체크하면 tooltipMessage2로 변경
+  } else {
+    tooltipMessage.value = '예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.'; // 체크 해제하면 기본 메시지로 변경
+  }
+  resetTooltips(); // 툴팁 업데이트
+  resetCharts();   // 차트 리셋 (기존 기능)
+};
 
+
+// 툴팁 메시지 변경 및 초기화 함수
+const resetTooltips = () => {
+  // 첫 번째 툴팁
+  nextTick(() => {
+    if (tooltipInstance.value) {
+      tooltipInstance.value.dispose(); // 기존 툴팁 제거
+    }
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value); // 툴팁 다시 초기화
+    }
+  });
+
+  // 두 번째 툴팁
+  nextTick(() => {
+    if (tooltipInstance2.value) {
+      tooltipInstance2.value.dispose(); // 기존 툴팁 제거
+    }
+    if (tooltipButton2.value) {
+      tooltipButton2.value.setAttribute('title', tooltipMessage2.value);
+      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value); // 툴팁 다시 초기화
+      console.log('Tooltip 2 initialized');
+    }
+  });
+};
 // 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(() => {
+  auth.fetchUserProfile();
+  nextTick(() => {
+    // 첫 번째 툴팁 초기화
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+    }
+
+    // 두 번째 툴팁 초기화
+    if (tooltipButton2.value) {
+      tooltipButton2.value.setAttribute('title', tooltipMessage2.value);
+      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value);
+    }
+  });
+
   fetchData()
 })
 </script>
@@ -706,7 +795,7 @@ onMounted(() => {
 .asset-title,
 .asset-analysis-title,
 .asset-level-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 500;
   line-height: 150%;
   color: var(--black-default, #19181d);
