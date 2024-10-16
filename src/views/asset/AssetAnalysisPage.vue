@@ -2,14 +2,14 @@
   <div>
     <div class="content-container">
       <div class="total-asset">
-        <div class="asset-title">김리치님의 총 자산 현황 😎</div>
+        <div class="asset-title">{{ auth.userProfile.data.nickname }} 총 자산 현황 😎</div>
         <div class="asset-amount">{{ formatCurrency(displayAsset) }}원</div>
       </div>
 
       <!-- 나의 단계 -->
       <div class="asset-level-container">
         <div class="asset-level-title">
-          김리치님은 <strong>{{ assetLevel.level }} 단계</strong>예요
+          {{ auth.userProfile.data.nickname }}님은 <strong>{{ assetLevel.level }} 단계</strong>예요
         </div>
         <div class="asset-level-sub">{{ assetLevel.description }}</div>
         <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }"></div>
@@ -158,6 +158,7 @@ import {
 } from 'chart.js'
 import instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth'
 
 Chart.register(
   PieController,
@@ -211,6 +212,8 @@ const tooltipInstance = ref(null) // 툴팁 인스턴스
 const tooltipInstance2 = ref(null) // 툴팁 인스턴스
 const tooltipMessage = ref('예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.')
 const tooltipMessage2 = ref('금융자산과 등록해주신 현물을 합산한 값 입니다.')
+
+const auth = useAuthStore();
 
 let chartInstance = null
 let barChartInstance = null
@@ -423,6 +426,8 @@ const fetchData = async () => {
       incomeLabels, returnIncome.value.map(item => item.balalnceRate),
       stockLabels, returnStock.value.map(item => item.earningRate)
     );
+
+    nickname.value = u
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error)
   }
@@ -712,6 +717,7 @@ const resetTooltips = () => {
 };
 // 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(() => {
+  auth.fetchUserProfile();
   nextTick(() => {
     // 첫 번째 툴팁 초기화
     if (tooltipButton.value) {
