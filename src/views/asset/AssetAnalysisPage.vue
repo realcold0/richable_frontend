@@ -12,15 +12,7 @@
           김리치님은 <strong>{{ assetLevel.level }} 단계</strong>예요
         </div>
         <div class="asset-level-sub">{{ assetLevel.description }}</div>
-        <div
-          class="asset-level-img"
-          :style="{
-            backgroundImage: `url(${assetLevel.imgUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }"
-        ></div>
+        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }"></div>
       </div>
 
       <!-- 자산 분석 섹션 -->
@@ -41,7 +33,7 @@
           </div>
           <div class="asset-analysis-btn">
             <!-- 체크박스 클릭 이벤트를 통해 값을 업데이트 -->
-            <input type="checkbox" v-model="includePhysicalAssets" @change="resetCharts" />
+            <input type="checkbox" v-model="includePhysicalAssets" @change="handleCheckboxChange" />
             <p>현물자산 포함</p>
           </div>
         </div>
@@ -120,8 +112,8 @@
 
         <div class="graph-container-wrapper">
           <div class="graph-container">
-            <div class="graph-title">저축량</div>
-            <div class="graph-sum">{{ returnIncomeSum }}%</div>
+            <div class="graph-title">저축률</div>
+            <div class="graph-sum">{{returnIncomeSum}}%</div>
             <canvas class="graph" ref="lineChart3"></canvas>
           </div>
 
@@ -149,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import {
   Chart,
   PieController,
@@ -214,7 +206,9 @@ const lineChart3 = ref(null)
 const lineChart4 = ref(null)
 
 const tooltipButton = ref(null) // 툴팁 버튼
+const tooltipButton2 = ref(null) // 툴팁 버튼
 const tooltipInstance = ref(null) // 툴팁 인스턴스
+const tooltipInstance2 = ref(null) // 툴팁 인스턴스
 const tooltipMessage = ref('예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.')
 const tooltipMessage2 = ref('금융자산과 등록해주신 현물을 합산한 값 입니다.')
 
@@ -224,6 +218,15 @@ let lineChartInstance1 = null
 let lineChartInstance2 = null
 let lineChartInstance3 = null
 let lineChartInstance4 = null
+
+watch(() => tooltipButton2.value, (newVal) => {
+  if (newVal) {
+    newVal.setAttribute('title', tooltipMessage2.value);
+    tooltipInstance2.value = new BootstrapTooltip(newVal);
+    resetTooltips();
+    console.log('Tooltip 2 initialized');
+  }
+});
 
 const displayAsset = computed(() =>
   includePhysicalAssets.value ? totalAsset.value : finAsset.value
@@ -308,13 +311,11 @@ const formatCurrency = (amount) => {
 
 const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
   // month가 1인 값을 찾아서 합계에 저장
-  returnBondSum.value = returnBond.find((item) => item.month === 1)?.earningRate || 0
-  returnCoinSum.value = returnCoin.find((item) => item.month === 1)?.earningRate || 0
-  returnStockSum.value = returnStock.find((item) => item.month === 1)?.earningRate || 0
-  returnIncomeSum.value = (
-    returnIncome.find((item) => item.month === '2024-10')?.balalnceRate || 0
-  ).toFixed(1) // 소수점 한 자리까지
-}
+  returnBondSum.value = returnBond.find(item => item.month === 1)?.earningRate || 0;
+  returnCoinSum.value = returnCoin.find(item => item.month === 1)?.earningRate || 0;
+  returnStockSum.value = returnStock.find(item => item.month === 1)?.earningRate || 0;
+  returnIncomeSum.value = (returnIncome.find(item => item.month === "2024-10")?.balalnceRate || 0).toFixed(1); // 소수점 한 자리까지
+};
 
 const fetchData = async () => {
   try {
@@ -417,15 +418,11 @@ const fetchData = async () => {
     const stockLabels = returnStock.value.map((item) => mapMonthToLabel(item.month))
 
     renderAllLineCharts(
-      bondLabels,
-      returnBond.value.map((item) => item.earningRate),
-      coinLabels,
-      returnCoin.value.map((item) => item.earningRate),
-      incomeLabels,
-      returnIncome.value.map((item) => item.balalnceRate),
-      stockLabels,
-      returnStock.value.map((item) => item.earningRate)
-    )
+      bondLabels, returnBond.value.map(item => item.earningRate),
+      coinLabels, returnCoin.value.map(item => item.earningRate),
+      incomeLabels, returnIncome.value.map(item => item.balalnceRate),
+      stockLabels, returnStock.value.map(item => item.earningRate)
+    );
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error)
   }
@@ -635,7 +632,7 @@ const renderLineChart = (chartRef, chartInstance, labels, data, isCurrency = fal
           ticks: {
             callback: function (value) {
               if (isCurrency) {
-                return value.toLocaleString() + '%'
+                return value.toLocaleString() + '%';
               } else {
                 return value + '%'
               }
@@ -673,21 +670,62 @@ const prevPage = () => {
 
 // 차트 리셋
 const resetCharts = () => {
-  // 체크박스의 상태에 따라 툴팁 메시지 변경
-  if (includePhysicalAssets.value) {
-    tooltipMessage.value = tooltipMessage2.value
-  } else {
-    tooltipMessage.value = '예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.'
-  }
-
   // 데이터 재로딩
   fetchData()
 }
-//툴팁 내용변경
-const resetTooltips = () => {}
+// 체크박스 변경 시 툴팁 메시지 업데이트 및 차트 리셋
+const handleCheckboxChange = () => {
+  if (includePhysicalAssets.value) {
+    tooltipMessage.value = tooltipMessage2.value; // 체크하면 tooltipMessage2로 변경
+  } else {
+    tooltipMessage.value = '예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.'; // 체크 해제하면 기본 메시지로 변경
+  }
+  resetTooltips(); // 툴팁 업데이트
+  resetCharts();   // 차트 리셋 (기존 기능)
+};
 
+
+// 툴팁 메시지 변경 및 초기화 함수
+const resetTooltips = () => {
+  // 첫 번째 툴팁
+  nextTick(() => {
+    if (tooltipInstance.value) {
+      tooltipInstance.value.dispose(); // 기존 툴팁 제거
+    }
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value); // 툴팁 다시 초기화
+    }
+  });
+
+  // 두 번째 툴팁
+  nextTick(() => {
+    if (tooltipInstance2.value) {
+      tooltipInstance2.value.dispose(); // 기존 툴팁 제거
+    }
+    if (tooltipButton2.value) {
+      tooltipButton2.value.setAttribute('title', tooltipMessage2.value);
+      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value); // 툴팁 다시 초기화
+      console.log('Tooltip 2 initialized');
+    }
+  });
+};
 // 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(() => {
+  nextTick(() => {
+    // 첫 번째 툴팁 초기화
+    if (tooltipButton.value) {
+      tooltipButton.value.setAttribute('title', tooltipMessage.value);
+      tooltipInstance.value = new BootstrapTooltip(tooltipButton.value);
+    }
+
+    // 두 번째 툴팁 초기화
+    if (tooltipButton2.value) {
+      tooltipButton2.value.setAttribute('title', tooltipMessage2.value);
+      tooltipInstance2.value = new BootstrapTooltip(tooltipButton2.value);
+    }
+  });
+
   fetchData()
 })
 </script>
