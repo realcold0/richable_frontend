@@ -68,7 +68,6 @@ const password = ref('')
 const showPassword = ref(false)
 const router = useRouter()
 const authStore = useAuthStore()
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
