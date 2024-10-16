@@ -113,8 +113,10 @@ const currentAsset = ref(0);
 const peerAverageAsset = ref(0); // 20대 평균 자산
 const assetDifference = ref(0); // 내 자산과 20대 평균 자산의 차이
 
+
 // 자산 리스트 (카테고리별)
 const assetList = ref([]);
+const financeData = ref([]);
 
 // 로딩 상태 및 오류 메시지
 const loading = ref(false);
@@ -193,6 +195,7 @@ const fetchPeerFinanceData = async () => {
     const financeData = response.data.response.data;
 
     if (Array.isArray(financeData)) {
+      console.log(financeData)
       assetList.value = financeData.map(item => ({
         category: categoryMapping[item.category] || item.category, // 카테고리 한국어 변환
         myAsset: item.bsAmount,
@@ -209,6 +212,7 @@ const fetchPeerFinanceData = async () => {
     console.error('Error fetching peer finance data:', error);
   } finally {
     loading.value = false;
+    console.log(financeData.value); // 데이터를 받아온 후 확인
   }
 };
 

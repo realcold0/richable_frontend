@@ -2,20 +2,17 @@
   <div>
     <div class="content-container">
       <div class="total-asset">
-        <div class="asset-title">김리치님의 총 자산 현황 😎</div>
+        <div class="asset-title">{{ auth.userProfile.data.nickname }} 총 자산 현황 😎</div>
         <div class="asset-amount">{{ formatCurrency(displayAsset) }}원</div>
       </div>
 
       <!-- 나의 단계 -->
       <div class="asset-level-container">
         <div class="asset-level-title">
-          김리치님은 <strong>{{ assetLevel.level }} 단계</strong>예요
+          {{ auth.userProfile.data.nickname }}님은 <strong>{{ assetLevel.level }} 단계</strong>예요
         </div>
         <div class="asset-level-sub">{{ assetLevel.description }}</div>
-        <div
-          class="asset-level-img"
-          :style="{ backgroundImage: `url(${assetLevel.imgUrl})` }"
-        ></div>
+        <div class="asset-level-img" :style="{ backgroundImage: `url(${assetLevel.imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }"></div>
       </div>
 
       <!-- 자산 분석 섹션 -->
@@ -115,8 +112,8 @@
 
         <div class="graph-container-wrapper">
           <div class="graph-container">
-            <div class="graph-title">저축량</div>
-            <div class="graph-sum">{{ returnIncomeSum }}만원</div>
+            <div class="graph-title">저축률</div>
+            <div class="graph-sum">{{returnIncomeSum}}%</div>
             <canvas class="graph" ref="lineChart3"></canvas>
           </div>
 
@@ -161,6 +158,7 @@ import {
 } from 'chart.js'
 import instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
+import { useAuthStore } from '@/stores/auth'
 
 Chart.register(
   PieController,
@@ -214,6 +212,8 @@ const tooltipInstance = ref(null) // 툴팁 인스턴스
 const tooltipInstance2 = ref(null) // 툴팁 인스턴스
 const tooltipMessage = ref('예적금은 [예금], [적금], [현금], [입출금] 이 포함된 값 입니다.')
 const tooltipMessage2 = ref('금융자산과 등록해주신 현물을 합산한 값 입니다.')
+
+const auth = useAuthStore();
 
 let chartInstance = null
 let barChartInstance = null
@@ -314,12 +314,11 @@ const formatCurrency = (amount) => {
 
 const processSums = (returnBond, returnCoin, returnStock, returnIncome) => {
   // month가 1인 값을 찾아서 합계에 저장
-  returnBondSum.value = returnBond.find((item) => item.month === 1)?.earningRate || 0
-  returnCoinSum.value = returnCoin.find((item) => item.month === 1)?.earningRate || 0
-  returnStockSum.value = returnStock.find((item) => item.month === 1)?.earningRate || 0
-  returnIncomeSum.value =
-    (returnIncome.find((item) => item.month === '2024-10')?.balance / 10000).toFixed(0) || 0 // 예시로 balance 사용
-}
+  returnBondSum.value = returnBond.find(item => item.month === 1)?.earningRate || 0;
+  returnCoinSum.value = returnCoin.find(item => item.month === 1)?.earningRate || 0;
+  returnStockSum.value = returnStock.find(item => item.month === 1)?.earningRate || 0;
+  returnIncomeSum.value = (returnIncome.find(item => item.month === "2024-10")?.balalnceRate || 0).toFixed(1); // 소수점 한 자리까지
+};
 
 const fetchData = async () => {
   try {
@@ -422,15 +421,13 @@ const fetchData = async () => {
     const stockLabels = returnStock.value.map((item) => mapMonthToLabel(item.month))
 
     renderAllLineCharts(
-      bondLabels,
-      returnBond.value.map((item) => item.earningRate),
-      coinLabels,
-      returnCoin.value.map((item) => item.earningRate),
-      incomeLabels,
-      returnIncome.value.map((item) => item.balance),
-      stockLabels,
-      returnStock.value.map((item) => item.earningRate)
-    )
+      bondLabels, returnBond.value.map(item => item.earningRate),
+      coinLabels, returnCoin.value.map(item => item.earningRate),
+      incomeLabels, returnIncome.value.map(item => item.balalnceRate),
+      stockLabels, returnStock.value.map(item => item.earningRate)
+    );
+
+    nickname.value = u
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error)
   }
@@ -640,7 +637,7 @@ const renderLineChart = (chartRef, chartInstance, labels, data, isCurrency = fal
           ticks: {
             callback: function (value) {
               if (isCurrency) {
-                return value.toLocaleString() + '원'
+                return value.toLocaleString() + '%';
               } else {
                 return value + '%'
               }
@@ -720,6 +717,7 @@ const resetTooltips = () => {
 };
 // 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(() => {
+  auth.fetchUserProfile();
   nextTick(() => {
     // 첫 번째 툴팁 초기화
     if (tooltipButton.value) {
