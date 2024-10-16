@@ -51,7 +51,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePasswordResetStore } from '@/stores/passwordResetStore'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 
 const router = useRouter()
 const passwordResetStore = usePasswordResetStore()
@@ -59,8 +59,6 @@ const passwordResetStore = usePasswordResetStore()
 const newPassword = ref('')
 const confirmPassword = ref('')
 const error = ref('')
-
-const BASE_URL =  import.meta.env.VITE_API_BASE_URL + "/member"
 
 onMounted(() => {
   if (!passwordResetStore.isVerified) {
@@ -81,7 +79,7 @@ const resetPassword = async () => {
 
   try {
     // API 호출로 비밀번호 재설정
-    const response = await axios.post(`${BASE_URL}/set/pw`, {
+    const response = await axiosinstance.post(`/member/set/pw`, {
       id: passwordResetStore.userId,
       newPassword: newPassword.value
     })

@@ -1,44 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="!isAuthenticated">
-      <h1>관리자 페이지 로그인</h1>
-      <form @submit.prevent="login">
-        <div class="mb-3 text-start">
-          <label for="id" class="form-label">아이디</label>
-          <input
-            type="text"
-            v-model="id"
-            class="form-control"
-            id="id"
-            placeholder="이메일 주소를 입력해주세요"
-            required
-          />
-        </div>
-        <div class="mb-3 text-start position-relative">
-          <label for="password" class="form-label">비밀번호</label>
-          <div class="input-group">
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              v-model="password"
-              class="form-control"
-              id="password"
-              placeholder="비밀번호를 입력해주세요"
-              required
-            />
-            <button
-              type="button"
-              class="btn btn-outline-secondary password-toggle pw-btn"
-              @click="togglePassword"
-            >
-              {{ showPassword ? 'off' : 'on' }}
-            </button>
-          </div>
-        </div>
-        <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
-      </form>
-    </div>
-
-    <div v-else>
+    <div>
       <h1>관리자 페이지</h1>
       <div>
         <p>접속 시간 : {{ currentTime }}</p>
@@ -60,50 +22,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 
 const currentTime = ref('')
 const stockUpdateTime = ref('')
 const coinUpdateTime = ref('')
 const checkError = ref('')
-const isAuthenticated = ref(false)
-
-const id = ref('')
-const password = ref('')
-const showPassword = ref(false)
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
-
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
-
-const login = async () => {
-  if (!id.value || !password.value) {
-    alert('아이디와 비밀번호를 모두 입력해주세요')
-    return
-  }
-
-  try {
-    const response = await axios.post(`${BASE_URL}/member/login`, {
-      id: id.value,
-      password: password.value
-    })
-    const token = response.data.response.data.token
-    console.log('Token received:', token)
-
-    if ((response.status === 200) & (id.value == 'admin')) {
-      alert('Login successful!')
-      isAuthenticated.value = true
-      localStorage.setItem('authToken', token)
-    } else {
-      alert('권한 없음')
-    }
-  } catch (error) {
-    console.error('Login failed:', error)
-    alert('Login failed. Please check your credentials.')
-  }
-}
 
 const updateTime = () => {
   const now = new Date()
@@ -120,7 +44,7 @@ const updateTime = () => {
 
 const updateStock = async () => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/master/update/stock`)
+    await axiosinstance.get(`/master/update/stock`)
     stockUpdateTime.value = updateTime()
     alert('주식 가격 업데이트 성공!')
   } catch (error) {
@@ -131,7 +55,7 @@ const updateStock = async () => {
 
 const updateCoin = async () => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/master/update/coin`)
+    await axiosinstance.get(`/master/update/coin`)
     coinUpdateTime.value = updateTime()
     alert('코인 가격 업데이트 성공!')
   } catch (error) {
@@ -158,6 +82,7 @@ onMounted(() => {
   text-align: center;
   margin: 5% auto;
 }
+
 .update-btn {
   border: none;
   color: white;
@@ -167,6 +92,7 @@ onMounted(() => {
   margin-top: 1rem;
   background-color: #ff0062;
 }
+
 .update-time {
   font-size: 0.8em;
   color: #666;
@@ -190,12 +116,14 @@ onMounted(() => {
   align-items: stretch;
   width: 100%;
 }
+
 .input-group > .form-control {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
 }
+
 /* .pw-btn {
   border: none;
   color: white;
