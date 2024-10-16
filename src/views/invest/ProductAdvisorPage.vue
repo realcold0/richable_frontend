@@ -261,6 +261,7 @@ const calculatePercentage = (cash) => {
 * {
   color: #19181d;
   font-family: 'Pretendard', sans-serif;
+
 }
 
 .container {
