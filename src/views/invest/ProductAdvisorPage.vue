@@ -265,8 +265,10 @@ const calculatePercentage = (cash) => {
 }
 
 .container {
-  margin: 0; /* 마진을 0으로 설정하여 여백 제거 */
-  padding: 20px; /* 패딩 추가 */
+  margin: 0; 
+  padding: 20px; 
+  transform: translateX(120px); /* 오른쪽으로 100px 이동 */
+
 }
 
 .total-asset {
@@ -406,7 +408,7 @@ const calculatePercentage = (cash) => {
 .custom-card {
   height: 180px;
   display: flex;
-  width: 100%;
+  width: 0%;
   padding: 20px;
   flex-direction: column;
   gap: 17px;
