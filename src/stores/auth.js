@@ -30,8 +30,6 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('authToken');
       this.userProfile = null;
       this.isLoggedIn = false;
-
-      sessionStorage.clear();
     },
   },
 });

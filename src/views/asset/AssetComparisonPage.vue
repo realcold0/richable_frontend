@@ -100,10 +100,14 @@ import { Chart, registerables } from 'chart.js';
 import axiosInstance from '@/AxiosInstance.js';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
-import { useAuthStore } from '@/stores/auth'
-const auth = useAuthStore();
+import { useAuthStore } from '@/stores/auth';
+
 
 Chart.register(...registerables);
+
+// 사용자 이름
+const auth = useAuthStore();
+
 
 // 현재 자산 정보 및 자산 차이
 const currentAsset = ref(0);
