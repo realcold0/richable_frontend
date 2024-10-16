@@ -16,25 +16,23 @@
       <div class="mb-3 text-start position-relative">
         <label for="password" class="form-label">비밀번호</label>
         <div class="password-input-wrapper position-relative">
-    <input
-      :type="showPassword ? 'text' : 'password'"
-      v-model="password"
-      class="form-control"
-      id="password"
-      placeholder="비밀번호를 입력해주세요"
-      required
-    />
-    <span
-      @click="togglePassword"
-      class="position-absolute top-50 end-0 translate-middle-y pe-2"
-      style="cursor: pointer"
-      :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
-    >
-      <font-awesome-icon 
-        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" 
-      />
-    </span>
-  </div>
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="password"
+            class="form-control"
+            id="password"
+            placeholder="비밀번호를 입력해주세요"
+            required
+          />
+          <span
+            @click="togglePassword"
+            class="position-absolute top-50 end-0 translate-middle-y pe-2"
+            style="cursor: pointer"
+            :aria-label="showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'"
+          >
+            <font-awesome-icon :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" />
+          </span>
+        </div>
       </div>
       <button type="submit" class="login-btn" :disabled="!id || !password">로그인</button>
     </form>
@@ -44,7 +42,7 @@
       <span class="mx-2"> | </span>
       <router-link to="/user/findpassword" class="join-link">비밀번호 찾기</router-link>
     </div>
-    <div class="or-divider">또는</div> 
+    <div class="or-divider">또는</div>
 
     <div class="sns-buttons">
       <img src="../../assets/images/naver.png" alt="Naver" @click="naverLogin" />
@@ -61,22 +59,22 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
-import axiosinstance from '@/AxiosInstance';
+import axiosinstance from '@/AxiosInstance'
 
 const id = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const router = useRouter()
 const authStore = useAuthStore()
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
-const setAuthToken = (key, value) => new Promise((resolve) => {
-  localStorage.setItem(key,value);
-  resolve();
-})
+const setAuthToken = (key, value) =>
+  new Promise((resolve) => {
+    localStorage.setItem(key, value)
+    resolve()
+  })
 
 const naverLogin = async () => {
   try {
@@ -101,28 +99,27 @@ const login = async () => {
     return
   }
   try {
-    const response = await axiosinstance.post(`/member/login` , {
+    const response = await axiosinstance.post(`/member/login`, {
       id: id.value,
       password: password.value
-    });
-    
-    
+    })
+
     // 응답 데이터 구조에 따라 토큰 추출
     if (response.data.success && response.data.response?.data?.token) {
-      const token = response.data.response.data.token;
-      console.log('Token received:', token);
+      const token = response.data.response.data.token
+      console.log('Token received:', token)
       // 로그인 성공 시 처리
-      alert('Login successful!');
-      await setAuthToken("authToken", token);
-      await authStore.fetchUserProfile();
+      alert('Login successful!')
+      await setAuthToken('authToken', token)
+      await authStore.fetchUserProfile()
 
-      router.push({ name: 'assetAnalysis' });
+      router.push({ name: 'assetAnalysis' })
     } else {
-      throw new Error('Invalid response format');
+      throw new Error('Invalid response format')
     }
   } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login failed. Please check your credentials.');
+    console.error('Login failed:', error)
+    alert('Login failed. Please check your credentials.')
   }
 }
 onMounted(() => {

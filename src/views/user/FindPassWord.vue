@@ -86,7 +86,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePasswordResetStore } from '@/stores/passwordResetStore'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 
 const router = useRouter()
 const passwordResetStore = usePasswordResetStore()
@@ -97,12 +97,10 @@ const verificationCode = ref('')
 const isCodeSent = ref(false)
 const isVerified = ref(false)
 
-const BASE_URL =  import.meta.env.VITE_API_BASE_URL + "/member"
-
 const sendVerificationCode = async () => {
   if (email.value && id.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/find/pw`, {
+      const response = await axiosinstance.post(`/member/find/pw`, {
         email: email.value,
         id: id.value
       })
@@ -124,7 +122,7 @@ const sendVerificationCode = async () => {
 const verifyCode = async () => {
   if (verificationCode.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/find/pw/auth`, {
+      const response = await axiosinstance.post(`/member/find/pw/auth`, {
         email: email.value,
         id: id.value,
         code: verificationCode.value
