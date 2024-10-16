@@ -63,7 +63,7 @@
             </li>
           </ul>
   
-          <router-link :to="{ path: '/budget/list', query: { category: selectedCategory.category } }">
+          <router-link style="text-decoration: none;":to="{ path: '/budget/list', query: { category: selectedCategory.category } }">
             <button class="btn btn-pink">세부항목 보러가기</button>
           </router-link>
         </div>
@@ -121,7 +121,7 @@
       selectedCategory.value = category;
       filteredItems.value = categories.value.slice(4);
     } else {
-      router.push({ path: '/budget/list'});
+      router.push({ path: '/budget/list', query: { category: category.category}});
     }
     showDetailModal.value = true;
   };
@@ -222,7 +222,6 @@
   
   <style scoped>
   * {
-    max-width: 1980px;
     font-family: 'Pretendard', sans-serif;
     font-size: 18px;
   }
