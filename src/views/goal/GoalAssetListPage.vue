@@ -133,7 +133,6 @@ import Instance from '@/AxiosInstance.js'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 import { useAuthStore } from '@/stores/auth'
 
-const auth = useAuthStore();
 
 const tooltipButton1 = ref(null) // 툴팁 버튼
 const tooltipButton2 = ref(null) // 툴팁 버튼
@@ -141,6 +140,9 @@ const tooltipButton2 = ref(null) // 툴팁 버튼
 const tooltipInstance = ref(null) // 툴팁 인스턴스
 const tooltipMessage1 = ref('모은 돈은 목표 자산 설정 이후의 소득입니다.')
 const tooltipMessage2 = ref('소비 등록 이후 모은 돈이 계산됩니다.')
+
+const auth = useAuthStore();
+
 
 // 로딩 상태
 const isLoading = ref(false)

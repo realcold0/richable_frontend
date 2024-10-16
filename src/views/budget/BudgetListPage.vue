@@ -45,7 +45,7 @@
 
 
 
-    <!-- 정렬 버튼 -->
+    <!-- 정렬 버튼
     <div class="sort-options" style="display: flex; align-items: center; margin-top: 20px;">
       <div class="sort-option-title">정렬</div>
       <div class="sort-option-btn"@click="sortOrder = 'desc'" :class="{ active: sortOrder === 'desc' }" style="margin-right: 10px;">
@@ -54,7 +54,7 @@
       <div class="sort-option-btn"@click="sortOrder = 'asc'" :class="{ active: sortOrder === 'asc' }">
         오래된순
       </div>
-    </div>
+    </div> -->
       </div>
 
       <div v-if="paginatedExpenses.length === 0" class="empty-state">
@@ -114,17 +114,16 @@
       </select>
     </div>
 
-    <!-- 정렬 버튼 -->
+    <!-- 정렬 버튼
     <div class="sort-options" style="display: flex; align-items: center; margin-top: 20px;">
       <div class="sort-option-title">정렬</div>
-      <div class="sort-option-btn" @click="sortOrder = 'desc'" :class="{ active: sortOrder === 'desc' }" style="margin-right: 10px;">
-        최신순
-    </div>
-      <div class="sort-option-btn" @click="sortOrder = 'asc'" :class="{ active: sortOrder === 'asc' }">
-        오래된순
-
-      </div>
-    </div>
+      <div class="sort-option-btn" @click="() => { sortOrder.value = 'desc'; console.log('sortOrder:', sortOrder.value); }" :class="{ active: sortOrder === 'desc' }" style="margin-right: 10px;">
+    최신순
+</div>
+<div class="sort-option-btn" @click="() => { sortOrder.value = 'asc'; console.log('sortOrder:', sortOrder.value); }" :class="{ active: sortOrder === 'asc' }">
+    오래된순
+</div>
+    </div> -->
   </div>
 
   <div v-if="paginatedIncomes.length === 0" class="empty-state">
@@ -194,9 +193,13 @@ import ConsumeDetailModal from '@/components/modal/budget/ConsumeDetailModal.vue
 import ConsumeUpdateModal from '@/components/modal/budget/ConsumeUpdateModal.vue';
 import axiosInstance from '@/AxiosInstance';
 
+import { useRoute } from 'vue-router';
 
 
 // hoveredIndex 선언
+const route = useRoute();
+const selectedExpenseCategory2 = ref('');
+
 const hoveredIndex = ref(null);
 const isLoggedIn = ref(null);
 const selectedTab = ref('expense');
@@ -209,7 +212,22 @@ const itemsPerPage = ref(9);
 const totalExpenses = computed(() => expenses.value.length);
 const totalIncomes = computed(() => incomes.value.length);
 
-
+// 카테고리 매핑
+const categoryMapping = {
+  '식료품 · 비주류음료': '식료품',
+  '주류 · 담배': '유흥',
+  '의류 · 신발': '쇼핑',
+  '주거 · 수도 · 광열': '공과금',
+  '가정용품 · 가사서비스': '생활용품',
+  '보건': '의료비',
+  '교통': '교통비',
+  '통신': '통신비',
+  '오락 · 문화': '문화',
+  '교육': '교육비',
+  '음식': '외식',
+  '기타상품': '기타',
+  '비소비지출': '비소비지출'
+};
 
 const sortOrder = ref('desc');  // 최신순(desc) 또는 오래된순(asc)을 저장할 변수
 const errorMessage = ref('');
@@ -443,7 +461,13 @@ watch(selectedTab, (newTab) => {
     fetchIncomes();
   }
 });
-
+onMounted(() => {
+  const categoryFromQuery = route.query.category;
+  if (categoryFromQuery) {
+    // 카테고리 매핑을 사용하여 매칭되는 값을 설정
+    selectedExpenseCategory.value = Object.keys(categoryMapping).find(key => categoryMapping[key] === categoryFromQuery) || categoryFromQuery;
+  }
+});
 // 초기 데이터 로드
 fetchExpenses(); 
 </script>
