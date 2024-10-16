@@ -271,6 +271,8 @@ const calculatePercentage = (cash) => {
 
 }
 
+
+
 .total-asset {
   border-radius: 20px;
   margin-top: 18px;
