@@ -13,7 +13,7 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue'
 
 <style scoped>
 .pageWrapper {
-  margin: 80px;
+  padding: 5em;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -22,7 +22,7 @@ import ConsumeCompareMonth from '@/components/consume/ConsumeCompareMonth.vue'
 /* 웹용*/
 @media (min-width: 1024px) {
   .pageWrapper {
-    margin: 80px;
+    padding: 5em;
     width: 100%;
   }
 }
