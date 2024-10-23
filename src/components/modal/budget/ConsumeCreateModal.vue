@@ -11,18 +11,19 @@
           <div class="mb-3" style="display: flex;">
             <label for="expenseType" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">유형</label>
             <select class="form-select" id="expenseType" v-model="expenseCategory">
-              <option value="식료품">식료품</option>
-              <option value="유흥">유흥</option>
-              <option value="쇼핑">쇼핑</option>
-              <option value="공과금">공과금</option>
-              <option value="생활용품">생활용품</option>
-              <option value="의료비">의료비</option>
-              <option value="교통비">교통비</option>
-              <option value="통신비">통신비</option>
-              <option value="문화">문화</option>
-              <option value="교육비">교육비</option>
-              <option value="외식 · 숙박">외식 · 숙박</option>
-              <option value="기타">기타</option>
+              <option value="식료품 · 비주류음료">식료품 · 비주류음료</option>
+              <option value="주류 · 담배">주류 · 담배</option>
+          <option value="의류 · 신발">의류 · 신발</option>
+           <option value="주거 · 수도 · 광열">주거 · 수도 · 광열</option>
+          <option value="가정용품 · 가사서비스">가정용품 · 가사서비스</option>
+          <option value="보건">보건</option>
+          <option value="교통">교통</option>
+         <option value="통신">통신</option>
+          <option value="오락 · 문화">오락 · 문화</option>
+          <option value="교육">교육</option>
+        <option value="음식">음식</option>
+        <option value="기타상품">기타상품</option>
+        <option value="비소비지출">비소비지출</option>
             </select>
           </div>
 
@@ -52,22 +53,18 @@
             <label for="expenseMemo" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">메모</label>
             <input type="text" class="form-control" id="expenseMemo" v-model="expenseMemo">
           </div>
-        </div>
 
-        <!-- 계좌 선택 -->
-        <div class="mb-3" style="display: flex">
-          <label
-            for="selectAccount"
-            class="form-label"
-            style="font-weight: bold; width: 70px; padding-top: 8px"
-            >계좌</label
-          >
-          <select class="form-select" id="selectAccount" v-model="selectedAccount">
-            <option value="" disabled>계좌를 선택하세요</option>
-            <option v-for="account in accounts" :key="account.index" :value="account.accountNum">
-              {{ account.orgCode }} - {{ account.accountNum }} - {{ account.prodName }}
-            </option>
-          </select>
+          <!-- 계좌 선택 -->
+          <div class="mb-3 form-group" style="display: flex;">
+            <label for="selectAccount" class="form-label" style="font-weight: bold; width: 70px; padding-top: 8px;">계좌</label>
+            <select class="form-select" id="selectAccount" v-model="selectedAccount" style="flex-grow: 1;">
+              <option value="" disabled>계좌를 선택하세요</option>
+              <option v-for="account in accounts" :key="account.index" :value="account.accountNum">
+                {{ account.orgCode }} - {{ account.accountNum }} - {{ account.prodName }}
+              </option>
+            </select>
+          </div>
+
         </div>
 
         <div class="modal-footer d-flex justify-content-between">
@@ -85,9 +82,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose } from 'vue'
+import { ref, onMounted, defineExpose, defineEmits } from 'vue'
 import { Modal } from 'bootstrap'
-import axios from 'axios'
 import axiosInstance from '@/AxiosInstance'
 
 // 모달 초기화 변수
@@ -99,9 +95,9 @@ const expenseCategory = ref('') // 소비 유형
 const expenseAmount = ref('') // 소비 가격
 const expenseDescript = ref('') // 소비 내용
 const expenseMemo = ref('') // 소비 메모
-const expenseDate = ref('')
-const accounts = ref([])
-const selectedAccount = ref(0)
+const expenseDate = ref('') // 소비 날짜
+const accounts = ref([]) // 계좌 목록
+const selectedAccount = ref(0) // 선택한 계좌
 
 // 모달 열기 함수
 const show = () => {
@@ -115,6 +111,8 @@ const show = () => {
     modalInstance.show()
   }
 }
+
+// 계좌 목록 불러오기
 const fetchAccounts = async () => {
   try {
     const response = await axiosInstance.get('/asset/account/list')
@@ -141,11 +139,11 @@ onMounted(() => {
 const registerExpense = async () => {
   try {
     const expenseData = {
-      expCategory: expenseCategory.value,              
-      amount: parseInt(expenseAmount.value),           
-      descript: expenseDescript.value,                 
+      expCategory: expenseCategory.value,
+      amount: parseInt(expenseAmount.value),
+      descript: expenseDescript.value,
       memo: expenseMemo.value,
-      date : expenseDate.value,
+      date: expenseDate.value,
       accountNum: selectedAccount.value
     };
 
@@ -158,6 +156,8 @@ const registerExpense = async () => {
       if (modalInstance) {
         modalInstance.hide();
       }
+      emit('outcomeRegistered');
+      console.log('outcomeRegistered');
     } else {
       console.error("소비 등록 실패:", response.data);
     }

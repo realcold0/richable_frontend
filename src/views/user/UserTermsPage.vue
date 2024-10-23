@@ -376,7 +376,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -411,7 +411,7 @@ const submitAgreement = async () => {
   const userId = route.params.id
 
   try {
-    const response = await axios.post(`http://localhost:8080/member/agree/${userId}`, {
+    const response = await axiosinstance.post(`/member/agree/${userId}`, {
       info: agreeServiceTerms.value,
       finance: agreePrivacyPolicy.value
     })

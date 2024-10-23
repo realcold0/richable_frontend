@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import HomeView from '../views/HomeView.vue'
 import HomePage from '@/views/HomePage.vue'
+import NotFoundPage from '@/views/NotFoundPage.vue'
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     component: () => import('../views/user/SignUpPage.vue')
   },
   {
+    path: '/auth/naver/callback',
+    name: 'NaverAuthCallback',
+    component: () => import('../views/user/NaverAuthCallback.vue')
+  },
+  {
     path: '/user/findpassword',
     name: 'findpassword',
     component: () => import('../views/user/FindPassWord.vue')
@@ -49,11 +55,6 @@ const routes = [
     path: '/user/terms/:id',
     name: 'terms',
     component: () => import('../views/user/UserTermsPage.vue')
-  },
-  {
-    path: '/user/Board/',
-    name: 'board',
-    component: () => import('../views/user/Board.vue')
   },
   {
     path: '/user/mypage',
@@ -147,6 +148,13 @@ const routes = [
     name: 'knowhowUpdate',
     component: () => import('../views/knowhow/KnowHowUpdatePage.vue'),
     meta: { requiresAuth: true }
+  },
+  // 404 페이지 라우트
+  {
+    path: '/:pathMatch(.*)*', // 모든 일치하지 않는 경로
+    name: 'NotFound',
+    component: NotFoundPage
+
   }
 ]
 

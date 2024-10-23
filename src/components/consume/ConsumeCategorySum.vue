@@ -2,7 +2,7 @@
     <div class="wrapper">
 
         <div class="text-center total-asset">
-            <div class="asset-title">김리치님의 이번 달 총 소비💸</div>
+            <div class="asset-title">{{ auth. userProfile.data.nickname}}님의 이번 달 총 소비💸</div>
             <div class="asset-amount">{{ totalSum !== null ? totalSum.toLocaleString() : '0' }} 원</div>
         </div>
 
@@ -63,7 +63,7 @@
             </li>
           </ul>
   
-          <router-link :to="{ path: '/budget/list', query: { category: selectedCategory.category } }">
+          <router-link style="text-decoration: none;":to="{ path: '/budget/list', query: { category: selectedCategory.category } }">
             <button class="btn btn-pink">세부항목 보러가기</button>
           </router-link>
         </div>
@@ -77,11 +77,16 @@
   import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, DoughnutController } from 'chart.js';
   import { nextTick, onMounted, ref, watch } from 'vue';
   import axiosinstance from '@/AxiosInstance';
-  
+  import {useRouter} from 'vue-router'
+  import { useAuthStore } from '@/stores/auth';
+
   ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, DoughnutController);
   
+  const router = useRouter();
   const month = useMonthStore();
   const doughnutChart = ref(null);
+  const auth = useAuthStore();
+
   let chartInstance = null;
   
   const totalSum = ref(0);
@@ -116,8 +121,7 @@
       selectedCategory.value = category;
       filteredItems.value = categories.value.slice(4);
     } else {
-      selectedCategory.value = category;
-      filteredItems.value = categories.value.filter(item => item.category === category.category);
+      router.push({ path: '/budget/list', query: { category: category.category}});
     }
     showDetailModal.value = true;
   };
@@ -169,6 +173,7 @@
   
       categories.value = responseData.categorys || [];
       totalSum.value = responseData.sum || 0;
+      console.log(`total sum : ${totalSum.value}`);
   
       processCategories();
     } catch (error) {
@@ -207,6 +212,7 @@
   
   onMounted(() => {
     renderDoughnutChart();
+    auth.fetchUserProfile();
   });
   
   watch(() => month.month, () => {
@@ -216,7 +222,6 @@
   
   <style scoped>
   * {
-    max-width: 1440px;
     font-family: 'Pretendard', sans-serif;
     font-size: 18px;
   }

@@ -1,40 +1,38 @@
 <template>
   <div class="mypage-container">
     <div class="top-section d-flex justify-content-between">
+      <!-- 프로필 섹션 -->
       <section class="profile-section box">
         <h5 class="bold-text text-left">나의 프로필</h5>
         <div class="profile">
-          <img :src="profileImageUrl" alt="프로필 이미지" />
-          <h2 class="mt-3">{{ userProfile.name }}</h2>
+          <img :src=auth.userProfile.data.img alt="프로필 이미지" />
+          <h2 class="mt-3">{{ auth.userProfile.data.nickname }}</h2>
           <button class="btn btn-danger mt-3" @click="openProfileModal" style="background-color: #FF0062; border-color: #FF0062;">프로필 수정</button>
         </div>
       </section>
 
+      <!-- API 관리 섹션 -->
       <section class="api-management box text-left">
         <h4 class="bold-text">API 관리</h4><br>
         <ul class="list-unstyled">
           <li class="d-flex align-items-center">
             <span>은행 api key</span>
-            <span class="ms-3">{{ apiKeys.bankApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.bank }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('bank')">➡️</button>
           </li>
           <li class="d-flex align-items-center">
             <span>증권 api key</span>
-            <span class="ms-3">{{ apiKeys.stockApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.stock.app }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('stock')">➡️</button>
           </li>
           <li class="d-flex align-items-center">
             <span>암호화폐 api key</span>
-            <span class="ms-3">{{ apiKeys.cryptoApiKey }}</span>
+            <span class="ms-3">{{ auth.userProfile.data.api.coin.app }}</span>
             <button class="btn btn-link ms-auto" @click="openApiKeyInput('crypto')">➡️</button>
-          </li>
-          <li class="d-flex align-items-center">
-            <span>동의여부</span>
-            <span class="ms-3">{{ apiKeys.consentStatus }}</span>
-            <button class="btn btn-link ms-auto" @click="openApiKeyInput('consent')">➡️</button>
           </li>
         </ul>
 
+        <!-- API 키 입력 -->
         <div v-if="showApiKeyInput" class="mt-3">
           <input type="text" class="form-control mb-2" :placeholder="currentApiKeyLabel + ' API 키 입력'" v-model="newApiKey" />
           <button class="btn btn-primary" @click="saveApiKey">저장</button>
@@ -42,9 +40,11 @@
       </section>
     </div>
 
+    <!-- 뱃지 섹션 -->
     <section class="badge-section box mt-5">
       <div class="d-flex justify-content-between align-items-center">
         <h1 class="badge-title bold-text">나의 뱃지</h1>
+        <!-- 전체보기 클릭 시 모달 오픈 -->
         <a href="#" class="text-end" @click.prevent="openBadgeModal" style="color: #FF0062;">전체보기</a>
       </div>
 
@@ -76,6 +76,9 @@
       </div>
     </section>
 
+    <!-- UserAllBadgesModal 모달 삽입 -->
+    <UserAllBadgesModal ref="badgeModal" />
+
     <!-- 회원 탈퇴 확인 모달 -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -95,7 +98,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
@@ -146,9 +148,46 @@ import noprofileImage from '@/assets/images/noprofile1.png'; // 이미지 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { useBadgeStore } from '@/stores/mypage/badge.js';
+import UserAllBadgesModal from '@/components/modal/user/UserAllBadgesModal.vue';
+import { useAuthStore } from '@/stores/auth';
+
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+  return JSON.parse(jsonPayload);
+}
+
+const badgeStore = useBadgeStore();
+const auth = useAuthStore();
+const badges = computed(() => badgeStore.badges);
+
+// 모달 관리
+const openBadgeModal = () => {
+  const badgeModal = new bootstrap.Modal(document.getElementById('badgeModal'));
+  badgeModal.show();
+};
+
+
+
 
 // JWT 토큰을 localStorage에서 가져오기
 const token = localStorage.getItem('authToken');
+
+let nickname = null;
+
+if (token) {
+  const decodedToken = parseJwt(token); // 토큰에서 닉네임 추출
+  nickname = decodedToken.nickname;
+} else {
+  console.error('토큰이 없습니다.');
+}
 
 // 프로필 및 API 키 관리용 변수
 const userProfile = ref({
@@ -218,6 +257,8 @@ const triggerFileUpload = () => {
   });
 };
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/member"
+
 // 사용자 ID를 userProfile에서 가져오는지 확인합니다.
 const deleteAccount = () => {
   const userId = userProfile.value.name;
@@ -228,7 +269,7 @@ const deleteAccount = () => {
   }
 
   axios
-    .delete(`http://localhost:8080/member/delete/${userId}`, {
+    .delete(`${BASE_URL}/delete/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(() => {
@@ -273,19 +314,15 @@ const apiKeys = ref({
   consentStatus: '',
 });
 
-// 뱃지 관련 데이터 및 함수
-const badges = ref([
-  { id: 1, name: '사과러버 리치', imageUrl: '/images/badge-apple-rich.png', isSelected: false },
-  { id: 2, name: '부릉부릉 리치', imageUrl: '/images/badge-car-rich.png', isSelected: false },
-  { id: 3, name: '저금통 리치', imageUrl: '/images/badge-coin-box-rich.png', isSelected: false },
-  { id: 4, name: '럭셔리 리치', imageUrl: '/images/badge-luxury-rich.png', isSelected: false },
-]);
-
 const selectedBadgeId = ref(null);
 
-const selectedBadge = computed(() => badges.value.find(badge => badge.id === selectedBadgeId.value));
+const selectedBadge = computed(() => badges.value.length > 0 ? badges.value.find(badge => badge.id === selectedBadgeId.value) : null);
 
-const selectBadge = (badge) => selectedBadgeId.value = badge.id;
+const selectBadge = (badge) => {
+  selectedBadgeId.value = badge.id;
+  // 선택한 배지 정보를 localStorage에 저장
+  localStorage.setItem('selectedBadge', JSON.stringify(badge));
+};
 
 const toggleBadgeSelection = (badge) => {
   if (!badge.isSelected) selectedBadgeId.value = null;
@@ -293,7 +330,20 @@ const toggleBadgeSelection = (badge) => {
 
 // 사용자 정보 로드
 onMounted(() => {
-  axios.get('http://localhost:8080/member/info')
+  auth.fetchUserProfile();
+  // localStorage에 저장된 배지 정보를 불러옴
+  const storedBadge = localStorage.getItem('selectedBadge');
+  if (storedBadge) {
+    const badge = JSON.parse(storedBadge);
+    selectedBadgeId.value = badge.id; // 저장된 배지 ID 설정
+  }
+  if (nickname) {
+    badgeStore.fetchBadges(nickname); // nickname을 전달해서 fetchBadges 호출
+  } else {
+    console.error('Nickname is not defined.');
+  }
+  
+  axios.get(`${BASE_URL}/info`)
     .then((response) => {
       const responseData = response.data.response.data?.data || {};
       userProfile.value = {
@@ -318,15 +368,18 @@ onMounted(() => {
           bankApiKey: 'API 키 없음',
           stockApiKey: 'API 키 없음',
           cryptoApiKey: 'API 키 없음',
-          consentStatus: '동의 안함',
+          consentStatus: '동의 안함'
         };
       }
     })
     .catch((error) => console.error('프로필 정보와 API 키를 가져오는 중 오류 발생:', error));
+    badgeStore.fetchBadges();
 });
 </script>
 
+
 <style scoped>
+/* 기본 스타일 (웹) */
 .mypage-container {
   padding: 20px;
   max-width: 1400px;
@@ -445,4 +498,113 @@ a.text-end {
 .bold-text {
   font-weight: bold;
 }
+
+/* 태블릿 환경 */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .mypage-container {
+    padding: 15px;
+    max-width: 800px;
+  }
+
+  .top-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .box {
+    padding: 30px;
+  }
+
+  .profile img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .badge-title {
+    font-size: 18px;
+  }
+
+  .badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .representative-badge {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .badge-item {
+    width: 120px;
+  }
+
+  .badge-image {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* 모바일 환경 */
+@media (max-width: 767px) {
+  .mypage-container {
+    padding: 10px;
+    max-width: 100%;
+  }
+
+  .top-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .box {
+    padding: 20px;
+    border-radius: 5px;
+  }
+
+  .profile img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile h2 {
+    font-size: 18px;
+  }
+
+  .badge-title {
+    font-size: 16px;
+  }
+
+  .badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .representative-badge {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .badge-item {
+    width: 100px;
+  }
+
+  .badge-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .modal-body .profile-image img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+
+  .btn {
+    font-size: 14px;
+  }
+}
 </style>
+

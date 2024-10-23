@@ -57,7 +57,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axiosinstance from '@/AxiosInstance'
 
 const router = useRouter()
 
@@ -67,12 +67,10 @@ const isCodeSent = ref(false)
 const isVerified = ref(false)
 const foundId = ref('')
 
-const BASE_URL = 'http://localhost:8080/member'
-
 const sendVerificationCode = async () => {
   if (email.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/find/id`, { email: email.value })
+      const response = await axiosinstance.post(`/member/find/id`, { email: email.value })
       if (response.data.success) {
         alert(response.data.response?.data?.message)
         isCodeSent.value = true
@@ -91,7 +89,7 @@ const sendVerificationCode = async () => {
 const verifyCode = async () => {
   if (verificationCode.value) {
     try {
-      const response = await axios.post(`${BASE_URL}/find/id/auth`, {
+      const response = await axiosinstance.post(`/member/find/id/auth`, {
         email: email.value,
         code: verificationCode.value
       })
