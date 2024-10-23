@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-        
     <!-- 탭 바 -->
     <div class="tab-bar">
       <ul class="nav nav-tabs" style="display: flex; margin-right: 20px;">
@@ -9,23 +8,18 @@
           소비
         </li>
         <li
-         class="nav-item nav-link" @click="selectedTab = 'income'" :class="{ active: selectedTab === 'income' }">
+        class="nav-item nav-link" @click="selectedTab = 'income'" :class="{ active: selectedTab === 'income' }">
           소득
         </li>
       </ul>
     </div>
-
     <!-- 소비 탭 -->
-
-    
     <div v-if="selectedTab === 'expense'">
-
   
       <div class="nav" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
         <div class="filter-bar">
         <label class = "select-title" for="expenseCategory">소비 카테고리</label>
         <select style="height: 48px; margin-left:8px; " id="expenseCategory" v-model="selectedExpenseCategory" class="form-select short-select">
-
           <option value="">전체</option>
           <option value="식료품 · 비주류음료">식료품 · 비주류음료</option>
           <option value="주류 · 담배">주류 · 담배</option>
@@ -43,20 +37,7 @@
         </select>
       </div>
 
-
-
-    <!-- 정렬 버튼
-    <div class="sort-options" style="display: flex; align-items: center; margin-top: 20px;">
-      <div class="sort-option-title">정렬</div>
-      <div class="sort-option-btn"@click="sortOrder = 'desc'" :class="{ active: sortOrder === 'desc' }" style="margin-right: 10px;">
-        최신순
       </div>
-      <div class="sort-option-btn"@click="sortOrder = 'asc'" :class="{ active: sortOrder === 'asc' }">
-        오래된순
-      </div>
-    </div> -->
-      </div>
-
       <div v-if="paginatedExpenses.length === 0" class="empty-state">
         등록된 소비가 없어요 <br/>
         나의 소비 내역에 등록해보세요!
@@ -89,14 +70,10 @@
           </tbody>
         </table>
 
-      
       <!-- 페이지네이션 -->
       <Pagination :total="filteredExpenses.length" :page="currentPage" :perPage="itemsPerPage" @update:page="updatePage" />
     </div>
-
   </div>
-
-
     <!-- 소득 탭 -->
 
 <div v-if="selectedTab === 'income'">
@@ -113,17 +90,6 @@
         <option value="보너스">보너스</option>
       </select>
     </div>
-
-    <!-- 정렬 버튼
-    <div class="sort-options" style="display: flex; align-items: center; margin-top: 20px;">
-      <div class="sort-option-title">정렬</div>
-      <div class="sort-option-btn" @click="() => { sortOrder.value = 'desc'; console.log('sortOrder:', sortOrder.value); }" :class="{ active: sortOrder === 'desc' }" style="margin-right: 10px;">
-    최신순
-</div>
-<div class="sort-option-btn" @click="() => { sortOrder.value = 'asc'; console.log('sortOrder:', sortOrder.value); }" :class="{ active: sortOrder === 'asc' }">
-    오래된순
-</div>
-    </div> -->
   </div>
 
   <div v-if="paginatedIncomes.length === 0" class="empty-state">
@@ -173,7 +139,6 @@
     <IncomeDetailModal ref="detailModal" :detail="selectedDetail" @close="switchModalInput"/>
     <IncomeUpdateModal ref="updateModal" :detail="selectedDetail"  @incomeUpdated="IncomeUpdated" @incomeDeleted="incomeDeleted" />
 
-  
     <ConsumeCreateModal ref="createModal2" @outcomeRegistered="fetchExpenses" />
     <ConsumeDetailModal ref="detailModal2" :detail="selectedDetail2" @close="switchModalConsume"/>
     <ConsumeUpdateModal ref="updateModal2"  :detail="selectedDetail2"  @consumeUpdated="consumeUpdated" @consumeDeleted="consumeDeleted"/>
@@ -187,7 +152,6 @@ import Pagination from '@/components/modal/pagenation/Pagenation.vue';
 import IncomeCreateModal from '@/components/modal/budget/IncomeCreateModal.vue'; 
 import IncomeDetailModal from '@/components/modal/budget/IncomeDetailModal.vue';
 import IncomeUpdateModal from '@/components/modal/budget/IncomeUpdateModal.vue'; 
-
 import ConsumeCreateModal from '@/components/modal/budget/ConsumeCreateModal.vue'; 
 import ConsumeDetailModal from '@/components/modal/budget/ConsumeDetailModal.vue';
 import ConsumeUpdateModal from '@/components/modal/budget/ConsumeUpdateModal.vue';
@@ -232,13 +196,9 @@ const categoryMapping = {
 const sortOrder = ref('desc');  // 최신순(desc) 또는 오래된순(asc)을 저장할 변수
 const errorMessage = ref('');
 
-function hoverEffect() {
-  //console.log('Hover effect removed.');
-}
+function hoverEffect() { }
 
-function removeHoverEffect() {
-  //console.log('Hover effect removed.');
-}
+function removeHoverEffect() {}
 // 소비 데이터 불러오기
 const fetchExpenses = async () => {
   try {
@@ -278,12 +238,10 @@ const openEditModal = (income) => {
 };
 //소득 수정
 const IncomeUpdated = async ()=>{
-  console.log("##################################################");
   console.log( selectedDetail.value );
   const response = await axiosInstance.put('/income/update',  selectedDetail.value );
     if (response.data.success) {
       console.log("소득 수정 성공:", response.data);
-      // incomes.value = response.data.response.data;
       fetchIncomes();
       //화면 다시 불러오기 
     } else {
@@ -292,7 +250,6 @@ const IncomeUpdated = async ()=>{
 }
 // 소득 삭제
 const incomeDeleted = async ()=>{
-  console.log("##################################################");
   console.log( selectedDetail.value.incomeId );
   const incomeId =  selectedDetail.value.incomeId;
   console.log(`/income/delete/${incomeId}`);
@@ -310,7 +267,6 @@ const incomeDeleted = async ()=>{
 
 //소비 수정
 const consumeUpdated = async ()=>{
-  console.log("##################################################");
   console.log( selectedDetail2.value );
   const response = await axiosInstance.put('/outcome/update',  selectedDetail2.value );
     if (response.data.success) {
@@ -325,8 +281,6 @@ const consumeUpdated = async ()=>{
 
 //소비 수정
 const consumeDeleted = async ()=>{
-  console.log("##################################################");
-  console.log( selectedDetail2.value );
   const index = selectedDetail2.value.index;
   const response = await axiosInstance.delete(`/outcome/delete/${index}`);
     if (response.data.success) {
@@ -366,12 +320,6 @@ const openUpdateModal = () => {
 };
 
 function switchModalInput(){
-
-  console.log("*****************************");
-  console.log("*****************************");
-  console.log("*****************************");
-  console.log("*****************************");
-  console.log("*****************************");
   //closeDetailModal();
   openUpdateModal();
 }
@@ -392,8 +340,6 @@ function switchModalConsume(){
   openUpdateModal2();
 }
 // 모달 닫기
-// const closeDetailModal = () => detailModal.value?.hide();
-// const closeDetailModal2 = () => detailModal2.value?.hide();
 const outcomeUpdate = (updatedoutcome) => {
   const index = outcome.value.findIndex(outcome => outcome.index === updatedoutcome.index); 
   if (index !== -1) {
