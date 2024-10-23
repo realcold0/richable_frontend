@@ -373,7 +373,7 @@ const renderPieChart2 = async () => {
             spotLuxuryAmount?.value,
             spotEtcAmount?.value
           ],
-          backgroundColor: ['#C30044', '#dda0dd', '#c71585', '#FFF2F6', '#DA0052']
+          backgroundColor: ['#C30044', '#dda0dd', '#c71585', '#FFF2F6','#DA0052']
         }
       ]
     },
@@ -688,6 +688,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 .tab-bar {
   width: 1704px;
   margin-left: 80px;
