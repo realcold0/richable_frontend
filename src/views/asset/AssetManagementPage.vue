@@ -34,182 +34,44 @@
 
     <div class="tab-content">
       <div class="tab-page" v-if="selectedTab === 'tab1'">
-        <div class="total-asset">
-          <div class="asset-title">김리치님의 총 금융 자산 현황 😎</div>
-          <div class="asset-amount">{{ financeTotalAmount.toLocaleString() }} 원</div>
-        </div>
-        <div class="asset-list">
-          <div class="list-title">
-            금융 자산 목록
-            <font-awesome-icon icon="square-plus" style="color: #c30044" @click="openCreateModal" />
-          </div>
-
-          <div class="list-box">
-            <div class="asset-item" @click="openCheckModal('bank')">
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 18px">예/적금</div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 24px; color: #ff0062">
-                  {{ bankAssetAmount.toLocaleString() }}
-                </div>
-                <div style="font-weight: bold; font-size: 18px; color: #8a8aa8; margin-left: 4px">
-                  원
-                </div>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  font-size: 60px;
-                  margin-top: 8px;
-                "
-              >
-                <font-awesome-icon icon="piggy-bank" />
-              </div>
-            </div>
-            <div class="asset-item" @click="openCheckModal('stock')">
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 18px">주식</div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 24px; color: #ff0062">
-                  {{ stockAssetAmount.toLocaleString() }}
-                </div>
-                <div style="font-weight: bold; font-size: 18px; color: #8a8aa8; margin-left: 4px">
-                  원
-                </div>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  font-size: 60px;
-                  margin-top: 8px;
-                "
-              >
-                <font-awesome-icon icon="chart-line" />
-              </div>
-            </div>
-            <div class="asset-item" @click="openCheckModal('bond')">
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 18px">채권</div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 24px; color: #ff0062">
-                  {{ bondAssetAmount.toLocaleString() }}
-                </div>
-                <div style="font-weight: bold; font-size: 18px; color: #8a8aa8; margin-left: 4px">
-                  원
-                </div>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  font-size: 60px;
-                  margin-top: 8px;
-                "
-              >
-                <font-awesome-icon icon="money-check-dollar" />
-              </div>
-            </div>
-            <div class="asset-item" @click="openCheckModal('coin')">
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 18px">코인</div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center">
-                <div style="font-weight: bold; font-size: 24px; color: #ff0062">
-                  {{ coinAssetAmount.toLocaleString() }}
-                </div>
-                <div style="font-weight: bold; font-size: 18px; color: #8a8aa8; margin-left: 4px">
-                  원
-                </div>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  font-size: 60px;
-                  margin-top: 8px;
-                "
-              >
-                <font-awesome-icon icon="fa-brands fa-bitcoin" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="asset-chart">
-          <div class="list-title">총 금융 자산 분포</div>
-          <div class="chart-box">
-            <canvas ref="pieChart"></canvas>
-          </div>
-        </div>
+        <TotalAssetDisplay 
+          asset-type="금융"
+          :amount="financeTotalAmount"
+        />
+        <FinancialAssetList
+          :bank-amount="bankAssetAmount"
+          :stock-amount="stockAssetAmount"
+          :bond-amount="bondAssetAmount"
+          :coin-amount="coinAssetAmount"
+          @open-create="openCreateModal"
+          @open-check="openCheckModal"
+        />
+        <AssetChart 
+          asset-type="금융"
+          :chart-data="[bankAssetAmount, stockAssetAmount, bondAssetAmount, coinAssetAmount]"
+          :chart-labels="['예/적금', '주식', '채권', '코인']"
+        />
       </div>
 
       <div class="tab-page" v-if="selectedTab === 'tab2'">
-        <div class="total-asset">
-          <div class="asset-title">김리치님의 총 현물 자산 현황 😎</div>
-          <div class="asset-amount">{{ spotTotalAmount.toLocaleString() }} 원</div>
-        </div>
-        <div class="asset-list">
-          <div class="list-title">
-            현물 자산 목록
-            <font-awesome-icon
-              icon="square-plus"
-              style="color: #c30044"
-              @click="openCreateModal2"
-            />
-          </div>
-
-          <!-- Carousel for Tangible Assets -->
-          <div class="list-box">
-            <button class="control-btn" @click="prevSlide" :disabled="currentSlide === 0">
-              <font-awesome-icon :icon="['fas', 'chevron-left']" />
-            </button>
-            <div class="carousel-track">
-              <div v-for="(asset, index) in paginatedAssets" :key="index" class="asset-item">
-                <div style="display: flex; flex-direction: row; justify-content: center">
-                  <div class="asset-category">{{ asset.category }}</div>
-                  <div
-                    style="color: #c30044; font-size: 16px; margin-left: 4px"
-                    @click="openEditModal2(asset)"
-                  >
-                    <font-awesome-icon icon="pen-to-square" />
-                  </div>
-                </div>
-
-                <div class="asset-name">{{ asset.name }}</div>
-                <div class="asset-price">
-                  <span class="price">{{ Number(asset.price).toLocaleString() }}</span>
-                  <span class="currency">원</span>
-                </div>
-                <div class="asset-icon">
-                  <font-awesome-icon :icon="getIcon(asset.category)" />
-                </div>
-              </div>
-            </div>
-
-            <button
-              class="control-btn"
-              @click="nextSlide"
-              :disabled="currentSlide === maxSlide - 1"
-            >
-              <font-awesome-icon :icon="['fas', 'chevron-right']" />
-            </button>
-          </div>
-
-          <div class="asset-chart">
-            <div class="list-title">총 현물 자산 분포</div>
-            <div class="chart-box">
-              <canvas ref="pieChart2"></canvas>
-            </div>
-          </div>
-        </div>
+        <TotalAssetDisplay 
+          asset-type="현물"
+          :amount="spotTotalAmount"
+        />
+        <TangibleAssetList
+          :paginated-assets="paginatedAssets"
+          :current-slide="currentSlide"
+          :max-slide="maxSlide"
+          @open-create="openCreateModal2"
+          @open-edit="openEditModal2"
+          @prev-slide="prevSlide"
+          @next-slide="nextSlide"
+        />
+        <AssetChart 
+          asset-type="현물"
+          :chart-data="[spotCarAmount, spotElecAmount, spotBrandAmount, spotLuxuryAmount, spotEtcAmount]"
+          :chart-labels="['자동차', '전자기기', '브랜드', '명품', '기타']"
+        />
       </div>
     </div>
     <AssetCreateModal ref="createModal" 
@@ -241,18 +103,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, nextTick, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import axiosInstance from '@/AxiosInstance'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
-import { Chart, PieController, ArcElement, Tooltip, Legend } from 'chart.js'
 import AssetCreateModal from '../../components/modal/asset/AssetCreateModal.vue'
 import AssetUpdateModal from '../../components/modal/asset/AssetUpdateModal.vue'
 import AssetCheckModal from '../../components/modal/asset/AssetCheckModal.vue'
 import TangibleAssetCreateModal from '../../components/modal/asset/TangibleAssetCreateModal.vue'
 import TangibleAssetUpdateModal from '../../components/modal/asset/TangibleAssetUpdateModal.vue'
-
-// Chart.js에 필요한 컴포넌트(컨트롤러, 요소, 플러그인) 등록
-Chart.register(PieController, ArcElement, Tooltip, Legend)
+import TotalAssetDisplay from '@/components/asset/TotalAssetDisplay.vue'
+import FinancialAssetList from '@/components/asset/FinancialAssetList.vue'
+import TangibleAssetList from '@/components/asset/TangibleAssetList.vue'
+import AssetChart from '@/components/asset/AssetChart.vue'
 
 // 1. 데이터 정의
 const selectedTab = ref('tab1') // 현재 선택된 탭
@@ -286,114 +148,9 @@ const paginatedAssets = computed(() => {
 // 총 슬라이드 개수 계산
 const maxSlide = computed(() => Math.ceil(tangibleAssets.value.length / itemsPerPage))
 
-// 카테고리에 따른 아이콘 매핑
-const getIcon = (category) => {
-  switch (category) {
-    case '자동차':
-      return 'car'
-    case '전자기기':
-      return 'desktop'
-    case '명품':
-      return 'fa-gem'
-    case '브랜드':
-      return 'tags'
-    case '기타':
-      return 'question-circle'
-    default:
-      return 'question-circle'
-  }
-}
-
 // 3. 차트 렌더링 함수 정의
-const pieChart = ref(null)
-const pieChart2 = ref(null)
-let chartInstance = null
-let chartInstance2 = null
-
-// 파이 차트 렌더링 (금융 자산)
-const renderPieChart = async () => {
-  // 데이터가 설정되었는지 먼저 확인
-  await fetchFinanceAmount()
-
-  await nextTick()
-  if (chartInstance) chartInstance.destroy()
-
-  chartInstance = new Chart(pieChart.value, {
-    type: 'doughnut',
-    data: {
-      labels: ['예/적금', '주식', '채권', '코인'],
-      datasets: [
-        {
-          data: [
-            bankAssetAmount?.value,
-            stockAssetAmount?.value,
-            bondAssetAmount?.value,
-            coinAssetAmount?.value
-          ],
-          backgroundColor: ['#C30044', '#dda0dd', '#c71585', '#FFF2F6']
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            boxWidth: 70,
-            padding: 100,
-            font: { size: 14, weight: 'bold' }
-          }
-        }
-      },
-      layout: { padding: { top: 10, bottom: 10 } }
-    }
-  })
-}
-
-// 파이 차트 렌더링 (현물 자산)
-const renderPieChart2 = async () => {
-  await getSpotList()
-
-  await nextTick()
-
-  if (chartInstance2) chartInstance2.destroy()
-
-  chartInstance2 = new Chart(pieChart2.value, {
-    type: 'doughnut',
-    data: {
-      labels: ['자동차', '전자기기', '브랜드', '명품', '기타'],
-      datasets: [
-        {
-          data: [
-            spotCarAmount?.value,
-            spotElecAmount?.value,
-            spotBrandAmount?.value,
-            spotLuxuryAmount?.value,
-            spotEtcAmount?.value
-          ],
-          backgroundColor: ['#C30044', '#dda0dd', '#c71585', '#FFF2F6','#DA0052']
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            boxWidth: 70,
-            padding: 100,
-            font: { size: 14, weight: 'bold' }
-          }
-        }
-      },
-      layout: { padding: { top: 10, bottom: 10 } }
-    }
-  })
-}
+// pieChart, pieChart2 ref 삭제
+// chartInstance, chartInstance2 변수 삭제
 
 // 4. 이벤트 핸들러 정의
 const prevSlide = () => {
@@ -404,7 +161,7 @@ const nextSlide = () => {
   if (currentSlide.value < maxSlide.value - 1) currentSlide.value++
 }
 
-// 툴팁 업데이트
+// 툴팁 데이트
 const updateTooltipMessage = async () => {
   tooltipMessage.value =
     selectedTab.value === 'tab1'
@@ -418,10 +175,10 @@ const updateTooltipMessage = async () => {
 }
 
 // 탭 변경 시 차트 렌더링
-watch(selectedTab, (newTab) => {
-  if (newTab === 'tab1') renderPieChart()
-  else if (newTab === 'tab2') renderPieChart2()
-})
+// watch(selectedTab, (newTab) => {
+//   if (newTab === 'tab1') renderPieChart()
+//   else if (newTab === 'tab2') renderPieChart2()
+// })
 
 
 // 모달 처리
@@ -447,10 +204,8 @@ const openCheckModal = (assetType) => {
 // 자산 추가 처리
 const handleCreateAsset = async (newAsset) => {
     tangibleAssets.value.push({ ...newAsset });
-
-    // 비동기 작업 대기
     await fetchSpotTotalAmount();
-    await renderPieChart2();
+    await getSpotList(); // renderPieChart2() 대신 데이터 갱신
 };
 
 // 자산 수정 처리
@@ -458,19 +213,16 @@ const handleUpdateAsset = async (updatedAsset) => {
   const index = tangibleAssets.value.findIndex((asset) => asset.index === updatedAsset.index);
   if (index !== -1) {
     tangibleAssets.value.splice(index, 1, { ...updatedAsset });
-
-      // 비동기 작업 대기
-      await fetchSpotTotalAmount();
-      await renderPieChart2();
+    await fetchSpotTotalAmount();
+    await getSpotList(); // renderPieChart2() 대신 데이터 갱신
   }
 };
 
 // 자산 삭제 처리
 const handleDeleteAsset = async (deletedAsset) => {
   tangibleAssets.value = tangibleAssets.value.filter((asset) => asset.index !== deletedAsset.index);
-  // 비동기 작업 대기
   await fetchSpotTotalAmount();
-  await renderPieChart2();
+  await getSpotList(); // renderPieChart2() 대신 데이터 갱신
 }
 
 const handleAssetUpdate = async (assetType, updatedAsset) => {
@@ -497,7 +249,7 @@ const handleAssetUpdate = async (assetType, updatedAsset) => {
   await getFinanceList();
   await fetchFinanceAmount();
   await fetchFinanceAssetList();
-  await renderPieChart();
+  // renderPieChart() 제거
 };
 
 const handleAssetDelete = async (assetType, assetIndex) => {
@@ -519,16 +271,16 @@ const handleAssetDelete = async (assetType, assetIndex) => {
   await getFinanceList();
   await fetchFinanceAmount();
   await fetchFinanceAssetList();
-  await renderPieChart();
+  // renderPieChart() 제거
 };
 
 
 const refreshData = async () => {
   console.log("데이터 새로고침 ");
   await fetchFinanceAmount(); 
-  await getFinanceList();// 금융 자산 리스트 다시 불러오기
+  await getFinanceList();
   await fetchFinanceAssetList();
-  await renderPieChart();
+  // renderPieChart() 제거
   console.log("데이터 새로고침 완료");
 }
 
@@ -619,7 +371,7 @@ const spotBrandAmount = ref(0)
 const spotLuxuryAmount = ref(0)
 const spotEtcAmount = ref(0)
 
-// 카테고리별 현물 자산 총합 조회
+// 카테고리별 현물 자산 총��� 조회
 const fetchSpotList = async (category) => {
   try {
 
@@ -683,26 +435,34 @@ onMounted(() => {
   getSpotList() // 현물 자산별 총합 조회
   fetchSpotTotalAmount() // 총 현물 자산 현황 조회
   fetchFinanceSpotList() // 현물 자산별 목록 조회
-  renderPieChart() // 초기 마운트 시 '금융 자산 현황' 차트 렌더링
+  // renderPieChart() 제거
 })
 </script>
 
 <style scoped>
-
 .tab-bar {
-  width: 1704px;
-  margin-left: 80px;
+  max-width: 1704px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 80px;
   position: relative;
+  padding: 0 20px;
 }
 
 .nav-tabs {
   border-bottom: 2px solid #414158;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  padding-right: 60px; /* 툴팁 버튼을 위한 공간 확보 */
 }
 
 .nav-item {
   color: #ccccd6;
-  width: 200px;
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
   height: 57px;
   text-align: center;
   font-size: 18px;
@@ -717,177 +477,57 @@ onMounted(() => {
   border-bottom: 2px solid #414158;
 }
 
-.tooltip-inner {
-  white-space: nowrap !important;
+.nav-item:hover {
+  cursor: pointer;
 }
 
 .tooltip-box {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .tool-btn {
+  background: none;
   border: none;
-  background-color: white;
-  padding-top: 4px;
-  margin-top: 12px;
+  color: #414158;
+  cursor: pointer;
 }
 
 .tab-content {
-  margin-top: 80px;
-  margin-left: 80px;
+  max-width: 1704px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
 }
 
 .tab-page {
+  margin-top: 40px;
 }
 
-.total-asset {
-  background-color: #f9f9f9;
-  max-width: 1704px;
-  height: 150px;
-  border-radius: 20px;
-  border: 1px solid #f8f8f8;
-  text-align: center;
-}
-.asset-title {
-  font-size: 20px;
-  margin-top: 36px;
-  margin-bottom: 10px;
+/* 반응형 스타일 추가 */
+@media (max-width: 768px) {
+  .nav-item {
+    min-width: 120px;
+    font-size: 16px;
+  }
+  
+  .tooltip-box {
+    right: -10px;
+  }
 }
 
-.asset-amount {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 36.5px;
-}
-
-.asset-list {
-  margin-top: 117px;
-}
-
-.list-title {
-  margin: 24px auto;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.list-box {
-  display: flex;
-  background-color: #fff2f6;
-  border-radius: 10px;
-  max-width: 1704px;
-  height: 244px;
-  margin-bottom: 44px;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 27px; /* 왼쪽 여백 */
-  padding-right: 27px; /* 오른쪽 여백 */
-}
-
-.asset-item {
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  height: 190px;
-  background-color: white;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
-  border-radius: 20px;
-  padding-top: 28px;
-}
-
-.chart-box {
-  max-width: 1704px;
-  height: 620px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 100px;
-  padding-bottom: 42.5px;
-}
-
-.asset-chart {
-  position: relative;
-  margin-top: 44px;
-  padding-bottom: 80px;
-}
-
-.list-box {
-  position: relative;
-  overflow: hidden;
-}
-
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s ease;
-}
-
-.asset-item {
-  width: 300px;
-  height: 200px;
-  background-color: white;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
-  border-radius: 20px;
-  padding: 20px;
-  margin-right: 20px;
-  text-align: center;
-}
-
-.asset-category {
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.asset-name {
-  font-size: 18px;
-  margin-top: 0px;
-}
-
-.asset-price {
-  margin-top: 0px;
-  font-weight: bold;
-  font-size: 24px;
-  color: #ff0062;
-}
-
-.price {
-  margin-right: 4px;
-}
-
-.currency {
-  font-size: 18px;
-  color: #8a8aa8;
-}
-
-.asset-icon {
-  font-size: 50px;
-  margin-top: 0px;
-}
-
-.carousel-controls {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.control-btn {
-  background-color: #c30044;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.control-btn:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
-.control-btn:hover:not(:disabled) {
-  background-color: #ff0055;
+@media (max-width: 576px) {
+  .nav-item {
+    min-width: 100px;
+    font-size: 14px;
+  }
+  
+  .tool-btn {
+    font-size: 20px;
+  }
 }
 </style>
 
@@ -902,3 +542,11 @@ body {
   font-size: 12px;
 }
 </style>
+
+
+
+
+
+
+
+
