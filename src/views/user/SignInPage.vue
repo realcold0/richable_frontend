@@ -78,14 +78,16 @@ const setAuthToken = (key, value) =>
 
 const naverLogin = async () => {
   try {
+    // 기존 토큰 제거
+    localStorage.removeItem('authToken')
     const response = await axiosinstance.get(`/member/naverlogin`)
-    console.log('Naver login response:', response.data)
+    
     if (response.data.success && response.data.response?.data?.redirectUrl) {
+      // 네이버 state 저장
       localStorage.setItem('naverState', response.data.response.data.state)
       window.location.href = response.data.response.data.redirectUrl
     } else {
-      console.error('Invalid response format:', response.data)
-      alert('네이버 로그인을 시작하는 데 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+      throw new Error('Invalid response format')
     }
   } catch (error) {
     console.error('Naver login initiation failed:', error)

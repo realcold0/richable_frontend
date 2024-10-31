@@ -4,9 +4,25 @@ import axiosInstance from '@/AxiosInstance'; // Axios 인스턴스를 불러옵�
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     userProfile: null,
-    isLoggedIn: false,
+    isLoggedIn: false, 
   }),
   actions: {
+    async handleNaverLogin(token) {
+      try {
+        // 기존 토큰 제거
+        this.clearAuth()
+        // 새 토큰 설정
+        localStorage.setItem('authToken', token)
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        // 사용자 정보 가져오기
+        await this.fetchUserProfile()
+        return true
+      } catch (error) {
+        console.error('Naver login handling error:', error)
+        this.clearAuth()
+        throw error
+      }
+    },
     async fetchUserProfile() {
       const token = localStorage.getItem('authToken');
       if (token) {
